@@ -11,6 +11,12 @@ a {
   text-decoration: none;
 }
 
+
+a:hover{
+  color: "blue";
+  text-decoration: underline;
+}
+
 * {
   box-sizing: border-box;
 }
