@@ -122,7 +122,7 @@ export const ComicCard = ({
   return (
     <Paper elevation={1} sx={{ display: "flex", width: "100%" }}>
       {type == "carousel" && (
-        <Box sx={{ p: 1 }}>
+        <Box sx={{ p: 1, minWidth: "100%" }}>
           <Image
             src="https://cdn.gudangkomik.com/eleceed/thumb.jpg?width=240"
             height={320}

@@ -190,7 +190,15 @@ function Slug({ router }: WithRouterProps) {
               </Button>
             </Box>
             <Divider orientation="vertical" flexItem />
-            <Stack direction="row">
+            <Stack
+              direction="row"
+              sx={{
+                display: {
+                  xs: "none",
+                  md: "flex",
+                },
+              }}
+            >
               {[...Array(10)].map((_, i) => (
                 <Chip
                   sx={{ mx: 0.5 }}

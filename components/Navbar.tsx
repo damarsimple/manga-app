@@ -94,51 +94,63 @@ export default function Navbar() {
                 </a>
               </Link>
               <Box sx={{ display: { xs: "flex", md: "none" } }}>
-                <Image
-                  src="https://gudangkomik.com/android-icon-48x48.png"
-                  width={48}
-                  height={48}
-                  alt="logo"
-                />
+                <Link href="/">
+                  <a>
+                    <Image
+                      src="https://gudangkomik.com/android-icon-48x48.png"
+                      width={48}
+                      height={48}
+                      alt="logo"
+                    />
+                  </a>
+                </Link>
               </Box>
             </IconButton>
-            <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <Box
+              sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
+            >
               {["Manga", "Manhwa", "Manhua"].map((e) => (
-                <Box
-                  key={e}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    sx={{ mr: 2 }}
-                  >
-                    <Typography
-                      fontWeight={900}
-                      variant="body1"
-                      textTransform="uppercase"
+                <Link key={e} href={`/list/comic/${e.toLowerCase()}`}>
+                  <a>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
-                      {e}
-                    </Typography>
-                  </IconButton>
-                </Box>
+                      <IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        sx={{ mr: 2 }}
+                      >
+                        <Typography
+                          fontWeight={900}
+                          variant="body1"
+                          textTransform="uppercase"
+                        >
+                          {e}
+                        </Typography>
+                      </IconButton>
+                    </Box>
+                  </a>
+                </Link>
               ))}
             </Box>
             <Box display="flex" alignItems="center" gap={1}>
-              <Search>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Cari Komik.."
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
+              <form method="GET" action="/list/comic/search">
+                <Search>
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    placeholder="Cari Komik.."
+                    inputProps={{ "aria-label": "search" }}
+                    name="q"
+                  />
+                </Search>
+              </form>
               <Box display="flex" alignItems="center" gap={0.2}>
                 <IconButton sx={{ ml: 1 }} onClick={toggle} color="inherit">
                   {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -166,29 +178,33 @@ export default function Navbar() {
             }}
           >
             {["Manga", "Manhwa", "Manhua"].map((e) => (
-              <Box
-                key={e}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <IconButton
-                  size="large"
-                  edge="start"
-                  color="inherit"
-                  sx={{ mr: 2 }}
-                >
-                  <Typography
-                    fontWeight={900}
-                    variant="body1"
-                    textTransform="uppercase"
+              <Link key={e} href={`/list/comic/${e.toLowerCase()}`}>
+                <a>
+                  <Box
+                    key={e}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    {e}
-                  </Typography>
-                </IconButton>
-              </Box>
+                    <IconButton
+                      size="large"
+                      edge="start"
+                      color="inherit"
+                      sx={{ mr: 2 }}
+                    >
+                      <Typography
+                        fontWeight={900}
+                        variant="body1"
+                        textTransform="uppercase"
+                      >
+                        {e}
+                      </Typography>
+                    </IconButton>
+                  </Box>
+                </a>
+              </Link>
             ))}
           </Box>
         </AppBar>
@@ -212,7 +228,15 @@ export default function Navbar() {
         <MenuItem onClick={handleClose}>Profile</MenuItem>
         <MenuItem onClick={handleClose}>Logout</MenuItem>
       </Menu>
-      {!transparentMode && <Box pt={10} />}
+      {!transparentMode && (
+        <Box
+          pt={{
+            xs: 20,
+            md: 10,
+            lg: 12,
+          }}
+        />
+      )}
     </>
   );
 }
