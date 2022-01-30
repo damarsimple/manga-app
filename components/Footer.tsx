@@ -1,7 +1,11 @@
 import React from 'react';
-import { Container } from '@mui/material';
+import { Container, useTheme } from '@mui/material';
 export default function Footer() {
-    return <Container sx={{ backgroundColor: "white" }}>
+
+    const theme = useTheme();
+    const { mode } = theme.palette
+
+    return <Container sx={{ backgroundColor: mode == "dark" ? "#111827" : "white", color: mode == "dark" ? "white" : "black" }}>
         <>
             <h1>
                 <strong>
