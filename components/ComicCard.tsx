@@ -50,7 +50,9 @@ export const ComicCard = ({
           display="flex"
           justifyContent="space-between"
           pt={1}
-          flexDirection={{ xs: "column", md: "row" }}
+          flexDirection={
+            layout != "detailed" ? { xs: "column", md: "row" } : undefined
+          }
           alignItems="center"
           gap={1}
         >
@@ -195,8 +197,8 @@ export const ComicCard = ({
             <a>
               <Image
                 src={fallback + "?width=240"}
-                height={400}
-                width={"100%"}
+                height={600}
+                width={500}
                 alt={name}
               />
             </a>
@@ -213,8 +215,8 @@ export const ComicCard = ({
             <a>
               <Image
                 src={fallback + "?width=240"}
-                height={320}
-                width={"100%"}
+                height={600}
+                width={500}
                 alt={name}
               />
             </a>

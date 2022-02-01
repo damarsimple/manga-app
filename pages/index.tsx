@@ -151,7 +151,6 @@ const Home = ({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
-
   const { data: { findManyComic: carousel } = {} } = await client.query<{
     findManyComic: Model["Comic"][];
   }>({
