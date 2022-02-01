@@ -176,7 +176,7 @@ export const ComicCard = ({
           sx={{
             height: {
               sx: 40,
-              sm: 70,
+              sm: 60,
             },
             // whiteSpace: "nowrap",
             overflow: "hidden",
@@ -184,7 +184,7 @@ export const ComicCard = ({
             lineClamp: 4,
             fontSize: {
               xs: "1rem",
-              sm: "1.5rem",
+              sm: "1.3rem",
             },
           }}
         >
