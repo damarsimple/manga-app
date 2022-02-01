@@ -31,6 +31,7 @@ export const ComicCard = ({
   lastChapterUpdateAt,
   isFirst,
   rating,
+  isHentai,
   layout = "detailed",
 }: ComicCardProps) => {
   const { push } = useRouter();
@@ -189,6 +190,20 @@ export const ComicCard = ({
             },
           }}
         >
+          {isHentai && (
+            <Box
+              component="span"
+              sx={{
+                height: "100%",
+                width: "100%",
+                color: "white",
+                backgroundColor: "red",
+                p: 0.5,
+              }}
+            >
+              18+
+            </Box>
+          )}{" "}
           {name}
         </Typography>
       </a>

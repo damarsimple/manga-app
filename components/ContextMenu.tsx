@@ -52,7 +52,7 @@ export default function ContextMenu() {
         {
           label: "Adult R18+",
           path: "/r18/active",
-          color: mode ? "error" : "secondary",
+          color: mode ? "success" : "error",
         },
       ].map(({ label, path, color }) => (
         <Link href={path} key={label}>
