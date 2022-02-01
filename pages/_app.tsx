@@ -6,7 +6,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import type { AppProps } from "next/app";
-import { Box, ThemeProvider, createTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import Footer from "../components/Footer";
 import { useColorMode } from "../stores/colorMode";
 import Navbar from "../components/Navbar";
@@ -17,6 +17,9 @@ import NextNProgress from "nextjs-progressbar";
 import ContextMenu from "../components/ContextMenu";
 import Head from "next/head";
 import { useEffect, useState } from "react";
+
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
 function MyApp({ Component, pageProps }: AppProps) {
   const { mode: modeStore } = useColorMode();
 

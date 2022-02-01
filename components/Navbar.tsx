@@ -163,11 +163,7 @@ export default function Navbar() {
                 sx={{ mr: 2 }}
                 onClick={(e) => setAccountEl(e.currentTarget)}
               >
-                <Avatar
-                  alt="Remy Sharp"
-                  src="/static/images/avatar/1.jpg"
-                  sx={{ width: 48, height: 48 }}
-                />
+                <Avatar alt="Remy Sharp" sx={{ width: 48, height: 48 }} />
               </IconButton>
             </Box>
           </Box>

@@ -1,5 +1,4 @@
 import {
-  capitalize,
   Box,
   Paper,
   Typography,
@@ -16,6 +15,10 @@ import { Model } from "../types";
 import { ComicCard } from "./ComicCard";
 import { useRouter } from "next/router";
 
+function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export default function SearchComicContainer({
   comics,
   context,
@@ -29,7 +32,7 @@ export default function SearchComicContainer({
 }) {
   const { push } = useRouter();
   const [type, setType] = useState<undefined | string>(
-    capitalize(title as string)
+    capitalizeFirstLetter(title as string)
   );
   const [mode, setMode] = useState(title == "all" ? "Text Mode" : "Card Mode");
 
