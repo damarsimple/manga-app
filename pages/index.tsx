@@ -185,7 +185,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           slug
           isHentai
           viewsWeek
-          lastChapterUpdateAt
           chapters(take: $chaptersTake2, orderBy: $orderBy) {
             id
             name
@@ -197,9 +196,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     variables: {
       take: 10,
       chaptersTake2: 1,
-      orderBy: {
-        lastChapterUpdateAt: "desc",
-      },
+      orderBy: [
+        {
+          lastChapterUpdateAt: "desc",
+        },
+      ],
       findManyComicOrderBy2: [
         {
           viewsWeek: "desc",
@@ -242,7 +243,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             slug
           }
           viewsWeek
-          lastChapterUpdateAt
           genres {
             id
             name
@@ -262,9 +262,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     variables: {
       take: 10,
       chaptersTake2: 1,
-      orderBy: {
-        lastChapterUpdateAt: "desc",
-      },
+      orderBy: [
+        {
+          lastChapterUpdateAt: "desc",
+        },
+      ],
       findManyComicOrderBy2: [
         {
           rating: "desc",
@@ -302,7 +304,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           isHentai
           viewsWeek
 
-          lastChapterUpdateAt
           chapters(take: $chaptersTake2, orderBy: $orderBy) {
             id
             name
@@ -317,9 +318,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     variables: {
       take: 48,
       chaptersTake2: 3,
-      orderBy: {
-        lastChapterUpdateAt: "desc",
-      },
+      orderBy: [
+        {
+          lastChapterUpdateAt: "desc",
+        },
+      ],
       findManyComicOrderBy2: [
         {
           rating: "desc",
