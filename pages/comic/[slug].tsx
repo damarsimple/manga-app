@@ -453,7 +453,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   return {
-    statusCode: Boolean(findFirstComic) ? 200 : 404,
+    notFound: Boolean(findFirstComic),
     props: {
       comic: findFirstComic,
     },
