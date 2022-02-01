@@ -448,12 +448,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
-  if (!Boolean(findFirstComic)) {
-    console.log(`Comic not found: ${slug} 404`);
-  }
-
   return {
-    notFound: Boolean(findFirstComic),
+    notFound: !findFirstComic,
     props: {
       comic: findFirstComic,
     },

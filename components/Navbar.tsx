@@ -84,12 +84,7 @@ export default function Navbar() {
               <Link href="/">
                 <a>
                   <Box sx={{ display: { xs: "none", md: "flex" } }}>
-                    <Image
-                      src="/img/logo.png"
-                      width={250}
-                      height={50}
-                      alt="logo"
-                    />
+                    <Image src="/logo.png" width={250} height={50} alt="logo" />
                   </Box>
                 </a>
               </Link>
