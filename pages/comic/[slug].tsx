@@ -43,9 +43,10 @@ import { SEO } from "../../modules/seo";
 
 interface SlugPageProps extends WithRouterProps {
   comic: Model["Comic"];
+  top: Model["Comic"][];
 }
 
-function Slug({ router, comic }: SlugPageProps) {
+function Slug({ top, router, comic }: SlugPageProps) {
   const [chapMode, setChapMode] = useState<"grid" | "list">("list");
   const { setTransparent, setTransparentMode } = useNavbarStore();
 
@@ -376,9 +377,9 @@ function Slug({ router, comic }: SlugPageProps) {
           >
             <Typography variant="h5">Rekomendasi</Typography>
             <Divider />
-            {/* {[...Array(6)].map((_, i) => (
-              <ComicCard key={i} layout="top" />
-            ))} */}
+            {top.map((e, i) => (
+              <ComicCard {...e} key={e.id} layout="top" />
+            ))}
           </Paper>
         </Grid>
       </Grid>
@@ -388,6 +389,72 @@ function Slug({ router, comic }: SlugPageProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.query;
+  const allowHentai = context.req.cookies.r18 == "enable" ?? false;
+
+  const { data: { findManyComic: top } = {} } = await client.query<{
+    findManyComic: Model["Comic"][];
+  }>({
+    query: gql`
+      query TopComic(
+        $take: Int
+        $chaptersTake2: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          rating
+          isHentai
+          author {
+            id
+            name
+            slug
+          }
+          viewsWeek
+          lastChapterUpdateAt
+          genres {
+            id
+            name
+            slug
+          }
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+          _count {
+            chapters
+          }
+        }
+      }
+    `,
+    variables: {
+      take: 10,
+      chaptersTake2: 1,
+      orderBy: {
+        createdAt: "desc",
+      },
+      findManyComicOrderBy2: [
+        {
+          rating: "desc",
+        },
+      ],
+      where: {
+        isHentai: {
+          equals: allowHentai,
+        },
+      },
+    },
+  });
 
   const { data: { findFirstComic } = {} } = await client.query<{
     findFirstComic: Model["Comic"];
