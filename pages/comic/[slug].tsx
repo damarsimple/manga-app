@@ -277,7 +277,7 @@ function Slug({ router, comic }: SlugPageProps) {
             sx={{ m: 0.5 }}
             key={e.id}
             label={e.name}
-            onClick={() => push("/list/genre/" + e.name)}
+            onClick={() => push("/list/genre/" + e.slug)}
           />
         ))}
       </Paper>
