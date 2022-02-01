@@ -19,26 +19,26 @@ import { gql } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import SearchComicContainer from "../../../components/SearchComicContainer";
 
-interface GenrePageProps extends WithRouterProps {
-  genres: Model["Genre"][];
+interface AuthorPageProps extends WithRouterProps {
+  authors: Model["Author"][];
   comics: Model["Comic"][];
 }
 
-function Catch({ comics, genres, router }: GenrePageProps) {
+function Catch({ comics, authors, router }: AuthorPageProps) {
   const { getall, q } = router.query;
 
   const getSortedObject = () => {
     const a = 65;
     const z = 91;
 
-    const map: Record<string, Model["Genre"][]> = {};
+    const map: Record<string, Model["Author"][]> = {};
     map["*"] = [];
 
     for (let i = a; i <= z; i++) {
       map[String.fromCharCode(i)] = [];
     }
 
-    genres.forEach((item) => {
+    authors.forEach((item) => {
       const firstLetter = item.name.charAt(0).toUpperCase();
 
       if (!map[firstLetter]) {
@@ -60,7 +60,7 @@ function Catch({ comics, genres, router }: GenrePageProps) {
       <Paper sx={{ p: 1 }}>
         <Box sx={{ display: "flex" }}>
           <Typography variant="h5">
-            Daftar Komik Genre {(getall as string)?.toUpperCase()}
+            Daftar Komik Author {(getall as string)?.toUpperCase()}
           </Typography>
         </Box>
         <Box>
@@ -72,7 +72,7 @@ function Catch({ comics, genres, router }: GenrePageProps) {
                   <Grid container spacing={1} sx={{ mt: 2 }}>
                     {sorted[e].map((e, i) => (
                       <Grid item xs={6} sm={3} lg={2} key={e.id}>
-                        <Link href={"/list/genre/" + e.slug}>
+                        <Link href={"/list/author/" + e.slug}>
                           <a>
                             <Typography variant="body1">{e.name}</Typography>
                           </a>
@@ -101,17 +101,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
   const { getall, q } = context.query;
 
-  let genres: Model["Genre"][] = [];
+  let authors: Model["Author"][] = [];
   let comics: Model["Comic"][] = [];
 
   if (getall == "all") {
     await client
       .query<{
-        findManyGenre: Model["Genre"][];
+        findManyAuthor: Model["Author"][];
       }>({
         query: gql`
-          query FindManyGenre($take: Int) {
-            findManyGenre(take: $take) {
+          query FindManyAuthor($take: Int) {
+            findManyAuthor(take: $take) {
               id
               name
               slug
@@ -120,21 +120,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         `,
       })
       .then(({ data }) => {
-        genres = data.findManyGenre;
+        authors = data.findManyAuthor;
       });
   } else {
     await client
       .query<{
-        findFirstGenre: Model["Genre"];
+        findFirstAuthor: Model["Author"];
       }>({
         query: gql`
-          query findFirstGenre(
-            $where: GenreWhereInput
+          query findFirstAuthor(
+            $where: AuthorWhereInput
             $take: Int
             $chaptersTake2: Int
             $comicsWhere2: ComicWhereInput
           ) {
-            findFirstGenre(where: $where) {
+            findFirstAuthor(where: $where) {
               id
               name
               comics(take: $take, where: $comicsWhere2) {
@@ -168,13 +168,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       })
       .then(({ data }) => {
-        comics = data.findFirstGenre.comics as Model["Comic"][];
+        comics = data.findFirstAuthor.comics as Model["Comic"][];
       });
   }
 
   return {
     props: {
-      genres,
+      authors,
       comics,
     },
   };

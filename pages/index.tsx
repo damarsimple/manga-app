@@ -14,52 +14,25 @@ import "swiper/css/pagination";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
-import Navbar from "../components/Navbar";
 import { ComicCard } from "../components/ComicCard";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { client } from "../modules/client";
+import { gql } from "@apollo/client";
+import { Model } from "../types";
+import { NextSeo } from "next-seo";
+import { SEO } from "../modules/seo";
 
-const Home: NextPage = () => {
-  const { push } = useRouter();
-
+const Home = ({
+  carousel,
+  top,
+  latest,
+}: {
+  top: Model["Comic"][];
+  latest: Model["Comic"][];
+  carousel: Model["Comic"][];
+}) => {
   return (
     <Box p={2} display="flex" gap={2} flexDirection={"column"}>
-      <Paper sx={{ p: 1 }}>
-        {[
-          {
-            label: "Terbaru",
-            path: "/list/comic/terbaru",
-          },
-          {
-            label: "Hot",
-            path: "/list/comic/hot",
-          },
-          {
-            label: "Rekomendasi",
-            path: "/list/comic/rekomendasi",
-          },
-          {
-            label: "Daftar Isi",
-            path: "/list/comic/all",
-          },
-          {
-            label: "Daftar Genre",
-            path: "/list/genre/all",
-          },
-          {
-            label: "Adult R18+",
-            path: "/r18/active",
-            color: "danger",
-          },
-        ].map(({ label, path, color }) => (
-          <Link href={path} key={label}>
-            <a>
-              <Chip sx={{ m: 0.5 }} label={label} onClick={() => push(path)} />
-            </a>
-          </Link>
-        ))}
-      </Paper>
-
+      <NextSeo {...SEO} />
       <Paper sx={{ p: 4 }}>
         <Swiper
           pagination
@@ -83,9 +56,9 @@ const Home: NextPage = () => {
           }}
           style={{ paddingBottom: 30 }}
         >
-          {[...Array(10)].map((_, i) => (
+          {carousel.map((e, i) => (
             <SwiperSlide key={i}>
-              <ComicCard type="carousel" />
+              <ComicCard {...e} layout="carousel" />
             </SwiperSlide>
           ))}
         </Swiper>
@@ -105,20 +78,20 @@ const Home: NextPage = () => {
                 sm: 0.5,
                 md: 1,
                 lg: 3,
-                xl: 10,
+                xl: 4,
               }}
             >
               <Grid container spacing={3}>
-                {[...Array(36)].map((_, i) => (
-                  <Grid item sm={12} lg={6} xl={3} key={i} width="100%">
-                    <ComicCard type="detailed" />
+                {latest.map((e, i) => (
+                  <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
+                    <ComicCard {...e} layout="detailed" key={e.id} />
                   </Grid>
                 ))}
               </Grid>
             </Box>
           </Paper>
 
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, mt: 2 }}>
             <Typography variant="h5" component="h3">
               KOMIK REKOMENDASI
             </Typography>
@@ -130,13 +103,13 @@ const Home: NextPage = () => {
                 sm: 0.5,
                 md: 1,
                 lg: 3,
-                xl: 10,
+                xl: 4,
               }}
             >
               <Grid container spacing={3}>
-                {[...Array(36)].map((_, i) => (
-                  <Grid item sm={12} lg={6} xl={3} key={i} width="100%">
-                    <ComicCard type="detailed" />
+                {latest.map((e, i) => (
+                  <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
+                    <ComicCard {...e} layout="detailed" key={e.id} />
                   </Grid>
                 ))}
               </Grid>
@@ -151,9 +124,9 @@ const Home: NextPage = () => {
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Grid container spacing={1}>
-              {[...Array(5)].map((_, i) => (
+              {top.map((e, i) => (
                 <Grid item xs={6} sm={12} key={i} width="100%">
-                  <ComicCard type="top" isFirst={i == 0} />
+                  <ComicCard {...e} layout="top" isFirst={i == 0} key={e.id} />
                 </Grid>
               ))}
               <Grid item xs={6} sm={12} width="100%">
@@ -177,8 +150,184 @@ const Home: NextPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const allowHentai = context.req.cookies.r18 == "enable" ?? false;
+
+  const { data: { findManyComic: carousel } = {} } = await client.query<{
+    findManyComic: Model["Comic"][];
+  }>({
+    query: gql`
+      query CarouselComic(
+        $take: Int
+        $chaptersTake2: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          isHentai
+          viewsWeek
+          lastChapterUpdateAt
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+        }
+      }
+    `,
+    variables: {
+      take: 10,
+      chaptersTake2: 1,
+      orderBy: {
+        createdAt: "desc",
+      },
+      findManyComicOrderBy2: [
+        {
+          viewsWeek: "desc",
+        },
+      ],
+      where: {
+        isHentai: {
+          equals: allowHentai,
+        },
+      },
+    },
+  });
+
+  const { data: { findManyComic: top } = {} } = await client.query<{
+    findManyComic: Model["Comic"][];
+  }>({
+    query: gql`
+      query TopComic(
+        $take: Int
+        $chaptersTake2: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          rating
+          isHentai
+          author {
+            id
+            name
+            slug
+          }
+          viewsWeek
+          lastChapterUpdateAt
+          genres {
+            id
+            name
+            slug
+          }
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+          _count {
+            chapters
+          }
+        }
+      }
+    `,
+    variables: {
+      take: 10,
+      chaptersTake2: 1,
+      orderBy: {
+        createdAt: "desc",
+      },
+      findManyComicOrderBy2: [
+        {
+          rating: "desc",
+        },
+      ],
+      where: {
+        isHentai: {
+          equals: allowHentai,
+        },
+      },
+    },
+  });
+
+  const { data: { findManyComic: latest } = {} } = await client.query<{
+    findManyComic: Model["Comic"][];
+  }>({
+    query: gql`
+      query TopComic(
+        $take: Int
+        $chaptersTake2: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          isHentai
+          viewsWeek
+
+          lastChapterUpdateAt
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+          _count {
+            chapters
+          }
+        }
+      }
+    `,
+    variables: {
+      take: 10,
+      chaptersTake2: 3,
+      orderBy: {
+        createdAt: "desc",
+      },
+      findManyComicOrderBy2: [
+        {
+          rating: "desc",
+        },
+      ],
+      where: {
+        isHentai: {
+          equals: allowHentai,
+        },
+      },
+    },
+  });
   return {
-    props: {},
+    props: {
+      carousel,
+      top,
+      latest,
+    },
   };
 };
 

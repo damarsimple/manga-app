@@ -13,82 +13,130 @@ import {
 import { ComicCard } from "../../../components/ComicCard";
 import { useState } from "react";
 import Link from "next/link";
+import { NextSeo } from "next-seo";
+import { SEO } from "../../../modules/seo";
+import { client } from "../../../modules/client";
+import { GetServerSideProps } from "next";
+import { gql } from "@apollo/client";
+import { Model } from "../../../types";
+import SearchComicContainer from "../../../components/SearchComicContainer";
 
-function Catch({ router }: WithRouterProps) {
+interface GetPageProp extends WithRouterProps {
+  result: Model["Comic"][];
+}
+
+const capitalize = (s: string) => {
+  return s[0].toUpperCase() + s.slice(1);
+};
+
+function Catch({ result, router }: GetPageProp) {
   const { getall, q } = router.query;
+  const { push } = router;
 
-  const [type, setType] = useState<undefined | string>();
-  const [mode, setMode] = useState(getall == "all" ? "Text Mode" : "Card Mode");
   return (
-    <Box sx={{ m: 1 }}>
-      <Paper sx={{ p: 1 }}>
-        <Box sx={{ display: "flex" }}>
-          <Typography variant="h5">
-            Daftar Komik {(getall as string)?.toUpperCase()}
-          </Typography>
-        </Box>
-        {getall !== "all" && (
-          <>
-            <Divider sx={{ my: 1 }} />
-            {["Manga", "Manhwa", "Manhua"].map((e) => (
-              <Chip
-                label={e}
-                key={e}
-                sx={{ mx: 0.2 }}
-                color={e == type ? "primary" : "secondary"}
-                onClick={() => setType(e == type ? undefined : e)}
-              />
-            ))}
-            <Divider sx={{ my: 1 }} />
-            {["Card Mode", "Text Mode"].map((e) => (
-              <Chip
-                label={e}
-                key={e}
-                sx={{ mx: 0.2 }}
-                color={e == mode ? "primary" : "secondary"}
-                onClick={() => setMode(e)}
-              />
-            ))}
-            <Divider sx={{ my: 1 }} />
-          </>
-        )}
-        <TextField label="Cari Komik" size="small" fullWidth />
-        <Divider sx={{ my: 1 }} />
-        {mode == "Card Mode" && getall !== "all" ? (
-          <>
-            <Grid
-              spacing={1}
-              container
-              sx={{ pt: 2, px: { xs: undefined, md: 10 } }}
-            >
-              {[...Array(10)].map((e, i) => (
-                <Grid item key={i} xs={6} sm={3} lg={2}>
-                  <ComicCard type="carousel" />
-                </Grid>
-              ))}
-            </Grid>
-          </>
-        ) : (
-          <Box>
-            <Box>
-              <Typography variant="h5">A</Typography>
-              <Grid container spacing={1}>
-                {[...Array(10)].map((e, i) => (
-                  <Grid item xs={6} sm={3} lg={2} key={i}>
-                    <Link href="/comic/[id]">
-                      <a>
-                        <Typography variant="body1">Naruto</Typography>
-                      </a>
-                    </Link>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Box>
-        )}
-      </Paper>
-    </Box>
+    <SearchComicContainer
+      title={getall as string}
+      query={q as string}
+      comics={result}
+      context="comic"
+    />
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const allowHentai = context.req.cookies.r18 == "enable" ?? false;
+  const { getall, q } = context.query;
+
+  let query = gql`
+    query Search(
+      $take: Int
+      $where: ComicWhereInput
+      $chaptersTake2: Int
+      $orderBy: [ComicOrderByWithRelationInput]
+    ) {
+      findManyComic(take: $take, where: $where, orderBy: $orderBy) {
+        id
+        slug
+        name
+        chapters(take: $chaptersTake2) {
+          id
+          name
+          createdAt
+        }
+        thumb
+      }
+    }
+  `;
+
+  const variables: any = {
+    where: {
+      isHentai: {
+        equals: allowHentai,
+      },
+      name: {
+        contains: q ?? undefined,
+      },
+      type: {},
+    },
+    take: 18,
+    chaptersTake2: 1,
+  };
+
+  if (getall == "all") {
+    variables.take = 9999999;
+    variables.chaptersTake2 = undefined;
+    query = gql`
+      query Search(
+        $take: Int
+        $where: ComicWhereInput
+        $orderBy: [ComicOrderByWithRelationInput]
+      ) {
+        findManyComic(take: $take, where: $where, orderBy: $orderBy) {
+          id
+          slug
+          name
+        }
+      }
+    `;
+  }
+
+  switch (getall) {
+    case "manga":
+    case "manhwa":
+    case "manhua":
+      variables.where.type = {
+        equals: getall,
+      };
+      break;
+    case "all":
+      variables.take = 9999999;
+      break;
+    case "rekomendasi":
+      // implement recomendation ....
+      // variables.take = 9999999;
+      break;
+    case "terbaru":
+      variables.orderBy = [
+        {
+          createdAt: "desc",
+        },
+      ];
+      break;
+    default:
+      break;
+  }
+
+  const { data: { findManyComic: result } = {} } = await client.query<{
+    findManyComic: Model["Comic"][];
+  }>({
+    query,
+    variables,
+  });
+  return {
+    props: {
+      result,
+    },
+  };
+};
 
 export default withRouter(Catch);
