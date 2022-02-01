@@ -174,11 +174,18 @@ export const ComicCard = ({
         <Typography
           variant={"h5"}
           sx={{
-            height: 70,
+            height: {
+              sx: 40,
+              sm: 70,
+            },
             // whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
             lineClamp: 4,
+            fontSize: {
+              xs: "1rem",
+              sm: "1.5rem",
+            },
           }}
         >
           {name}
