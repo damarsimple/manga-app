@@ -46,7 +46,7 @@ export default function ContextMenu() {
           path: "/list/genre/all",
         },
         {
-          label: "Daftar Genre",
+          label: "Daftar Author",
           path: "/list/author/all",
         },
         {
