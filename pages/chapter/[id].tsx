@@ -84,6 +84,37 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     if (imageIndex > 0) setImageIndex((i) => i - 1);
   };
 
+  const nextChapter = () => {
+    let idx = 0;
+    //@ts-ignore
+    for (const x of comic.chapters) {
+      if (x.id == chapter.id) {
+        const next = comic.chapters[idx + 1];
+
+        if (next) {
+          push(`/chapter/${next.id}`);
+        }
+      }
+
+      idx++;
+    }
+  };
+  const prevChapter = () => {
+    let idx = 0;
+
+    //@ts-ignore
+    for (const x of comic.chapters) {
+      if (x.id == chapter.id) {
+        const prev = comic.chapters[idx - 1];
+        if (prev) {
+          push(`/chapter/${prev.id}`);
+        }
+      }
+
+      idx++;
+    }
+  };
+
   const Header = () => (
     <Paper sx={{ mb: 1 }}>
       <Box>
@@ -100,7 +131,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
             p: 1,
           }}
         >
-          <IconButton>
+          <IconButton onClick={prevChapter}>
             <NavigateBefore />
           </IconButton>
           {/* <Typography
@@ -132,7 +163,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
                 ))}
             </Select>
           </FormControl>
-          <IconButton>
+          <IconButton onClick={nextChapter}>
             <NavigateNext />
           </IconButton>
         </Box>

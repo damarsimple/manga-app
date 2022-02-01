@@ -117,6 +117,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                zIndex: 50,
               }}
             >
               UP
