@@ -193,7 +193,7 @@ export const ComicCard = ({
         <Box sx={{ minWidth: "100%" }}>
           <Link href={myUrl}>
             <a>
-              <img
+              <Image
                 src={fallback + "?width=240"}
                 height={400}
                 width={"100%"}
@@ -211,7 +211,7 @@ export const ComicCard = ({
         <Box sx={{ p: 1, minWidth: "100%" }}>
           <Link href={myUrl}>
             <a>
-              <img
+              <Image
                 src={fallback + "?width=240"}
                 height={320}
                 width={"100%"}
@@ -235,7 +235,7 @@ export const ComicCard = ({
           <Box display="flex" alignItems="center">
             <Link href={myUrl}>
               <a>
-                <img
+                <Image
                   src={fallback + "?width=240"}
                   height={320 / 2}
                   width={240 / 2}

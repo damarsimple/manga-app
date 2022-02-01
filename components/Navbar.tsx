@@ -85,7 +85,7 @@ export default function Navbar() {
                 <a>
                   <Box sx={{ display: { xs: "none", md: "flex" } }}>
                     <Image
-                      src="https://gudangkomik.com/img/logo.png"
+                      src="/img/logo.png"
                       width={250}
                       height={50}
                       alt="logo"
@@ -97,7 +97,7 @@ export default function Navbar() {
                 <Link href="/">
                   <a>
                     <Image
-                      src="https://gudangkomik.com/android-icon-48x48.png"
+                      src="/android-icon-48x48.png"
                       width={48}
                       height={48}
                       alt="logo"
