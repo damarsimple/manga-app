@@ -182,6 +182,7 @@ export const ComicCard = ({
             overflow: "hidden",
             textOverflow: "ellipsis",
             lineClamp: 4,
+            fontWeight: "bold",
             fontSize: {
               xs: "1rem",
               sm: "1.3rem",
