@@ -211,7 +211,12 @@ export const ComicCard = ({
         <Box sx={{ p: 1, minWidth: "100%" }}>
           <Link href={myUrl}>
             <a>
-              <img src={fallback + "?width=240"} height={320} alt={name} />
+              <img
+                src={fallback + "?width=240"}
+                height={320}
+                width={"100%"}
+                alt={name}
+              />
             </a>
           </Link>
           <Box display="flex" alignItems="center" gap={0.5}>

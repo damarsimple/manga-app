@@ -305,7 +305,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     `,
     variables: {
-      take: 10,
+      take: 48,
       chaptersTake2: 3,
       orderBy: {
         createdAt: "desc",
