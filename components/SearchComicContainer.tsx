@@ -57,8 +57,6 @@ export default function SearchComicContainer({
       }
     });
 
-    console.log(map);
-
     return map;
   };
 
