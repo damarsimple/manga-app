@@ -519,6 +519,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     notFound: !findFirstComic,
     props: {
       comic: findFirstComic,
+      top: top ?? [],
     },
   };
 };
