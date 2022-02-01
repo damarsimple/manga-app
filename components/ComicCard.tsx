@@ -240,7 +240,7 @@ export const ComicCard = ({
         </Box>
       )}
       {layout == "detailed" && (
-        <Box display="flex" width="100%">
+        <Box display="flex" width="100%" gap={0.5}>
           <Box display="flex" alignItems="center">
             <Link href={myUrl}>
               <a>
