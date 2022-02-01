@@ -312,7 +312,7 @@ function Slug({ router, comic }: SlugPageProps) {
 
             {chapMode == "list" ? (
               <List sx={{ maxHeight: 600, overflowY: "auto" }}>
-                {comic.chapters.map((e, i) => (
+                {comic.chapters.sort().map((e, i) => (
                   <Link key={i} href={`/chapter/${e.id}`}>
                     <a>
                       <ListItem key={i} disablePadding>
