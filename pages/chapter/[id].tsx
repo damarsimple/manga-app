@@ -28,6 +28,7 @@ import { Model } from "../../types";
 import { NextSeo } from "next-seo";
 import moment from "moment";
 import { SEO } from "../../modules/seo";
+import Link from "next/link";
 function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const { push } = useRouter();
   const comic: Model["Comic"] = chapter.comic as Model["Comic"];
@@ -118,9 +119,17 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const Header = () => (
     <Paper sx={{ mb: 1 }}>
       <Box>
-        <Typography textAlign={"center"} variant="h6" textTransform="uppercase">
-          {title}
-        </Typography>
+        <Link href={`/comic/${comic.slug}`}>
+          <a>
+            <Typography
+              textAlign={"center"}
+              variant="h6"
+              textTransform="uppercase"
+            >
+              {title}
+            </Typography>
+          </a>
+        </Link>
       </Box>
       <Box>
         <Box
