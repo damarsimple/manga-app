@@ -175,7 +175,7 @@ export const ComicCard = ({
           variant={"h5"}
           sx={{
             height: {
-              sx: 40,
+              xs: 40,
               sm: 60,
             },
             // whiteSpace: "nowrap",
