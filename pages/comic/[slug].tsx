@@ -515,6 +515,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
+  if (!findFirstComic) {
+    console.log(`404 ${slug}`);
+  }
+
   return {
     notFound: !findFirstComic,
     props: {
