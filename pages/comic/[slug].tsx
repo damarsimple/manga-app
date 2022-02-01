@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import {
   Box,
   Button,
@@ -154,10 +155,10 @@ function Slug({ top, router, comic }: SlugPageProps) {
               }}
             >
               <Box display="flex" alignItems="center">
-                <Image
+                <img
                   src={comic.thumb + "?width=240"}
                   height={320 / 1.2}
-                  width={240 / 1.2}
+                  width={"100%"}
                   alt="Cover"
                 />
               </Box>

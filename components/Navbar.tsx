@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import {
   Box,
   AppBar,
@@ -84,14 +85,14 @@ export default function Navbar() {
               <Link href="/">
                 <a>
                   <Box sx={{ display: { xs: "none", md: "flex" } }}>
-                    <Image src="/logo.png" width={250} height={50} alt="logo" />
+                    <img src="/logo.png" width={250} height={50} alt="logo" />
                   </Box>
                 </a>
               </Link>
               <Box sx={{ display: { xs: "flex", md: "none" } }}>
                 <Link href="/">
                   <a>
-                    <Image
+                    <img
                       src="/android-icon-48x48.png"
                       width={48}
                       height={48}
