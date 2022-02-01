@@ -143,13 +143,14 @@ const Home = ({
               </Grid>
               <Grid item xs={6} sm={12} width="100%">
                 <p>
-                  IGCPLAY Daftar 12 situs{" "}
-                  <a href="https://172.104.60.132/">
-                    <strong>judi online slot</strong>
+                  RINGBET88 daftar 12 situs judi{" "}
+                  <a href="https://carolesundfoundation.com/">
+                    <strong>slot online</strong>
                   </a>{" "}
-                  terbaik dan terpercaya di Indonesia IGCPLAY, judi bola online
-                  terbaik, situs judi online terpercaya, casino online resmi, 24
-                  jam non stop di IGCPLAY.
+                  joker123 terpercaya di Indonesia degan games slot online
+                  terlengkap, judi bola online terbaik yang ada di Indonesia,
+                  judi online 24 jam non stop, proses deposit dan withdraw
+                  instant.
                 </p>
               </Grid>
             </Grid>
@@ -322,7 +323,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
       findManyComicOrderBy2: [
         {
-          lastChapterUpdatedAt: "desc",
+          rating: "desc",
         },
       ],
       where: {
