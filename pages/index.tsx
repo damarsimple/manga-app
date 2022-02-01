@@ -323,7 +323,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
       findManyComicOrderBy2: [
         {
-          rating: "desc",
+          lastChapterUpdateAt: "desc",
         },
       ],
       where: {
