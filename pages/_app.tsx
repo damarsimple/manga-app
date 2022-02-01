@@ -23,6 +23,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 function MyApp({ Component, pageProps }: AppProps) {
   const { mode: modeStore } = useColorMode();
 
+  const [showUp, setShowUp] = useState(false);
+
   const darkTheme = createTheme({
     palette: {
       mode: "dark",
@@ -50,6 +52,30 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const handleTop = () => (document.documentElement.scrollTop = 0);
 
+  useEffect(() => {
+    setShowUp(true);
+    window.addEventListener("scroll", listenToScroll);
+
+    return () => {
+      window.removeEventListener("scroll", listenToScroll);
+      setShowUp(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const listenToScroll = () => {
+    const winScroll =
+      document.body.scrollTop || document.documentElement.scrollTop;
+
+    const height =
+      document.documentElement.scrollHeight -
+      document.documentElement.clientHeight;
+
+    const scrolled = winScroll / height;
+
+    setShowUp(scrolled != 0);
+  };
+
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
@@ -74,26 +100,29 @@ function MyApp({ Component, pageProps }: AppProps) {
             minHeight: "100vh",
           }}
         >
-          <Box
-            component="button"
-            onClick={handleTop}
-            sx={{
-              position: "fixed",
-              height: 40,
-              width: 40,
-              color: "white",
-              bottom: 30,
-              right: 10,
-              p: 2,
-              backgroundColor: "red",
-              textAlign: "center",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            UP
-          </Box>
+          {showUp && (
+            <Box
+              component="button"
+              onClick={handleTop}
+              sx={{
+                position: "fixed",
+                height: 40,
+                width: 40,
+                color: "white",
+                bottom: 30,
+                right: 10,
+                p: 2,
+                backgroundColor: "red",
+                textAlign: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              UP
+            </Box>
+          )}
+
           <NextNProgress color="#ff0033" />
 
           <Navbar />
