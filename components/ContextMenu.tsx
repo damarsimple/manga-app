@@ -52,12 +52,13 @@ export default function ContextMenu() {
         {
           label: "Adult R18+",
           path: "/r18/active",
-          color: mode ? "error" : undefined,
+          color: mode ? "error" : "secondary",
         },
       ].map(({ label, path, color }) => (
         <Link href={path} key={label}>
           <a>
             <Chip
+              size="medium"
               sx={{ m: 0.5 }}
               label={label}
               onClick={() => push(path)}
