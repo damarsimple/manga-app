@@ -246,8 +246,8 @@ export const ComicCard = ({
               <a>
                 <Image
                   src={fallback + "?width=240"}
-                  height={320 / 2}
-                  width={240 / 2}
+                  height={320 / 1.5}
+                  width={240 / 1.5}
                   alt={name}
                 />
               </a>
