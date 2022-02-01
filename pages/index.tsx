@@ -141,6 +141,17 @@ const Home = ({
                   instant.
                 </p>
               </Grid>
+              <Grid item xs={6} sm={12} width="100%">
+                <p>
+                  IGCPLAY Daftar 12 situs{" "}
+                  <a href="https://172.104.60.132/">
+                    <strong>judi online slot</strong>
+                  </a>{" "}
+                  terbaik dan terpercaya di Indonesia IGCPLAY, judi bola online
+                  terbaik, situs judi online terpercaya, casino online resmi, 24
+                  jam non stop di IGCPLAY.
+                </p>
+              </Grid>
             </Grid>
           </Paper>
         </Grid>

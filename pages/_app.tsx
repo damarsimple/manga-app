@@ -48,6 +48,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, []);
 
+  const handleTop = () => (document.documentElement.scrollTop = 0);
+
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
@@ -72,6 +74,26 @@ function MyApp({ Component, pageProps }: AppProps) {
             minHeight: "100vh",
           }}
         >
+          <Box
+            component="button"
+            onClick={handleTop}
+            sx={{
+              position: "fixed",
+              height: 40,
+              width: 40,
+              color: "white",
+              bottom: 30,
+              right: 10,
+              p: 2,
+              backgroundColor: "red",
+              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            UP
+          </Box>
           <NextNProgress color="#ff0033" />
 
           <Navbar />

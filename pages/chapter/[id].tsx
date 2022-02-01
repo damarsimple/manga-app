@@ -37,18 +37,20 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const [imageIndex, setImageIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const images = chapter.imageUrls;
+
   useEffect(() => {
     if (chapter) {
       if (chapter.comic.type != "manga") {
         setReadMode("longstrip");
       }
 
-      chapter.imageUrls.forEach((e) => {
+      images.forEach((e) => {
         const img = new Image();
         img.src = e;
       });
     }
-  }, [chapter]);
+  }, [chapter, images]);
 
   const Navigation = () =>
     readMode == "single" ? (
@@ -64,7 +66,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
             <NavigateBefore />
           </IconButton>
           <Box>
-            {imageIndex + 1}/{chapter.imageUrls.length}
+            {imageIndex + 1}/{images.length}
           </Box>
           <IconButton onClick={next}>
             <NavigateNext />
@@ -76,7 +78,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     );
 
   const next = () => {
-    if (imageIndex < chapter.imageUrls.length - 1) setImageIndex((i) => i + 1);
+    if (imageIndex < images.length - 1) setImageIndex((i) => i + 1);
   };
   const prev = () => {
     if (imageIndex > 0) setImageIndex((i) => i - 1);
@@ -177,7 +179,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
       <Paper sx={{ mb: 1 }}>
         {readMode === "single" ? (
           <img
-            src={chapter.imageUrls[imageIndex]}
+            src={images[imageIndex]}
             alt="comic"
             height={"100%"}
             width={"100%"}
@@ -196,7 +198,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
           />
         ) : (
           <>
-            {chapter.imageUrls.map((e, i) => (
+            {images.map((e, i) => (
               <img key={e} src={e} alt={title} height={"100%"} width={"100%"} />
             ))}
           </>
