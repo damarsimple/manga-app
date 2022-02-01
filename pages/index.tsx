@@ -198,7 +198,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       take: 10,
       chaptersTake2: 1,
       orderBy: {
-        createdAt: "desc",
+        lastChapterUpdateAt: "desc",
       },
       findManyComicOrderBy2: [
         {
@@ -263,7 +263,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       take: 10,
       chaptersTake2: 1,
       orderBy: {
-        createdAt: "desc",
+        lastChapterUpdateAt: "desc",
       },
       findManyComicOrderBy2: [
         {
@@ -318,7 +318,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       take: 48,
       chaptersTake2: 3,
       orderBy: {
-        createdAt: "desc",
+        lastChapterUpdateAt: "desc",
       },
       findManyComicOrderBy2: [
         {
