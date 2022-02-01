@@ -268,8 +268,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
-  console.log(error);
-
   return {
     props: {
       chapter: findFirstChapter,

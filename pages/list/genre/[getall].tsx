@@ -48,8 +48,6 @@ function Catch({ comics, genres, router }: GenrePageProps) {
       }
     });
 
-    console.log(map);
-
     return map;
   };
 

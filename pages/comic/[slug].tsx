@@ -75,8 +75,6 @@ function Slug({ router, comic }: SlugPageProps) {
     const scrolled = winScroll / height;
 
     setTransparent(scrolled == 0);
-
-    console.log(`called ${scrolled}`);
   };
 
   const { push } = router;
@@ -450,7 +448,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
+  if (!Boolean(findFirstComic)) {
+    console.log(`Comic not found: ${slug} 404`);
+  }
+
   return {
+    statusCode: Boolean(findFirstComic) ? 200 : 404,
     props: {
       comic: findFirstComic,
     },

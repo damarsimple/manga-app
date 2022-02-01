@@ -48,8 +48,6 @@ function Catch({ comics, authors, router }: AuthorPageProps) {
       }
     });
 
-    console.log(map);
-
     return map;
   };
 
