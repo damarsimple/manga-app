@@ -30,12 +30,16 @@ import moment from "moment";
 import { SEO } from "../../modules/seo";
 import Link from "next/link";
 function Id({ chapter }: { chapter: Model["Chapter"] }) {
-  const { push } = useRouter();
+  const { push, query } = useRouter();
+
+  const { page } = query;
   const comic: Model["Comic"] = chapter.comic as Model["Comic"];
   const title =
     "Komik " + comic.name + ` Chapter ${chapter.name} ` + SEO.padding;
   const [readMode, setReadMode] = useState<"single" | "longstrip">("single");
-  const [imageIndex, setImageIndex] = useState(0);
+  const [imageIndex, setImageIndex] = useState(
+    isNaN(parseInt(page as string)) ? 0 : parseInt(page as string)
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   const images = chapter.imageUrls;
@@ -90,10 +94,12 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     //@ts-ignore
     for (const x of comic.chapters) {
       if (x.id == chapter.id) {
-        const next = comic.chapters[idx + 1];
+        const sorts = comic.chapters.sort((e, x) => e.name - x.name);
+
+        const next = sorts[idx + 1];
 
         if (next) {
-          push(`/chapter/${next.id}`);
+          push(`/chapter/${next.id}?page=0`);
         }
       }
 
@@ -106,9 +112,11 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     //@ts-ignore
     for (const x of comic.chapters) {
       if (x.id == chapter.id) {
-        const prev = comic.chapters[idx - 1];
+        const sorts = comic.chapters.sort((e, x) => e.name - x.name);
+
+        const prev = sorts[idx - 1];
         if (prev) {
-          push(`/chapter/${prev.id}`);
+          push(`/chapter/${prev.id}?page=0`);
         }
       }
 
