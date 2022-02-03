@@ -89,13 +89,21 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     if (imageIndex > 0) setImageIndex((i) => i - 1);
   };
 
+  // const maps = comic.chapters.reduce((acc, cur) => {
+  //   return {
+  //     ...acc,
+
+  //     [cur.name]: cur.id,
+  //   };
+  // }, {} as Record<number, number>);
+
+  const sorts = [...comic.chapters.sort((e, x) => e.name - x.name)];
+
   const nextChapter = () => {
     let idx = 0;
     //@ts-ignore
-    for (const x of comic.chapters) {
+    for (const x of sorts) {
       if (x.id == chapter.id) {
-        const sorts = comic.chapters.sort((e, x) => e.name - x.name);
-
         const next = sorts[idx + 1];
 
         if (next) {
@@ -110,7 +118,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     let idx = 0;
 
     //@ts-ignore
-    for (const x of comic.chapters) {
+    for (const x of sorts) {
       if (x.id == chapter.id) {
         const sorts = comic.chapters.sort((e, x) => e.name - x.name);
 
