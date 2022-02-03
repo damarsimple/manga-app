@@ -392,6 +392,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.query;
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
 
+  const where = allowHentai
+    ? {}
+    : {
+        isHentai: {
+          equals: false,
+        },
+      };
+
   const { data: { findManyComic: top } = {} } = await client.query<{
     findManyComic: Model["Comic"][];
   }>({
@@ -449,11 +457,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           rating: "desc",
         },
       ],
-      where: {
-        isHentai: {
-          equals: allowHentai,
-        },
-      },
+      where,
     },
   });
 
@@ -508,11 +512,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       orderBy: {
         createdAt: "desc",
       },
-      where: {
-        slug: {
-          equals: slug,
-        },
-      },
+      where,
     },
   });
 

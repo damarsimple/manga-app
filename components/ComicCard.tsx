@@ -272,7 +272,7 @@ export const ComicCard = ({
               <a>
                 <img
                   src={fallback + "?width=240"}
-                  height={320 / 1.5}
+                  height={320 / 1.3}
                   width={"100%"}
                   alt={name}
                 />

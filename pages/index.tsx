@@ -163,6 +163,15 @@ const Home = ({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
+
+  const where = allowHentai
+    ? {}
+    : {
+        isHentai: {
+          equals: false,
+        },
+      };
+
   const { data: { findManyComic: carousel } = {} } = await client.query<{
     findManyComic: Model["Comic"][];
   }>({
@@ -206,11 +215,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           viewsWeek: "desc",
         },
       ],
-      where: {
-        isHentai: {
-          equals: allowHentai,
-        },
-      },
+      where,
     },
   });
 
@@ -271,11 +276,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           rating: "desc",
         },
       ],
-      where: {
-        isHentai: {
-          equals: allowHentai,
-        },
-      },
+      where,
     },
   });
 
@@ -326,11 +327,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           lastChapterUpdateAt: "desc",
         },
       ],
-      where: {
-        isHentai: {
-          equals: allowHentai,
-        },
-      },
+      where,
     },
   });
   return {

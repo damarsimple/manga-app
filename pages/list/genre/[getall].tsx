@@ -102,6 +102,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let genres: Model["Genre"][] = [];
   let comics: Model["Comic"][] = [];
 
+  const where = allowHentai
+    ? {}
+    : {
+        isHentai: {
+          equals: false,
+        },
+      };
+
   if (getall == "all") {
     await client
       .query<{
@@ -152,6 +160,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         variables: {
           take: 10,
           where: {
+            ...where,
             slug: {
               equals: getall,
             },

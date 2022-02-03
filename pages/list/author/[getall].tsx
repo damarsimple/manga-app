@@ -97,6 +97,15 @@ function Catch({ comics, authors, router }: AuthorPageProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
+
+  const where = allowHentai
+    ? {}
+    : {
+        isHentai: {
+          equals: false,
+        },
+      };
+
   const { getall, q } = context.query;
 
   let authors: Model["Author"][] = [];
@@ -152,6 +161,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         variables: {
           take: 10,
           where: {
+            ...where,
             slug: {
               equals: getall,
             },

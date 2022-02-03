@@ -47,6 +47,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
   const { getall, q } = context.query;
 
+  const where = allowHentai
+    ? {}
+    : {
+        isHentai: {
+          equals: false,
+        },
+      };
+
   let query = gql`
     query Search(
       $take: Int
@@ -70,9 +78,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const variables: any = {
     where: {
-      isHentai: {
-        equals: allowHentai,
-      },
+      ...where,
       name: {
         contains: q ?? undefined,
       },

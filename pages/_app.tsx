@@ -19,6 +19,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ArrowUpward } from "@mui/icons-material";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { mode: modeStore } = useColorMode();
@@ -80,6 +81,40 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
         <Head>
+          <title>
+            GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia
+          </title>
+          <meta
+            name="description"
+            content="Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif"
+          />
+          <link rel="canonical" href="https://gudangkomik.com" />
+          <meta name="robots" content="index,follow" />
+          <meta
+            property="og:title"
+            content="GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia"
+          />
+          <meta
+            property="og:description"
+            content="Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif"
+          />
+          <meta property="og:url" content="https://gudangkomik.com" />
+          <meta property="og:locale" content="id-id" />
+          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:site" content="@gudang_komik" />
+          <meta
+            name="keywords"
+            content="Gudangkomik, gudang komik, baca manga, baca komik, baca manga online, baca komik online"
+          />
+          <meta name="copyright" content="GudangKomik" />
+          <meta name="rating" content="general" />
+          <meta name="language" content="ID" />
+          <meta name="tgn.nation" content="Indonesia" />
+          <meta name="rating" content="general" />
+          <meta name="author" content="GudangKomik" />
+          <meta name="distribution" content="GudangKomik" />
+          <meta name="publisher" content="GudangKomik" />
+          <meta name="Slurp" content="all" />
           <meta
             name="keywords"
             content="Gudangkomik, gudang komik, baca manga, baca komik, baca manga online, baca komik online"
@@ -112,15 +147,16 @@ function MyApp({ Component, pageProps }: AppProps) {
                 bottom: 30,
                 right: 10,
                 p: 2,
-                backgroundColor: "red",
+                backgroundColor: "blue",
                 textAlign: "center",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 zIndex: 50,
+                borderRadius: 20,
               }}
             >
-              UP
+              <ArrowUpward />
             </Box>
           )}
 
