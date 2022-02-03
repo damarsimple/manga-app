@@ -313,7 +313,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
             {chapMode == "list" ? (
               <List sx={{ maxHeight: 600, overflowY: "auto" }}>
                 {comic.chapters
-                  .sort((e, x) => e.name - x.name)
+                  .sort((e, x) => x.name - e.name)
                   .map((e, i) => (
                     <Link key={i} href={`/chapter/${e.id}`}>
                       <a>
@@ -344,7 +344,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
             ) : (
               <Grid container spacing={2}>
                 {comic.chapters
-                  .sort((e, x) => e.name - x.name)
+                  .sort((e, x) => x.name - e.name)
                   .map((e, i) => (
                     <Grid key={i} item xs={6} md={3}>
                       <Link href={`/chapter/${e.id}`}>

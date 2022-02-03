@@ -163,7 +163,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
                 Chapter {chapter.name}
               </MenuItem>
               {comic.chapters
-                .sort((e, x) => e.name - x.name)
+                .sort((e, x) => x.name - e.name)
                 .filter((e) => e.id != chapter.id)
                 .map((e) => (
                   <MenuItem value={e.id} key={e.id}>
