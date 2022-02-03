@@ -64,8 +64,6 @@ function Slug({ top, router, comic }: SlugPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const chapters = [...Array(100)].map((_, i) => `Chapter ${i + 1}`);
-
   const listenToScroll = () => {
     const winScroll =
       document.body.scrollTop || document.documentElement.scrollTop;
@@ -343,7 +341,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
               </List>
             ) : (
               <Grid container spacing={2}>
-                {comic.chapters.map((e, i) => (
+                {comic.chapters.sort().map((e, i) => (
                   <Grid key={i} item xs={6} md={3}>
                     <Link href={`/chapter/${e.id}`}>
                       <a>
