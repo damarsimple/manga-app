@@ -457,7 +457,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           rating: "desc",
         },
       ],
-      // where,
+      where,
     },
   });
 
@@ -512,7 +512,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       orderBy: {
         createdAt: "desc",
       },
-      where,
+      // where,
     },
   });
 
