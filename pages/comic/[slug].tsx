@@ -312,59 +312,63 @@ function Slug({ top, router, comic }: SlugPageProps) {
 
             {chapMode == "list" ? (
               <List sx={{ maxHeight: 600, overflowY: "auto" }}>
-                {comic.chapters.sort().map((e, i) => (
-                  <Link key={i} href={`/chapter/${e.id}`}>
-                    <a>
-                      <ListItem key={i} disablePadding>
-                        <ListItemButton>
-                          <Box
-                            display="flex"
-                            justifyContent={"space-between"}
-                            width="100%"
-                          >
-                            <Box display="flex" gap={1} alignItems={"center"}>
-                              <RemoveRedEye />
-                              <ListItemText primary={`Chapter ${e.name}`} />
+                {comic.chapters
+                  .sort((e, x) => e.name - x.name)
+                  .map((e, i) => (
+                    <Link key={i} href={`/chapter/${e.id}`}>
+                      <a>
+                        <ListItem key={i} disablePadding>
+                          <ListItemButton>
+                            <Box
+                              display="flex"
+                              justifyContent={"space-between"}
+                              width="100%"
+                            >
+                              <Box display="flex" gap={1} alignItems={"center"}>
+                                <RemoveRedEye />
+                                <ListItemText primary={`Chapter ${e.name}`} />
+                              </Box>
+                              <Box display="flex" gap={1} alignItems={"center"}>
+                                <AccessTime />
+                                <ListItemText
+                                  primary={moment(e.createdAt).fromNow()}
+                                />
+                              </Box>
                             </Box>
-                            <Box display="flex" gap={1} alignItems={"center"}>
-                              <AccessTime />
-                              <ListItemText
-                                primary={moment(e.createdAt).fromNow()}
-                              />
-                            </Box>
-                          </Box>
-                        </ListItemButton>
-                      </ListItem>
-                    </a>
-                  </Link>
-                ))}
+                          </ListItemButton>
+                        </ListItem>
+                      </a>
+                    </Link>
+                  ))}
               </List>
             ) : (
               <Grid container spacing={2}>
-                {comic.chapters.sort().map((e, i) => (
-                  <Grid key={i} item xs={6} md={3}>
-                    <Link href={`/chapter/${e.id}`}>
-                      <a>
-                        <Paper
-                          sx={{
-                            p: 2,
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <IconButton>
-                            <RemoveRedEye />
-                          </IconButton>
-                          <Typography textAlign="center" variant="body1">
-                            Chapter {e.name}
-                          </Typography>
-                          <IconButton></IconButton>
-                        </Paper>
-                      </a>
-                    </Link>
-                  </Grid>
-                ))}
+                {comic.chapters
+                  .sort((e, x) => e.name - x.name)
+                  .map((e, i) => (
+                    <Grid key={i} item xs={6} md={3}>
+                      <Link href={`/chapter/${e.id}`}>
+                        <a>
+                          <Paper
+                            sx={{
+                              p: 2,
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <IconButton>
+                              <RemoveRedEye />
+                            </IconButton>
+                            <Typography textAlign="center" variant="body1">
+                              Chapter {e.name}
+                            </Typography>
+                            <IconButton></IconButton>
+                          </Paper>
+                        </a>
+                      </Link>
+                    </Grid>
+                  ))}
               </Grid>
             )}
           </Paper>
