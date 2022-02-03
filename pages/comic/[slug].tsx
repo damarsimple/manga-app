@@ -457,7 +457,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           rating: "desc",
         },
       ],
-      where,
+      // where,
     },
   });
 
