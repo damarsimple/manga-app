@@ -88,7 +88,6 @@ function MyApp({ Component, pageProps }: AppProps) {
             name="description"
             content="Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif"
           />
-          <link rel="canonical" href="https://gudangkomik.com" />
           <meta name="robots" content="index,follow" />
           <meta
             property="og:title"
