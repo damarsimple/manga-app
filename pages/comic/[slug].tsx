@@ -512,7 +512,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       orderBy: {
         createdAt: "desc",
       },
-      // where,
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
     },
   });
 
