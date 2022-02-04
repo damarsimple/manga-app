@@ -284,50 +284,55 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
-  const { data: { findFirstChapter } = {}, error } = await client.query<{
-    findFirstChapter: Model["Chapter"];
-  }>({
-    query: gql`
-      query FindFirstChapter($where: ChapterWhereInput) {
-        findFirstChapter(where: $where) {
-          id
-          name
-          title
-          comic {
+  const { data: { findFirstChapter } = {}, error: errorChapter } =
+    await client.query<{
+      findFirstChapter: Model["Chapter"];
+    }>({
+      query: gql`
+        query FindFirstChapter($where: ChapterWhereInput) {
+          findFirstChapter(where: $where) {
             id
             name
+            title
+            comic {
+              id
+              name
 
-            type
-            chapters {
-              id
-              name
+              type
+              chapters {
+                id
+                name
+              }
+              thumb
+              description
+              author {
+                id
+                name
+              }
+              genres {
+                id
+                name
+                slug
+              }
             }
-            thumb
-            description
-            author {
-              id
-              name
-            }
-            genres {
-              id
-              name
-              slug
-            }
+            imageUrls
           }
-          imageUrls
         }
-      }
-    `,
-    variables: {
-      where: {
-        id: {
-          equals: parseInt(id as string),
+      `,
+      variables: {
+        where: {
+          id: {
+            equals: parseInt(id as string),
+          },
         },
       },
-    },
-  });
+    });
   if (!findFirstChapter) {
     console.log(`404 ${id}`);
+  }
+
+  if (errorChapter) {
+    console.log(errorChapter);
   }
 
   return {

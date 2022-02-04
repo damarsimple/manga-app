@@ -132,12 +132,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       break;
   }
 
-  const { data: { findManyComic: result } = {} } = await client.query<{
+  const { data: { findManyComic: result } = {}, error } = await client.query<{
     findManyComic: Model["Comic"][];
   }>({
     query,
     variables,
   });
+
+  if (error) {
+    console.log(error);
+  }
+
   return {
     props: {
       result,

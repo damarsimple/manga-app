@@ -179,164 +179,174 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       };
 
-  const { data: { findManyComic: carousel } = {} } = await client.query<{
-    findManyComic: Model["Comic"][];
-  }>({
-    query: gql`
-      query CarouselComic(
-        $take: Int
-        $chaptersTake2: Int
-        $orderBy: ChapterOrderByWithRelationInput
-        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-        $where: ComicWhereInput
-      ) {
-        findManyComic(
-          take: $take
-          orderBy: $findManyComicOrderBy2
-          where: $where
+  const { data: { findManyComic: carousel } = {}, error: errorCarousel } =
+    await client.query<{
+      findManyComic: Model["Comic"][];
+    }>({
+      query: gql`
+        query CarouselComic(
+          $take: Int
+          $chaptersTake2: Int
+          $orderBy: ChapterOrderByWithRelationInput
+          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+          $where: ComicWhereInput
         ) {
-          id
-          name
-          thumb
-          thumbWide
-          slug
-          isHentai
-          viewsWeek
-          lastChapterUpdateAt
-          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+          findManyComic(
+            take: $take
+            orderBy: $findManyComicOrderBy2
+            where: $where
+          ) {
             id
             name
-            createdAt
-          }
-        }
-      }
-    `,
-    variables: {
-      take: 10,
-      chaptersTake2: 1,
-      orderBy: {
-        name: "desc",
-      },
-      findManyComicOrderBy2: [
-        {
-          viewsWeek: "desc",
-        },
-      ],
-      where,
-    },
-  });
-
-  const { data: { findManyComic: top } = {} } = await client.query<{
-    findManyComic: Model["Comic"][];
-  }>({
-    query: gql`
-      query TopComic(
-        $take: Int
-        $chaptersTake2: Int
-        $orderBy: ChapterOrderByWithRelationInput
-        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-        $where: ComicWhereInput
-      ) {
-        findManyComic(
-          take: $take
-          orderBy: $findManyComicOrderBy2
-          where: $where
-        ) {
-          id
-          name
-          thumb
-          thumbWide
-          slug
-          rating
-          isHentai
-          author {
-            id
-            name
+            thumb
+            thumbWide
             slug
-          }
-          viewsWeek
-          lastChapterUpdateAt
-          genres {
-            id
-            name
-            slug
-          }
-          chapters(take: $chaptersTake2, orderBy: $orderBy) {
-            id
-            name
-            createdAt
-          }
-          _count {
-            chapters
+            isHentai
+            viewsWeek
+            lastChapterUpdateAt
+            chapters(take: $chaptersTake2, orderBy: $orderBy) {
+              id
+              name
+              createdAt
+            }
           }
         }
-      }
-    `,
-    variables: {
-      take: 10,
-      chaptersTake2: 1,
-      orderBy: {
-        name: "desc",
-      },
-      findManyComicOrderBy2: [
-        {
-          rating: "desc",
+      `,
+      variables: {
+        take: 10,
+        chaptersTake2: 1,
+        orderBy: {
+          name: "desc",
         },
-      ],
-      where,
-    },
-  });
+        findManyComicOrderBy2: [
+          {
+            viewsWeek: "desc",
+          },
+        ],
+        where,
+      },
+    });
 
-  const { data: { findManyComic: latest } = {} } = await client.query<{
-    findManyComic: Model["Comic"][];
-  }>({
-    query: gql`
-      query TopComic(
-        $take: Int
-        $chaptersTake2: Int
-        $orderBy: ChapterOrderByWithRelationInput
-        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-        $where: ComicWhereInput
-      ) {
-        findManyComic(
-          take: $take
-          orderBy: $findManyComicOrderBy2
-          where: $where
+  const { data: { findManyComic: top } = {}, error: errorTop } =
+    await client.query<{
+      findManyComic: Model["Comic"][];
+    }>({
+      query: gql`
+        query TopComic(
+          $take: Int
+          $chaptersTake2: Int
+          $orderBy: ChapterOrderByWithRelationInput
+          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+          $where: ComicWhereInput
         ) {
-          id
-          name
-          thumb
-          thumbWide
-          slug
-          isHentai
-          viewsWeek
-
-          lastChapterUpdateAt
-          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+          findManyComic(
+            take: $take
+            orderBy: $findManyComicOrderBy2
+            where: $where
+          ) {
             id
             name
-            createdAt
-          }
-          _count {
-            chapters
+            thumb
+            thumbWide
+            slug
+            rating
+            isHentai
+            author {
+              id
+              name
+              slug
+            }
+            viewsWeek
+            lastChapterUpdateAt
+            genres {
+              id
+              name
+              slug
+            }
+            chapters(take: $chaptersTake2, orderBy: $orderBy) {
+              id
+              name
+              createdAt
+            }
+            _count {
+              chapters
+            }
           }
         }
-      }
-    `,
-    variables: {
-      take: 48,
-      chaptersTake2: 3,
-      orderBy: {
-        name: "desc",
-      },
-      findManyComicOrderBy2: [
-        {
-          lastChapterUpdateAt: "desc",
+      `,
+      variables: {
+        take: 10,
+        chaptersTake2: 1,
+        orderBy: {
+          name: "desc",
         },
-      ],
-      where,
-    },
-  });
+        findManyComicOrderBy2: [
+          {
+            rating: "desc",
+          },
+        ],
+        where,
+      },
+    });
+
+  const { data: { findManyComic: latest } = {}, error: errorLatest } =
+    await client.query<{
+      findManyComic: Model["Comic"][];
+    }>({
+      query: gql`
+        query TopComic(
+          $take: Int
+          $chaptersTake2: Int
+          $orderBy: ChapterOrderByWithRelationInput
+          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+          $where: ComicWhereInput
+        ) {
+          findManyComic(
+            take: $take
+            orderBy: $findManyComicOrderBy2
+            where: $where
+          ) {
+            id
+            name
+            thumb
+            thumbWide
+            slug
+            isHentai
+            viewsWeek
+
+            lastChapterUpdateAt
+            chapters(take: $chaptersTake2, orderBy: $orderBy) {
+              id
+              name
+              createdAt
+            }
+            _count {
+              chapters
+            }
+          }
+        }
+      `,
+      variables: {
+        take: 48,
+        chaptersTake2: 3,
+        orderBy: {
+          name: "desc",
+        },
+        findManyComicOrderBy2: [
+          {
+            lastChapterUpdateAt: "desc",
+          },
+        ],
+        where,
+      },
+    });
+
+  if (errorCarousel || errorTop || errorLatest) {
+    console.log(errorCarousel);
+    console.log(errorTop);
+    console.log(errorLatest);
+  }
+
   return {
     props: {
       carousel,
