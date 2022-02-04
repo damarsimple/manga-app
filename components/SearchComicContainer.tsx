@@ -7,7 +7,6 @@ import {
   TextField,
   Grid,
 } from "@mui/material";
-import { NextSeo } from "next-seo";
 import Link from "next/link";
 import React, { useState } from "react";
 import { SEO } from "../modules/seo";
@@ -64,7 +63,7 @@ export default function SearchComicContainer({
 
   return (
     <Box sx={{ m: 1 }}>
-      <NextSeo {...SEO} title={"Daftar Komik " + title} />
+      {/* <NextSeo {...SEO} title={"Daftar Komik " + title} /> */}
       <Paper sx={{ p: 1 }}>
         {context == "comic" && (
           <Box sx={{ display: "flex" }}>

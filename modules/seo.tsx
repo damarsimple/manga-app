@@ -20,6 +20,7 @@ export const SEO = {
     site: "@gudang_komik",
     cardType: "summary_large_image",
   },
+
   //@ts-ignore
   padding: " - GudangKomik",
 };

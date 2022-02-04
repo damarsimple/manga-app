@@ -97,55 +97,27 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <Head>
+      <Head>
+        <>
           <title>
             GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia
           </title>
-          <meta
-            name="description"
-            content="Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif"
-          />
+          <meta name="copyright" content="GudangKomik" />
+          <meta name="language" content="ID" />
+          <meta name="tgn.nation" content="Indonesia" />
+          <meta name="rating" content="general" />
+          <meta name="distribution" content="GudangKomik" />
+          <meta name="publisher" content="GudangKomik" />
+          <meta name="Slurp" content="all" />
           <meta name="robots" content="index,follow" />
-          <meta
-            property="og:title"
-            content="GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia"
-          />
-          <meta
-            property="og:description"
-            content="Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif"
-          />
-          <meta property="og:url" content="https://gudangkomik.com" />
-          <meta property="og:locale" content="id-id" />
-          <meta name="twitter:card" content="summary" />
-          <meta name="twitter:site" content="@gudang_komik" />
+          <meta name="googlebot" content="index,follow" />
           <meta
             name="keywords"
             content="Gudangkomik, gudang komik, baca manga, baca komik, baca manga online, baca komik online"
-          />
-          <meta name="copyright" content="GudangKomik" />
-          <meta name="rating" content="general" />
-          <meta name="language" content="ID" />
-          <meta name="tgn.nation" content="Indonesia" />
-          <meta name="rating" content="general" />
-          <meta name="author" content="GudangKomik" />
-          <meta name="distribution" content="GudangKomik" />
-          <meta name="publisher" content="GudangKomik" />
-          <meta name="Slurp" content="all" />
-          <meta
-            name="keywords"
-            content="Gudangkomik, gudang komik, baca manga, baca komik, baca manga online, baca komik online"
-          />
-          <meta name="copyright" content="GudangKomik" />
-          <meta name="rating" content="general" />
-          <meta name="language" content="ID" />
-          <meta name="tgn.nation" content="Indonesia" />
-          <meta name="rating" content="general" />
-          <meta name="author" content="GudangKomik" />
-          <meta name="distribution" content="GudangKomik" />
-          <meta name="publisher" content="GudangKomik" />
-          <meta name="Slurp" content="all" />
-        </Head>
+          ></meta>
+        </>
+      </Head>
+      <ThemeProvider theme={theme}>
         <Box
           sx={{
             backgroundColor: mode == "dark" ? "#111827" : "#e5e7eb",
