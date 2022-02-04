@@ -160,7 +160,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         variables: {
           take: 10,
           where: {
-            ...where,
             slug: {
               equals: getall,
             },
@@ -169,6 +168,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             name: {
               contains: q ?? undefined,
             },
+            ...where,
           },
 
           chaptersTake2: 1,
