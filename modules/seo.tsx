@@ -1,6 +1,6 @@
 import { NextSeoProps } from "next-seo";
 
-export const SEO: NextSeoProps = {
+export const SEO = {
   title: "GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia",
   description:
     "Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif",

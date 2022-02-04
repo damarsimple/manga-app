@@ -247,7 +247,7 @@ export const ComicCard = ({
                 height={{
                   xs: 240,
                   sm: 320,
-                  lg: 420,
+                  lg: 440,
                 }}
                 width={"100%"}
                 alt={name}

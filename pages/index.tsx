@@ -65,7 +65,15 @@ const Home = ({
       </Paper>
 
       <Grid container spacing={1}>
-        <Grid item xs={12} sm={9} md={10} display="flex" flexDirection="column">
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={9}
+          lg={10}
+          display="flex"
+          flexDirection="column"
+        >
           <Paper sx={{ p: 2 }}>
             <Typography variant="h5" component="h3">
               UPDATE KOMIK TERBARU
@@ -117,7 +125,7 @@ const Home = ({
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={3} md={2}>
+        <Grid item xs={12} sm={4} md={3} lg={2}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h5" component="h3">
               TOP KOMIK
