@@ -122,9 +122,22 @@ export default function Navbar() {
                         sx={{ mr: 2 }}
                       >
                         <Typography
-                          fontWeight={900}
-                          variant="body1"
-                          textTransform="uppercase"
+                          variant={"h5"}
+                          sx={{
+                            height: {
+                              xs: 40,
+                              sm: 60,
+                            },
+                            // whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            lineClamp: 4,
+                            fontWeight: "bold",
+                            fontSize: {
+                              xs: "1rem",
+                              sm: "1.3rem",
+                            },
+                          }}
                         >
                           {e}
                         </Typography>

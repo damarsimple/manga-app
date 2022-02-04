@@ -35,6 +35,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   const lightTheme = createTheme({
     palette: {
       mode: "light",
+      primary: {
+        main: "#4164b2",
+      },
     },
   });
 
