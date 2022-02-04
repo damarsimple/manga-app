@@ -297,7 +297,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             comic {
               id
               name
-
+              slug
               type
               chapters {
                 id
@@ -308,6 +308,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               author {
                 id
                 name
+                slug
               }
               genres {
                 id
