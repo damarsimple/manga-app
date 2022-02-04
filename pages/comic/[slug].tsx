@@ -525,7 +525,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
 
   if (!findFirstComic) {
-    console.log(`404 ${slug}`);
+    console.log(`404 comic ${slug}`);
   }
 
   if (errorTop || errorComic) {

@@ -328,7 +328,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     });
   if (!findFirstChapter) {
-    console.log(`404 ${id}`);
+    console.log(`404 chapter ${id}`);
   }
 
   if (errorChapter) {
