@@ -153,12 +153,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
               }}
             >
               <Box display="flex" alignItems="center">
-                <img
-                  src={comic.thumb + "?width=240"}
-                  height={320 / 1.2}
-                  width={"100%"}
-                  alt="Cover"
-                />
+                <img src={comic.thumb} height={320} width={240} alt="Cover" />
               </Box>
               <Box
                 sx={{
