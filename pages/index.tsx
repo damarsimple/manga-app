@@ -16,10 +16,11 @@ import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { ComicCard } from "../components/ComicCard";
 import { client } from "../modules/client";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { Model } from "../types";
 import { NextSeo } from "next-seo";
 import { SEO } from "../modules/seo";
+import { useR18 } from "../stores/r18";
 
 const Home = ({
   carousel,
@@ -30,6 +31,68 @@ const Home = ({
   latest: Model["Comic"][];
   carousel: Model["Comic"][];
 }) => {
+  const { mode } = useR18();
+  const where = mode
+    ? {}
+    : {
+        isHentai: {
+          equals: false,
+        },
+      };
+  const { data: { findManyComic: latestClient } = {}, error: errorLatest } =
+    useQuery<{
+      findManyComic: Model["Comic"][];
+    }>(
+      gql`
+        query TopComic(
+          $take: Int
+          $chaptersTake2: Int
+          $orderBy: ChapterOrderByWithRelationInput
+          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+          $where: ComicWhereInput
+        ) {
+          findManyComic(
+            take: $take
+            orderBy: $findManyComicOrderBy2
+            where: $where
+          ) {
+            id
+            name
+            thumb
+            thumbWide
+            slug
+            isHentai
+            viewsWeek
+
+            lastChapterUpdateAt
+            chapters(take: $chaptersTake2, orderBy: $orderBy) {
+              id
+              name
+              createdAt
+            }
+            _count {
+              chapters
+            }
+          }
+        }
+      `,
+      {
+        variables: {
+          take: 48,
+          chaptersTake2: 3,
+          orderBy: {
+            name: "desc",
+          },
+          findManyComicOrderBy2: [
+            {
+              lastChapterUpdateAt: "desc",
+            },
+          ],
+          where,
+        },
+      }
+    );
+
   return (
     <Box p={2} display="flex" gap={2} flexDirection={"column"}>
       <NextSeo {...SEO} />
@@ -90,7 +153,7 @@ const Home = ({
               }}
             >
               <Grid container spacing={3}>
-                {latest.map((e, i) => (
+                {(latestClient ?? latest ?? []).map((e, i) => (
                   <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
                     <ComicCard {...e} layout="detailed" key={e.id} />
                   </Grid>
@@ -115,7 +178,7 @@ const Home = ({
               }}
             >
               <Grid container spacing={3}>
-                {latest.map((e, i) => (
+                {(latestClient ?? latest ?? []).map((e, i) => (
                   <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
                     <ComicCard {...e} layout="detailed" key={e.id} />
                   </Grid>
@@ -327,7 +390,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
       `,
       variables: {
-        take: 48,
+        take: 9,
         chaptersTake2: 3,
         orderBy: {
           name: "desc",
