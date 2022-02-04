@@ -70,9 +70,6 @@ const Home = ({
               name
               createdAt
             }
-            _count {
-              chapters
-            }
           }
         }
       `,
@@ -330,9 +327,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               id
               name
               createdAt
-            }
-            _count {
-              chapters
             }
           }
         }

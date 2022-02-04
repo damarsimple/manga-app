@@ -181,7 +181,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       })
       .then(({ data }) => {
-        comics = data.findFirstAuthor.comics as Model["Comic"][];
+        comics = (data.findFirstAuthor.comics ?? []) as Model["Comic"][];
       });
   }
 

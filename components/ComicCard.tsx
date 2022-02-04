@@ -27,7 +27,7 @@ export const ComicCard = ({
   author,
   chapters,
   genres,
-  _count,
+  // _count,
   lastChapterUpdateAt,
   isFirst,
   rating,
@@ -135,22 +135,22 @@ export const ComicCard = ({
     </Box>
   );
 
-  const TotalChapterFormatted = () => (
-    <Box
-      display="flex"
-      flexDirection={{ xs: "column", sm: "row" }}
-      justifyContent="space-between"
-      pt={1}
-    >
-      <Box display="flex" alignItems="center" gap={0.5}>
-        <Book fontSize="small" />
-        <Typography variant={"caption"}>Total Chapter</Typography>
-      </Box>
-      <Box display="flex" alignItems="center" gap={0.5}>
-        <Typography variant={"caption"}>{_count.chapters} Chapter</Typography>
-      </Box>
-    </Box>
-  );
+  // const TotalChapterFormatted = () => (
+  //   <Box
+  //     display="flex"
+  //     flexDirection={{ xs: "column", sm: "row" }}
+  //     justifyContent="space-between"
+  //     pt={1}
+  //   >
+  //     <Box display="flex" alignItems="center" gap={0.5}>
+  //       <Book fontSize="small" />
+  //       <Typography variant={"caption"}>Total Chapter</Typography>
+  //     </Box>
+  //     <Box display="flex" alignItems="center" gap={0.5}>
+  //       <Typography variant={"caption"}>{_count.chapters} Chapter</Typography>
+  //     </Box>
+  //   </Box>
+  // );
 
   const RatingFormatted = () => (
     <Box
@@ -260,7 +260,7 @@ export const ComicCard = ({
           </Box>
           <AuthorFormatted />
           <GenreFormatted />
-          <TotalChapterFormatted />
+          {/* <TotalChapterFormatted /> */}
           <RatingFormatted />
           <LastUpdatedFormatted />
         </Box>

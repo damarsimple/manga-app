@@ -182,7 +182,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       })
       .then(({ data }) => {
-        comics = data.findFirstGenre.comics as Model["Comic"][];
+        comics = (data?.findFirstGenre?.comics ?? []) as Model["Comic"][];
       });
   }
 
