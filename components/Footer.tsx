@@ -25,7 +25,7 @@ export default function Footer() {
           <br />
         </p>
         <p>
-          <a href="https://gudangkomik.com/">
+          <a href="https://www.gudangkomik.com/">
             <strong>Gudangkomik</strong>
           </a>{" "}
           adalah situs <strong>Baca Manga Online Indonesia</strong> dengan
@@ -111,7 +111,7 @@ export default function Footer() {
         </h3>
         <p>
           Manhwa adalah istilah Korea umum untuk komik dan kartun cetak{" "}
-          <a href="https://gudangkomik.com/" title="Baca Manga">
+          <a href="https://www.gudangkomik.com/" title="Baca Manga">
             <strong>Baca Manga</strong>
           </a>{" "}
           Manhwa hanya di <strong>Gudangkomik</strong>, atau biasa disebut
@@ -158,7 +158,7 @@ export default function Footer() {
           Tentu saja, semua manga yang sudah publish di publik akan tayang di
           situs ini secara realtime. Bahkan ketika manganya masih tersedia Low
           Quality kamu bisa{" "}
-          <a href="https://gudangkomik.com/" title="Baca Komik">
+          <a href="https://www.gudangkomik.com/" title="Baca Komik">
             <strong>Baca Komik</strong>
           </a>{" "}
           tersebut di <strong>Gudangkomik</strong> secara gratis dan mudah.

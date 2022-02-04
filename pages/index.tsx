@@ -143,14 +143,13 @@ const Home = ({
               </Grid>
               <Grid item xs={6} sm={12} width="100%">
                 <p>
-                  RINGBET88 daftar 12 situs judi{" "}
-                  <a href="https://carolesundfoundation.com/">
-                    <strong>slot online</strong>
+                  IGCPLAY Daftar 12 situs{" "}
+                  <a href="https://172.104.60.132/">
+                    <strong>judi online slot</strong>
                   </a>{" "}
-                  joker123 terpercaya di Indonesia degan games slot online
-                  terlengkap, judi bola online terbaik yang ada di Indonesia,
-                  judi online 24 jam non stop, proses deposit dan withdraw
-                  instant.
+                  terbaik dan terpercaya di Indonesia IGCPLAY, judi bola online
+                  terbaik, situs judi online terpercaya, casino online resmi, 24
+                  jam non stop di IGCPLAY.
                 </p>
               </Grid>
             </Grid>

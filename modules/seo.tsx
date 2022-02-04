@@ -1,19 +1,25 @@
-export const SEO = {
+import { NextSeoProps } from "next-seo";
+
+export const SEO: NextSeoProps = {
   title: "GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia",
-  description: "GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia",
+  description:
+    "Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif",
   canonical: "https://www.gudangkomik.com",
   openGraph: {
     url: "https://www.gudangkomik.com/",
     title: "GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia",
     description:
-      "Gudangkomik, gudang komik, baca manga, baca komik, baca manga online, baca komik online" ??
+      "Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif" ??
       "",
     site_name: "Gudang Komik",
-    twitter: {
-      handle: "@gudang_komik",
-      site: "@gudang_komik",
-      cardType: "summary_large_image",
-    },
+    type: "website",
+    locale: "id-id",
   },
+  twitter: {
+    handle: "@gudang_komik",
+    site: "@gudang_komik",
+    cardType: "summary_large_image",
+  },
+  //@ts-ignore
   padding: " - GudangKomik",
 };

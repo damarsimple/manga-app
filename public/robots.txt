@@ -1,3 +1,3 @@
 User-agent: *
 Allow:/      
-Sitemap: https://gudangkomik.com/sitemap.xml
+Sitemap: https://www.gudangkomik.com/sitemap.xml
