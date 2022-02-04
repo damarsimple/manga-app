@@ -164,7 +164,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 bottom: 30,
                 right: 10,
                 p: 2,
-                backgroundColor: "blue",
+                backgroundColor: "#4164b2",
                 textAlign: "center",
                 display: "flex",
                 alignItems: "center",
