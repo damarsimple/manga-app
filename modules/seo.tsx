@@ -4,9 +4,9 @@ export const SEO = {
   title: "GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia",
   description:
     "Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif",
-  canonical: "https://gudangkomik.com"",
+  canonical: "https://gudangkomik.com",
   openGraph: {
-    url: "https://gudangkomik.com"/",
+    url: "https://gudangkomik.com/",
     title: "GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia",
     description:
       "Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif" ??

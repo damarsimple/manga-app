@@ -115,7 +115,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             property="og:description"
             content="Gudangkomik merupakan situs baca komik online dengan koleksi terlengkap dan terupdate. Kalian bisa membaca ratusan judul komik yang kami update setiap hari secara gratis dan dibalut dengan tampilan modern yang nyaman dan responsif"
           />
-          <meta property="og:url" content="https://gudangkomik.com"" />
+          <meta property="og:url" content="https://gudangkomik.com" />
           <meta property="og:locale" content="id-id" />
           <meta name="twitter:card" content="summary" />
           <meta name="twitter:site" content="@gudang_komik" />
