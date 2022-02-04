@@ -13,10 +13,8 @@ import { SEO } from "../modules/seo";
 import { Model } from "../types";
 import { ComicCard } from "./ComicCard";
 import { useRouter } from "next/router";
-
-function capitalizeFirstLetter(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import { useEffect } from "react";
+import { capitalizeFirstLetter } from "../modules/helper";
 
 export default function SearchComicContainer({
   comics,
@@ -29,7 +27,7 @@ export default function SearchComicContainer({
   context: "comic" | "genre" | "author";
   comics: Model["Comic"][];
 }) {
-  const { push } = useRouter();
+  const { push, pathname } = useRouter();
   const [type, setType] = useState<undefined | string>(
     capitalizeFirstLetter(title as string)
   );
@@ -83,7 +81,11 @@ export default function SearchComicContainer({
                 color={e == type ? "primary" : "secondary"}
                 onClick={() => {
                   setType(e == type ? undefined : e);
-                  push(`/list/${context}/` + e.toLowerCase());
+                  push(
+                    `/list/${context}/${title.toLowerCase()}?type=${e.toLowerCase()}${
+                      mode == "Text Mode" ? "&all=true" : ""
+                    }`
+                  );
                 }}
               />
             ))}
@@ -94,7 +96,18 @@ export default function SearchComicContainer({
                 key={e}
                 sx={{ mx: 0.2 }}
                 color={e == mode ? "primary" : "secondary"}
-                onClick={() => setMode(e)}
+                onClick={() => {
+                  if (e == "Text Mode") {
+                    push(
+                      `/list/${context}/${title.toLowerCase()}?all=true${
+                        type ? `&type=${type.toLowerCase()} ` : ""
+                      }`
+                    );
+                    setMode(e);
+                  } else {
+                    setMode(e);
+                  }
+                }}
               />
             ))}
             <Divider sx={{ my: 1 }} />

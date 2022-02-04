@@ -45,7 +45,7 @@ function Catch({ result, router }: GetPageProp) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
-  const { getall, q } = context.query;
+  const { getall, q, all } = context.query;
 
   const where = allowHentai
     ? {}
@@ -88,7 +88,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     chaptersTake2: 1,
   };
 
-  if (getall == "all") {
+  if (getall == "all" || all == "true") {
     variables.take = 9999999;
     variables.chaptersTake2 = undefined;
     query = gql`

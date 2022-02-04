@@ -86,7 +86,7 @@ function Catch({ comics, genres, router }: GenrePageProps) {
               query={q as string}
               title={getall as string}
               context="genre"
-              comics={comics}
+              comics={comics ?? []}
             />
           )}
         </Box>
@@ -97,7 +97,7 @@ function Catch({ comics, genres, router }: GenrePageProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
-  const { getall, q } = context.query;
+  const { getall, q, all, type } = context.query;
 
   let genres: Model["Genre"][] = [];
   let comics: Model["Comic"][] = [];
@@ -109,6 +109,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           equals: false,
         },
       };
+
+  if (type) {
+    //@ts-ignore
+    where.type = {
+      equals: type,
+    };
+  }
 
   if (getall == "all") {
     await client
@@ -158,7 +165,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           }
         `,
         variables: {
-          take: 10,
+          take: all == "true" ? 99999 : 16,
           where: {
             slug: {
               equals: getall,

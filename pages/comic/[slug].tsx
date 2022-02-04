@@ -41,6 +41,7 @@ import { client } from "../../modules/client";
 import moment from "moment";
 import { NextSeo } from "next-seo";
 import { SEO } from "../../modules/seo";
+import { capitalizeFirstLetter } from "../../modules/helper";
 
 interface SlugPageProps extends WithRouterProps {
   comic: Model["Comic"];
@@ -234,6 +235,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
               </Button>
             </Box>
             <Divider orientation="vertical" flexItem />
+
             <Stack
               direction="row"
               sx={{
@@ -243,6 +245,12 @@ function Slug({ top, router, comic }: SlugPageProps) {
                 },
               }}
             >
+              <Chip
+                sx={{ mx: 0.5 }}
+                label={capitalizeFirstLetter(comic.type)}
+                onClick={() => push("/list/comic/" + comic.type)}
+              />
+              <Divider orientation="vertical" flexItem />
               {comic.genres.map((e, i) => (
                 <Chip
                   sx={{ mx: 0.5 }}
@@ -262,11 +270,16 @@ function Slug({ top, router, comic }: SlugPageProps) {
           my: 2,
           p: 1,
           display: {
-            xs: undefined,
+            xs: "undefined",
             sm: "none",
           },
         }}
       >
+        <Chip
+          sx={{ mx: 0.5 }}
+          label={capitalizeFirstLetter(comic.type)}
+          onClick={() => push("/list/comic/" + comic.type)}
+        />
         {comic.genres.map((e, i) => (
           <Chip
             sx={{ m: 0.5 }}

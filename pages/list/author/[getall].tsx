@@ -85,8 +85,8 @@ function Catch({ comics, authors, router }: AuthorPageProps) {
             <SearchComicContainer
               query={q as string}
               title={getall as string}
-              context="genre"
-              comics={comics}
+              context="author"
+              comics={comics ?? []}
             />
           )}
         </Box>
@@ -106,12 +106,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       };
 
-  const { getall, q } = context.query;
-
+  const { getall, q, all, type } = context.query;
+  if (type) {
+    //@ts-ignore
+    where.type = {
+      equals: type,
+    };
+  }
   let authors: Model["Author"][] = [];
   let comics: Model["Comic"][] = [];
 
-  if (getall == "all") {
+  if (getall == "all" || all == "true") {
     await client
       .query<{
         findManyAuthor: Model["Author"][];
@@ -159,7 +164,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           }
         `,
         variables: {
-          take: 10,
+          take: all == "true" ? 99999 : 16,
           where: {
             slug: {
               equals: getall,
