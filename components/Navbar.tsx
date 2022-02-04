@@ -124,10 +124,6 @@ export default function Navbar() {
                         <Typography
                           variant={"h5"}
                           sx={{
-                            height: {
-                              xs: 40,
-                              sm: 60,
-                            },
                             // whiteSpace: "nowrap",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
@@ -139,7 +135,7 @@ export default function Navbar() {
                             },
                           }}
                         >
-                          {e}
+                          {e.toUpperCase()}
                         </Typography>
                       </IconButton>
                     </Box>
