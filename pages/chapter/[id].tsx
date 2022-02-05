@@ -36,7 +36,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const comic: Model["Comic"] = chapter.comic as Model["Comic"];
   const title =
     "Komik " + comic.name + ` Chapter ${chapter.name} ` + SEO.padding;
-  const [readMode, setReadMode] = useState<"single" | "longstrip">("single");
+  const [readMode, setReadMode] = useState<"single" | "longstrip">("longstrip");
   const [imageIndex, setImageIndex] = useState(
     isNaN(parseInt(page as string)) ? 0 : parseInt(page as string)
   );
