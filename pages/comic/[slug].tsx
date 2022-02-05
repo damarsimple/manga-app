@@ -139,7 +139,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
               bottom: 0,
               position: "absolute",
               color: "white",
-              p: 16,
+              p: 12,
               display: "flex",
               gap: 2,
               flexDirection: {
