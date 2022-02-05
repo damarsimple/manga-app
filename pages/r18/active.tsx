@@ -7,6 +7,7 @@ export default function Active() {
 
   useEffect(() => {
     toggle();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <div></div>;
