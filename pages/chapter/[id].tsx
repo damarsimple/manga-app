@@ -343,7 +343,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       },
     });
-  if (!findFirstChapter) {
+
+  if (!findFirstChapter && id != undefined) {
     console.log(`404 chapter ${id} referrer ${context.req.headers.referer}`);
   }
 

@@ -177,12 +177,17 @@ function Slug({ top, router, comic }: SlugPageProps) {
 
           <Box
             sx={{
-              bottom: 0,
+              bottom: 125,
               position: "absolute",
+              width: "100%",
               color: "white",
-              p: 16,
               display: "flex",
+              alignItems: "center",
               gap: 2,
+              pl: {
+                xs: 2,
+                sm: 6,
+              },
               flexDirection: {
                 xs: "colurn",
                 md: "row",
@@ -192,9 +197,21 @@ function Slug({ top, router, comic }: SlugPageProps) {
             <Box
               sx={{
                 textAlign: "center",
+                width: {
+                  xs: "100%",
+                  sm: "auto",
+                },
               }}
             >
-              <Box display="flex" alignItems="center">
+              <Box
+                display="flex"
+                justifyContent={"center"}
+                alignItems="center"
+                width={{
+                  xs: "100%",
+                  sm: "auto",
+                }}
+              >
                 <img
                   src={comic.thumb}
                   height={320 / 1.2}
@@ -677,7 +694,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         },
       },
     });
-  if (!findFirstComic) {
+  if (!findFirstComic && slug != undefined) {
     console.log(`404 comic ${slug}`);
   }
   if (errorComic) {
