@@ -1,7 +1,7 @@
 import React from "react";
 import { Container } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-
+/* eslint-disable @next/next/no-img-element */
 export default function Footer() {
   const theme = useTheme();
   const { mode } = theme.palette;
@@ -206,6 +206,8 @@ export default function Footer() {
         <p>
           <br />
         </p>
+        <a href="/" target="_blank" />
+        <img src="//sstatic1.histats.com/0.gif?4473363&101" alt="" />
       </>
     </Container>
   );
