@@ -344,7 +344,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     });
   if (!findFirstChapter) {
-    console.log(`404 chapter ${id}`);
+    console.log(`404 chapter ${id} referrer ${context.req.headers.referer}`);
   }
 
   if (errorChapter) {
