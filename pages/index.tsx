@@ -110,7 +110,7 @@ const Home = ({
             },
             // when window width is >= 640px
             1024: {
-              slidesPerView: 5,
+              slidesPerView: 6,
               spaceBetween: 40,
             },
           }}
