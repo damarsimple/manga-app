@@ -14,12 +14,11 @@ import {
   IconButton,
   TextField,
   Stack,
+  Skeleton,
 } from "@mui/material";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { ComicSeo } from "../../components/Seo/Comic";
-import Image from "next/image";
 import {
   AccessTime,
   Bento,
@@ -34,15 +33,16 @@ import {
 import { ComicCard } from "../../components/ComicCard";
 import { useNavbarStore } from "../../stores/navbar";
 import Link from "next/link";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import { Model } from "../../types";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { client } from "../../modules/client";
 import moment from "moment";
 import { NextSeo } from "next-seo";
 import { SEO } from "../../modules/seo";
 import { capitalizeFirstLetter } from "../../modules/helper";
-
+import RenderXTime from "../../components/RenderXTime";
+import SortIcon from "@mui/icons-material/Sort";
 interface SlugPageProps extends WithRouterProps {
   comic: Model["Comic"];
   top: Model["Comic"][];
@@ -50,7 +50,36 @@ interface SlugPageProps extends WithRouterProps {
 
 function Slug({ top, router, comic }: SlugPageProps) {
   const [chapMode, setChapMode] = useState<"grid" | "list">("list");
+
+  const [search, setSearch] = useState("");
+
+  const [sortMode, setSortMode] = useState<"desc" | "asc">("desc");
   const { setTransparent, setTransparentMode } = useNavbarStore();
+
+  const { data: { findManyChapter: chaptersRaw } = {}, loading } = useQuery<{
+    findManyChapter: Model["Chapter"][];
+  }>(
+    gql`
+      query FindManyChapter($where: ChapterWhereInput) {
+        findManyChapter(where: $where) {
+          id
+          name
+          createdAt
+        }
+      }
+    `,
+    {
+      variables: {
+        where: {
+          comicId: {
+            equals: comic.id,
+          },
+        },
+      },
+    }
+  );
+
+  const chapters = chaptersRaw ? [...chaptersRaw] : [];
 
   useEffect(() => {
     setTransparent(true);
@@ -79,6 +108,18 @@ function Slug({ top, router, comic }: SlugPageProps) {
   };
 
   const { push } = router;
+
+  const chaptersFiltered = search
+    ? chapters?.filter((chapter) => {
+        return chapter.name
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase());
+      })
+    : chapters;
+
+  const sortFunction = (e: Model["Chapter"], x: Model["Chapter"]) =>
+    sortMode == "desc" ? x.name - e.name : e.name - x.name;
 
   return (
     <div>
@@ -139,7 +180,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
               bottom: 0,
               position: "absolute",
               color: "white",
-              p: 12,
+              p: 16,
               display: "flex",
               gap: 2,
               flexDirection: {
@@ -154,7 +195,12 @@ function Slug({ top, router, comic }: SlugPageProps) {
               }}
             >
               <Box display="flex" alignItems="center">
-                <img src={comic.thumb} height={320} width={240} alt="Cover" />
+                <img
+                  src={comic.thumb}
+                  height={320 / 1.2}
+                  width={240 / 1.2}
+                  alt="Cover"
+                />
               </Box>
               <Box
                 sx={{
@@ -301,8 +347,18 @@ function Slug({ top, router, comic }: SlugPageProps) {
           <Paper sx={{ p: 2 }}>
             <Box display="flex" justifyContent={"space-between"}>
               <Typography variant="h5">Daftar Chapter</Typography>
+
               <Divider />
               <Box display="flex" gap={1}>
+                <IconButton
+                  color={sortMode == "desc" ? "primary" : undefined}
+                  onClick={() =>
+                    setSortMode(sortMode == "desc" ? "asc" : "desc")
+                  }
+                >
+                  <SortIcon />
+                </IconButton>
+                <Divider orientation="vertical" />
                 <IconButton
                   color={chapMode == "list" ? "primary" : undefined}
                   onClick={() => setChapMode("list")}
@@ -317,66 +373,87 @@ function Slug({ top, router, comic }: SlugPageProps) {
                 </IconButton>
               </Box>
             </Box>
+            <TextField
+              size="small"
+              label="Cari Chapter"
+              fullWidth
+              onChange={(e) => setSearch(e.target.value)}
+              value={search}
+            />
 
             {chapMode == "list" ? (
               <List sx={{ maxHeight: 600, overflowY: "auto" }}>
-                {comic.chapters
-                  .sort((e, x) => x.name - e.name)
-                  .map((e, i) => (
-                    <Link key={i} href={`/chapter/${e.id}`}>
-                      <a>
-                        <ListItem key={i} disablePadding>
-                          <ListItemButton>
-                            <Box
-                              display="flex"
-                              justifyContent={"space-between"}
-                              width="100%"
-                            >
-                              <Box display="flex" gap={1} alignItems={"center"}>
-                                <RemoveRedEye />
-                                <ListItemText primary={`Chapter ${e.name}`} />
-                              </Box>
-                              <Box display="flex" gap={1} alignItems={"center"}>
-                                <AccessTime />
-                                <ListItemText
-                                  primary={moment(e.createdAt).fromNow()}
-                                />
-                              </Box>
+                {loading && (
+                  <RenderXTime x={20}>
+                    <Box width="100%">
+                      <Skeleton sx={{ height: 40 }} />
+                    </Box>
+                  </RenderXTime>
+                )}
+                {chaptersFiltered?.sort(sortFunction).map((e, i) => (
+                  <Link key={i} href={`/chapter/${e.id}`}>
+                    <a>
+                      <ListItem key={i} disablePadding>
+                        <ListItemButton>
+                          <Box
+                            display="flex"
+                            justifyContent={"space-between"}
+                            width="100%"
+                          >
+                            <Box display="flex" gap={1} alignItems={"center"}>
+                              <RemoveRedEye />
+                              <ListItemText primary={`Chapter ${e.name}`} />
                             </Box>
-                          </ListItemButton>
-                        </ListItem>
-                      </a>
-                    </Link>
-                  ))}
+                            <Box display="flex" gap={1} alignItems={"center"}>
+                              <AccessTime />
+                              <ListItemText
+                                primary={moment(e.createdAt).fromNow()}
+                              />
+                            </Box>
+                          </Box>
+                        </ListItemButton>
+                      </ListItem>
+                    </a>
+                  </Link>
+                ))}
               </List>
             ) : (
               <Grid container spacing={2}>
-                {comic.chapters
-                  .sort((e, x) => x.name - e.name)
-                  .map((e, i) => (
-                    <Grid key={i} item xs={6} md={3}>
-                      <Link href={`/chapter/${e.id}`}>
-                        <a>
-                          <Paper
-                            sx={{
-                              p: 2,
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            <IconButton>
-                              <RemoveRedEye />
-                            </IconButton>
-                            <Typography textAlign="center" variant="body1">
-                              Chapter {e.name}
-                            </Typography>
-                            <IconButton></IconButton>
-                          </Paper>
-                        </a>
-                      </Link>
+                {loading && (
+                  <RenderXTime x={20}>
+                    <Grid item xs={6} md={3}>
+                      <Skeleton
+                        sx={{
+                          height: 85,
+                        }}
+                      />
                     </Grid>
-                  ))}
+                  </RenderXTime>
+                )}
+                {chaptersFiltered?.sort(sortFunction).map((e, i) => (
+                  <Grid key={i} item xs={6} md={3}>
+                    <Link href={`/chapter/${e.id}`}>
+                      <a>
+                        <Paper
+                          sx={{
+                            p: 2,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <IconButton>
+                            <RemoveRedEye />
+                          </IconButton>
+                          <Typography textAlign="center" variant="body1">
+                            Chapter {e.name}
+                          </Typography>
+                          <IconButton></IconButton>
+                        </Paper>
+                      </a>
+                    </Link>
+                  </Grid>
+                ))}
               </Grid>
             )}
           </Paper>
@@ -398,89 +475,166 @@ function Slug({ top, router, comic }: SlugPageProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { slug } = context.query;
-  const allowHentai = context.req.cookies.r18 == "enable" ?? false;
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const { slug } = context.query;
+//   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
 
-  const where = allowHentai
-    ? {}
-    : {
-        isHentai: {
-          equals: false,
-        },
-      };
+//   const where = allowHentai
+//     ? {}
+//     : {
+//         isHentai: {
+//           equals: false,
+//         },
+//       };
 
-  const { data: { findManyComic: top } = {}, error: errorTop } =
-    await client.query<{
-      findManyComic: Model["Comic"][];
-    }>({
-      query: gql`
-        query TopComic(
-          $take: Int
-          $chaptersTake2: Int
-          $orderBy: ChapterOrderByWithRelationInput
-          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-          $where: ComicWhereInput
-        ) {
-          findManyComic(
-            take: $take
-            orderBy: $findManyComicOrderBy2
-            where: $where
-          ) {
-            id
-            name
-            thumb
-            thumbWide
-            slug
-            rating
-            isHentai
-            author {
-              id
-              name
-              slug
-            }
-            viewsWeek
-            lastChapterUpdateAt
-            genres {
-              id
-              name
-              slug
-            }
-            chapters(take: $chaptersTake2, orderBy: $orderBy) {
-              id
-              name
-              createdAt
-            }
-            _count {
-              chapters
-            }
-          }
-        }
-      `,
-      variables: {
-        take: 10,
-        chaptersTake2: 1,
-        orderBy: {
-          name: "desc",
-        },
-        findManyComicOrderBy2: [
-          {
-            rating: "desc",
-          },
-        ],
-        where,
-      },
-    });
+//   const { data: { findManyComic: top } = {}, error: errorTop } =
+//     await client.query<{
+//       findManyComic: Model["Comic"][];
+//     }>({
+//       query: gql`
+//         query TopComic(
+//           $take: Int
+//           $chaptersTake2: Int
+//           $orderBy: ChapterOrderByWithRelationInput
+//           $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+//           $where: ComicWhereInput
+//         ) {
+//           findManyComic(
+//             take: $take
+//             orderBy: $findManyComicOrderBy2
+//             where: $where
+//           ) {
+//             id
+//             name
+//             thumb
+//             thumbWide
+//             slug
+//             rating
+//             isHentai
+//             author {
+//               id
+//               name
+//               slug
+//             }
+//             viewsWeek
+//             lastChapterUpdateAt
+//             genres {
+//               id
+//               name
+//               slug
+//             }
+//             chapters(take: $chaptersTake2, orderBy: $orderBy) {
+//               id
+//               name
+//               createdAt
+//             }
+//             _count {
+//               chapters
+//             }
+//           }
+//         }
+//       `,
+//       variables: {
+//         take: 10,
+//         chaptersTake2: 1,
+//         orderBy: {
+//           name: "desc",
+//         },
+//         findManyComicOrderBy2: [
+//           {
+//             rating: "desc",
+//           },
+//         ],
+//         where,
+//       },
+//     });
 
+//   const { data: { findFirstComic } = {}, error: errorComic } =
+//     await client.query<{
+//       findFirstComic: Model["Comic"];
+//     }>({
+//       query: gql`
+//         query FindFirstComic(
+//           $orderBy: ChapterOrderByWithRelationInput
+//           $where: ComicWhereInput
+//         ) {
+//           findFirstComic(where: $where) {
+//             id
+//             name
+//             thumb
+//             type
+//             thumbWide
+//             altName
+//             slug
+//             isHentai
+//             released
+//             author {
+//               id
+//               name
+//               slug
+//             }
+//             rating
+//             views
+//             viewsWeek
+//             description
+//             age
+//             status
+//             concept
+//             lastChapterUpdateAt
+//             createdAt
+//             updatedAt
+//             authorId
+//             genres {
+//               id
+//               name
+//               slug
+//             }
+//             chapters(orderBy: $orderBy) {
+//               id
+//               name
+//               createdAt
+//             }
+//           }
+//         }
+//       `,
+//       variables: {
+//         orderBy: {
+//           name: "desc",
+//         },
+//         where: {
+//           slug: {
+//             equals: slug,
+//           },
+//         },
+//       },
+//     });
+
+//   if (!findFirstComic) {
+//     console.log(`404 comic ${slug}`);
+//   }
+
+//   if (errorTop || errorComic) {
+//     console.log(errorTop);
+//     console.log(errorComic);
+//   }
+
+//   return {
+//     notFound: !findFirstComic,
+//     props: {
+//       comic: findFirstComic,
+//       top: top ?? [],
+//     },
+//   };
+// };
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const slug = context?.params?.slug as string;
   const { data: { findFirstComic } = {}, error: errorComic } =
     await client.query<{
       findFirstComic: Model["Comic"];
     }>({
       query: gql`
-        query FindFirstComic(
-          $orderBy: ChapterOrderByWithRelationInput
-          $where: ComicWhereInput
-        ) {
+        query FindFirstComic($where: ComicWhereInput) {
           findFirstComic(where: $where) {
             id
             name
@@ -491,11 +645,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             slug
             isHentai
             released
-            author {
-              id
-              name
-              slug
-            }
             rating
             views
             viewsWeek
@@ -507,23 +656,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             createdAt
             updatedAt
             authorId
+            author {
+              id
+              name
+              slug
+            }
             genres {
               id
               name
               slug
             }
-            chapters(orderBy: $orderBy) {
-              id
-              name
-              createdAt
-            }
           }
         }
       `,
       variables: {
-        orderBy: {
-          name: "desc",
-        },
         where: {
           slug: {
             equals: slug,
@@ -531,23 +677,50 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       },
     });
-
   if (!findFirstComic) {
     console.log(`404 comic ${slug}`);
   }
-
-  if (errorTop || errorComic) {
-    console.log(errorTop);
+  if (errorComic) {
     console.log(errorComic);
   }
-
   return {
     notFound: !findFirstComic,
     props: {
       comic: findFirstComic,
-      top: top ?? [],
+      top: [],
     },
+    revalidate: 60 * 60, // 1 hours
   };
 };
+
+// This function gets called at build time on server-side.
+// It may be called again, on a serverless function, if
+// the path has not been generated.
+export async function getStaticPaths() {
+  const { data: { findManyComic: comics } = {} } = await client.query<{
+    findManyComic: Model["Comic"][];
+  }>({
+    query: gql`
+      query FindFirstComic {
+        findManyComic {
+          id
+          name
+          slug
+        }
+      }
+    `,
+  });
+
+  // Get the paths we want to pre-render based on posts
+  const paths =
+    comics?.map((comic) => ({
+      params: { slug: comic.slug },
+    })) ?? [];
+
+  // We'll pre-render only these paths at build time.
+  // { fallback: blocking } will server-render pages
+  // on-demand if the path doesn't exist.
+  return { paths, fallback: "blocking" };
+}
 
 export default withRouter(Slug);

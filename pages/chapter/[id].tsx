@@ -21,7 +21,7 @@ import {
   Report,
   SkipPrevious,
 } from "@mui/icons-material";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import { client } from "../../modules/client";
 import { Model } from "../../types";
@@ -43,6 +43,33 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const images = chapter.imageUrls;
+
+  const { data: { findManyChapter: chapters } = {}, loading } = useQuery<{
+    findManyChapter: Model["Chapter"][];
+  }>(
+    gql`
+      query FindManyChapter($where: ChapterWhereInput) {
+        findManyChapter(where: $where) {
+          id
+          name
+          createdAt
+        }
+      }
+    `,
+    {
+      variables: {
+        where: {
+          comicId: {
+            equals: comic.id,
+          },
+        },
+      },
+    }
+  );
+
+  useEffect(() => {
+    page && setImageIndex(parseInt(page as string));
+  }, [page]);
 
   useEffect(() => {
     if (chapter) {
@@ -89,15 +116,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     if (imageIndex > 0) setImageIndex((i) => i - 1);
   };
 
-  // const maps = comic.chapters.reduce((acc, cur) => {
-  //   return {
-  //     ...acc,
-
-  //     [cur.name]: cur.id,
-  //   };
-  // }, {} as Record<number, number>);
-
-  const sorts = [...comic.chapters.sort((e, x) => e.name - x.name)];
+  const sorts = chapters ? [...chapters].sort((e, x) => e.name - x.name) : [];
 
   const nextChapter = () => {
     let idx = 0;
@@ -120,7 +139,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     //@ts-ignore
     for (const x of sorts) {
       if (x.id == chapter.id) {
-        const sorts = comic.chapters.sort((e, x) => e.name - x.name);
+        const sorts = (chapters ?? []).sort((e, x) => e.name - x.name);
 
         const prev = sorts[idx - 1];
         if (prev) {
@@ -178,8 +197,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
               <MenuItem value={chapter.id} selected>
                 Chapter {chapter.name}
               </MenuItem>
-              {comic.chapters
-                .sort((e, x) => x.name - e.name)
+              {sorts
                 .filter((e) => e.id != chapter.id)
                 .map((e) => (
                   <MenuItem value={e.id} key={e.id}>
@@ -299,10 +317,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               name
               slug
               type
-              chapters {
-                id
-                name
-              }
+
               thumb
               description
               author {

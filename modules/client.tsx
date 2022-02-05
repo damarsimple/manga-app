@@ -12,7 +12,11 @@ const defaultOptions: DefaultOptions = {
 };
 
 export const client = new ApolloClient({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+  uri: process.browser
+    ? process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT
+    : process.env.NEXT_PUBLIC_USE_INNER_GRAPHQL_ENDPOINT
+    ? process.env.NEXT_PUBLIC_INNER_GRAPHQL_ENDPOINT
+    : process.env.GRAPHQL_ENDPOINT,
   cache: new InMemoryCache(),
-  defaultOptions: defaultOptions,
+  defaultOptions: process.browser ? undefined : defaultOptions,
 });
