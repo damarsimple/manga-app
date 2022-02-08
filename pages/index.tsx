@@ -74,6 +74,7 @@ const Home = ({
         }
       `,
       {
+        fetchPolicy: "network-only",
         variables: {
           take: 48,
           chaptersTake2: 3,
