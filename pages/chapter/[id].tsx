@@ -216,7 +216,12 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
 
   const Ads = () => (
     <a target="_blank" href="https://bit.ly/3njmpck" rel="noreferrer">
-      <img src="/slot-online.webp" alt="Slot Online" title="Slot Online" />
+      <img
+        width="100%"
+        src="/slot-online.webp"
+        alt="Slot Online"
+        title="Slot Online"
+      />
     </a>
   );
 
