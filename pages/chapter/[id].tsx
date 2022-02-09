@@ -213,6 +213,13 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
       </Box>
     </Paper>
   );
+
+  const Ads = () => (
+    <a target="_blank" href="https://bit.ly/3njmpck" rel="noreferrer">
+      <img src="/slot-online.webp" alt="Slot Online" title="Slot Online" />
+    </a>
+  );
+
   return (
     <Container>
       <NextSeo
@@ -251,6 +258,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
       <Navigation />
       <div ref={containerRef} />
       <Paper sx={{ mb: 1 }}>
+        <Ads />
         {readMode === "single" ? (
           <img
             src={images[imageIndex]}
@@ -277,6 +285,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
             ))}
           </>
         )}
+        <Ads />
       </Paper>
 
       <Navigation />
