@@ -82,16 +82,13 @@ export default function Navbar() {
         >
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton size="large" edge="start" color="inherit" sx={{ p: 2 }}>
-              <Link href="/">
-                <a>
+                <a  href="/">
                   <Box sx={{ display: { xs: "none", md: "flex" } }}>
                     <img src="/logo.png" width={250} height={50} alt="logo" />
                   </Box>
                 </a>
-              </Link>
               <Box sx={{ display: { xs: "flex", md: "none" } }}>
-                <Link href="/">
-                  <a>
+                  <a  href="/">
                     <img
                       src="/android-icon-48x48.png"
                       width={48}
@@ -99,7 +96,6 @@ export default function Navbar() {
                       alt="logo"
                     />
                   </a>
-                </Link>
               </Box>
             </IconButton>
             <Box
