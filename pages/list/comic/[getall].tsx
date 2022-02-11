@@ -222,7 +222,10 @@ function Catch({ router }: WithRouterProps) {
                 <Box key={e} sx={{ mt: 2 }}>
                   <Typography variant="h5">{e}</Typography>
                   <Grid container spacing={1} sx={{ mt: 2 }}>
-                    {sorted[e].map((e, i) => (
+                    {(!hMode
+                      ? sorted[e].filter((e) => !e.isHentai)
+                      : sorted[e]
+                    ).map((e, i) => (
                       <Grid item xs={6} sm={3} lg={2} key={e.id}>
                         <Link href={"/comic/" + e.slug}>
                           <a>

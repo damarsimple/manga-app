@@ -6,6 +6,7 @@ import {
   Paper,
   Typography,
   Pagination as PaginationMUI,
+  Chip,
 } from "@mui/material";
 import type { GetServerSideProps, NextPage } from "next";
 // import Swiper core and required modules
@@ -30,6 +31,7 @@ import { NextSeo } from "next-seo";
 import { SEO } from "../modules/seo";
 import { useR18 } from "../stores/r18";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const Home = ({
   carousel,
@@ -51,57 +53,24 @@ const Home = ({
 
   const { push } = useRouter();
 
-  // const { data: { findManyComic: latestClient } = {}, error: errorLatest } =
-  //   useQuery<{
-  //     findManyComic: Model["Comic"][];
-  //   }>(
-  //     gql`
-  //       query TopComic(
-  //         $take: Int
-  //         $chaptersTake2: Int
-  //         $orderBy: ChapterOrderByWithRelationInput
-  //         $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-  //         $where: ComicWhereInput
-  //       ) {
-  //         findManyComic(
-  //           take: $take
-  //           orderBy: $findManyComicOrderBy2
-  //           where: $where
-  //         ) {
-  //           id
-  //           name
-  //           thumb
-  //           thumbWide
-  //           slug
-  //           isHentai
-  //           viewsWeek
-
-  //           lastChapterUpdateAt
-  //           chapters(take: $chaptersTake2, orderBy: $orderBy) {
-  //             id
-  //             name
-  //             createdAt
-  //           }
-  //         }
-  //       }
-  //     `,
-  //     {
-  //       fetchPolicy: "network-only",
-  //       variables: {
-  //         take: 48,
-  //         chaptersTake2: 3,
-  //         orderBy: {
-  //           name: "desc",
-  //         },
-  //         findManyComicOrderBy2: [
-  //           {
-  //             lastChapterUpdateAt: "desc",
-  //           },
-  //         ],
-  //         where,
-  //       },
-  //     }
-  //   );
+  const { data: { findManyGenre: genres } = {} } = useQuery<{
+    findManyGenre: Model["Genre"][];
+  }>(
+    gql`
+      query Query($take: Int) {
+        findManyGenre(take: $take) {
+          id
+          name
+          slug
+        }
+      }
+    `,
+    {
+      variables: {
+        take: 28,
+      },
+    }
+  );
 
   return (
     <Box p={2} display="flex" gap={2} flexDirection={"column"}>
@@ -214,7 +183,7 @@ const Home = ({
             <Divider sx={{ my: 2 }} />
             <Grid container spacing={1}>
               {top.map((e, i) => (
-                <Grid item xs={6} sm={12} key={i} width="100%">
+                <Grid item xs={12} key={i} width="100%">
                   <ComicCard {...e} layout="top" isFirst={i == 0} key={e.id} />
                 </Grid>
               ))}
@@ -243,6 +212,25 @@ const Home = ({
               </Grid>
             </Grid>
           </Paper>
+
+          <Paper sx={{ p: 2, mt: 1 }}>
+            <Typography variant="h5" component="h3">
+              DAFTAR GENRE
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            {genres?.map((e, i) => (
+              <Link href={`/list/genre/` + e.slug} key={e.id}>
+                <a>
+                  <Chip
+                    label={e.name}
+                    sx={{
+                      margin: 0.5,
+                    }}
+                  />
+                </a>
+              </Link>
+            ))}
+          </Paper>
         </Grid>
       </Grid>
     </Box>
@@ -252,7 +240,12 @@ const Home = ({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
   const { page: p } = context.query;
-  const page = parseInt((p as string) ?? "") ?? 1;
+  let page = parseInt((p as string) ?? "") ?? 1;
+
+  if (!page) page = 1;
+
+  const perPage = 18;
+
   const where = allowHentai
     ? {}
     : {
@@ -408,9 +401,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
       `,
       variables: {
-        take: 48,
-        skip: (page == 1 ? 0 : page) * 48,
+        take: perPage,
         chaptersTake2: 3,
+        skip: page == 1 ? 0 : page * perPage,
         orderBy: {
           name: "desc",
         },

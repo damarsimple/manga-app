@@ -10,6 +10,7 @@ import {
   InputBase,
   Paper,
   Skeleton,
+  Divider,
 } from "@mui/material";
 import { useContext, useState } from "react";
 import Image from "next/image";
@@ -141,7 +142,12 @@ export default function Navbar() {
           elevation={0}
           position="fixed"
           sx={{
-            backgroundColor: transparent ? "transparent" : undefined,
+            color: mode == "dark" ? "white" : "black",
+            backgroundColor: transparent
+              ? "transparent"
+              : mode == "dark"
+              ? "#1e1e1e"
+              : "white",
           }}
         >
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>

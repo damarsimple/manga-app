@@ -695,7 +695,20 @@ export const getStaticProps: GetStaticProps = async (context) => {
       },
     });
   if (!findFirstComic && slug != undefined) {
-    console.log(`404 comic ${slug}`);
+    client
+      .query({
+        query: gql`
+          mutation ReportMissing($data: String!, $context: String!) {
+            reportMissing(data: $data, context: $context)
+          }
+        `,
+
+        variables: {
+          context: "comic",
+          data: slug,
+        },
+      })
+      .then(() => console.log(`404 comic ${slug}`));
   }
   if (errorComic) {
     console.log(errorComic);
