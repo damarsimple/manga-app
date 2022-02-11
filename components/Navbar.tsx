@@ -27,6 +27,7 @@ import Tippy from "@tippyjs/react";
 import { ComicSearch } from "../types";
 import { gql, useQuery } from "@apollo/client";
 import { useR18 } from "../stores/r18";
+import { useRouter } from "next/router";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -69,6 +70,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Navbar() {
+  const { push } = useRouter();
   const [accountEl, setAccountEl] = useState<Element | null>(null);
 
   const [query, setQuery] = useState("");
@@ -223,7 +225,7 @@ export default function Navbar() {
                       name="q"
                       onChange={(e) => setQuery(e.target.value)}
                       onFocus={() => setFocused(true)}
-                      onBlur={() => setFocused(false)}
+                      onBlur={() => setTimeout(() => setFocused(false), 200)}
                     />
                   </Search>
                   <Box
@@ -262,6 +264,7 @@ export default function Navbar() {
                                   backgroundColor: "lightgray",
                                 },
                               }}
+                              onClick={() => push("/comic/" + e.slug)}
                             >
                               <img
                                 alt={e.name}
