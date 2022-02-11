@@ -35,7 +35,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const { page } = query;
   const comic: Model["Comic"] = chapter.comic as Model["Comic"];
   const title =
-    "Komik " + comic.name + ` Chapter ${chapter.name} ` + SEO.padding;
+    "Baca " + comic.name + ` Chapter ${chapter.name} ` + SEO.padding;
   const [readMode, setReadMode] = useState<"single" | "longstrip">("longstrip");
   const [imageIndex, setImageIndex] = useState(
     isNaN(parseInt(page as string)) ? 0 : parseInt(page as string)
@@ -173,11 +173,12 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
             justifyContent: "space-between",
             alignItems: "center",
             p: 1,
+            gap: 0.2,
           }}
         >
-          <IconButton onClick={prevChapter}>
-            <NavigateBefore />
-          </IconButton>
+          <Button onClick={prevChapter} variant="contained">
+            Prev
+          </Button>
           {/* <Typography
               textAlign={"center"}
               variant="body1"
@@ -206,9 +207,9 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
                 ))}
             </Select>
           </FormControl>
-          <IconButton onClick={nextChapter}>
-            <NavigateNext />
-          </IconButton>
+          <Button onClick={nextChapter} variant="contained">
+            Next
+          </Button>
         </Box>
       </Box>
     </Paper>

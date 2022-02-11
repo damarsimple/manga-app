@@ -5,12 +5,14 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
+import "react-virtualized/styles.css";
+import "tippy.js/dist/tippy.css"; // optional
+
 import type { AppProps } from "next/app";
 import { Box } from "@mui/material";
 import Footer from "../components/Footer";
 import { useColorMode } from "../stores/colorMode";
 import Navbar from "../components/Navbar";
-import { useNavbarStore } from "../stores/navbar";
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../modules/client";
 import NextNProgress from "nextjs-progressbar";

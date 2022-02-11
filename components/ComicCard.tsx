@@ -83,9 +83,6 @@ export const ComicCard = ({
         >
           <Box display="flex" alignItems="center" gap={0.5}>
             <Person fontSize="small" />
-            <Typography variant={"caption"}>Author</Typography>
-          </Box>
-          <Box display="flex" alignItems="center" gap={0.5}>
             <Typography variant={"caption"}>{author?.name}</Typography>
           </Box>
         </Box>
@@ -100,12 +97,9 @@ export const ComicCard = ({
       justifyContent="space-between"
       pt={1}
     >
-      <Box display="flex" alignItems="center" gap={0.5}>
-        <LocalMovies fontSize="small" />
-        <Typography variant={"caption"}>Genres</Typography>
-      </Box>
       <Box display="flex" alignItems="center" gap={0.1} overflow="hidden">
-        {genres.map((e, i) => (
+        <LocalMovies fontSize="small" />
+        {[...genres].slice(0, 2).map((e, i) => (
           <Chip
             key={i}
             label={e.name}
@@ -125,9 +119,7 @@ export const ComicCard = ({
     >
       <Box display="flex" alignItems="center" gap={0.5}>
         <AccessTime fontSize="small" />
-        <Typography variant={"caption"}>Last Updated</Typography>
-      </Box>
-      <Box display="flex" alignItems="center" gap={0.5}>
+
         <Typography variant={"caption"}>
           {moment(lastChapterUpdateAt).fromNow()}
         </Typography>
@@ -161,9 +153,6 @@ export const ComicCard = ({
     >
       <Box display="flex" alignItems="center" gap={0.5}>
         <Star fontSize="small" />
-        <Typography variant={"caption"}>Rating</Typography>
-      </Box>
-      <Box display="flex" alignItems="center" gap={0.5}>
         <Typography variant={"caption"}>{rating}</Typography>
       </Box>
     </Box>
@@ -186,7 +175,7 @@ export const ComicCard = ({
             fontWeight: "bold",
             fontSize: {
               xs: "1rem",
-              sm: "1.3rem",
+              sm: "1.2rem",
             },
           }}
         >
@@ -204,7 +193,11 @@ export const ComicCard = ({
               18+
             </Box>
           )}{" "}
-          {name}
+          <span
+            dangerouslySetInnerHTML={{
+              __html: name,
+            }}
+          />
         </Typography>
       </a>
     </Link>
@@ -213,7 +206,14 @@ export const ComicCard = ({
   const fallback = thumb ?? "/static/no-image.png";
 
   return (
-    <Paper elevation={1} sx={{ display: "flex", width: "100%" }}>
+    <Paper
+      elevation={1}
+      sx={{
+        display: "flex",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
       {layout == "carousel" && (
         <Box sx={{ minWidth: "100%" }}>
           <Link href={myUrl}>
@@ -221,11 +221,7 @@ export const ComicCard = ({
               <Box
                 component="img"
                 src={fallback + "?width=240"}
-                height={{
-                  xs: 240,
-                  sm: 320,
-                  lg: 320,
-                }}
+                height={250}
                 width={"100%"}
                 alt={name}
               />
@@ -233,36 +229,34 @@ export const ComicCard = ({
           </Link>
           <Box sx={{ p: 1 }}>
             <TitleFormatted />
-            <ChapterTimestamp {...firstChapter} />
+            {firstChapter && <ChapterTimestamp {...firstChapter} />}
           </Box>
         </Box>
       )}
       {layout == "top" && (
-        <Box sx={{ p: 1, minWidth: "100%" }}>
+        <Box sx={{ p: 1, minWidth: "100%", display: "flex", gap: 1 }}>
           <Link href={myUrl}>
             <a>
               <Box
                 component="img"
                 src={fallback + "?width=240"}
-                height={{
-                  xs: 240,
-                  sm: 320,
-                  lg: 440,
-                }}
-                width={"100%"}
+                height={"100%"}
+                width={100}
                 alt={name}
               />
             </a>
           </Link>
-          <Box display="flex" alignItems="center" gap={0.5}>
-            {isFirst && <StarRate />}
-            <TitleFormatted />
+          <Box>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              {isFirst && <StarRate />}
+              <TitleFormatted />
+            </Box>
+            <AuthorFormatted />
+            <GenreFormatted />
+            {/* <TotalChapterFormatted /> */}
+            <RatingFormatted />
+            <LastUpdatedFormatted />
           </Box>
-          <AuthorFormatted />
-          <GenreFormatted />
-          {/* <TotalChapterFormatted /> */}
-          <RatingFormatted />
-          <LastUpdatedFormatted />
         </Box>
       )}
       {layout == "detailed" && (

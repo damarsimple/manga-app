@@ -1,5 +1,12 @@
 /* eslint-disable @next/next/no-html-link-for-pages  */
-import { Box, Divider, Grid, Paper, Typography, Chip } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Grid,
+  Paper,
+  Typography,
+  Pagination as PaginationMUI,
+} from "@mui/material";
 import type { GetServerSideProps, NextPage } from "next";
 // import Swiper core and required modules
 
@@ -22,6 +29,7 @@ import { Model } from "../types";
 import { NextSeo } from "next-seo";
 import { SEO } from "../modules/seo";
 import { useR18 } from "../stores/r18";
+import { useRouter } from "next/router";
 
 const Home = ({
   carousel,
@@ -40,6 +48,9 @@ const Home = ({
           equals: false,
         },
       };
+
+  const { push } = useRouter();
+
   // const { data: { findManyComic: latestClient } = {}, error: errorLatest } =
   //   useQuery<{
   //     findManyComic: Model["Comic"][];
@@ -103,39 +114,33 @@ const Home = ({
             // when window width is >= 320px
             320: {
               slidesPerView: 2,
-              spaceBetween: 20,
+              spaceBetween: 5,
             },
             // when window width is >= 480px
             768: {
               slidesPerView: 4,
-              spaceBetween: 30,
+              spaceBetween: 10,
             },
             // when window width is >= 640px
             1024: {
               slidesPerView: 6,
-              spaceBetween: 40,
+              spaceBetween: 10,
             },
           }}
           style={{ paddingBottom: 30 }}
         >
           {carousel.map((e, i) => (
             <SwiperSlide key={i}>
-              <ComicCard {...e} layout="carousel" />
+              <Box sx={{ mr: 1 }}>
+                <ComicCard {...e} layout="carousel" />
+              </Box>
             </SwiperSlide>
           ))}
         </Swiper>
       </Paper>
 
       <Grid container spacing={1}>
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={9}
-          lg={10}
-          display="flex"
-          flexDirection="column"
-        >
+        <Grid item xs={12} sm={8} md={9} display="flex" flexDirection="column">
           <Paper sx={{ p: 2 }}>
             <Typography variant="h5" component="h3">
               UPDATE KOMIK TERBARU
@@ -159,9 +164,23 @@ const Home = ({
                 ))}
               </Grid>
             </Box>
+            <Divider sx={{ my: 2 }} />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <PaginationMUI
+                count={10}
+                onChange={(_, v) => {
+                  push("/?page=" + v);
+                }}
+              />
+            </Box>
           </Paper>
 
-          <Paper sx={{ p: 2, mt: 2 }}>
+          {/* <Paper sx={{ p: 2, mt: 2 }}>
             <Typography variant="h5" component="h3">
               KOMIK REKOMENDASI
             </Typography>
@@ -184,10 +203,10 @@ const Home = ({
                 ))}
               </Grid>
             </Box>
-          </Paper>
+          </Paper> */}
         </Grid>
 
-        <Grid item xs={12} sm={4} md={3} lg={2}>
+        <Grid item xs={12} sm={4} md={3}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h5" component="h3">
               TOP KOMIK
@@ -232,7 +251,8 @@ const Home = ({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
-
+  const { page: p } = context.query;
+  const page = parseInt((p as string) ?? "") ?? 1;
   const where = allowHentai
     ? {}
     : {
@@ -334,7 +354,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
       `,
       variables: {
-        take: 10,
+        take: 5,
         chaptersTake2: 1,
         orderBy: {
           name: "desc",
@@ -356,6 +376,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         query TopComic(
           $take: Int
           $chaptersTake2: Int
+          $skip: Int
           $orderBy: ChapterOrderByWithRelationInput
           $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
           $where: ComicWhereInput
@@ -364,6 +385,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             take: $take
             orderBy: $findManyComicOrderBy2
             where: $where
+            skip: $skip
           ) {
             id
             name
@@ -387,6 +409,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       `,
       variables: {
         take: 48,
+        skip: (page == 1 ? 0 : page) * 48,
         chaptersTake2: 3,
         orderBy: {
           name: "desc",

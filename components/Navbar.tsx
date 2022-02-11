@@ -8,6 +8,8 @@ import {
   Menu,
   MenuItem,
   InputBase,
+  Paper,
+  Skeleton,
 } from "@mui/material";
 import { useContext, useState } from "react";
 import Image from "next/image";
@@ -20,6 +22,10 @@ import { TextField } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 
 import SearchIcon from "@mui/icons-material/Search";
+import Tippy from "@tippyjs/react";
+import { ComicSearch } from "../types";
+import { gql, useQuery } from "@apollo/client";
+import { useR18 } from "../stores/r18";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -64,9 +70,67 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Navbar() {
   const [accountEl, setAccountEl] = useState<Element | null>(null);
 
+  const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
   const handleClose = () => {
     setAccountEl(null);
   };
+
+  const { mode: hMode } = useR18();
+
+  const {
+    data: { comicSearch } = {},
+    loading,
+    error,
+  } = useQuery<{
+    comicSearch: ComicSearch;
+  }>(
+    gql`
+      query ComicSearch(
+        $query: String!
+        $offset: Int
+        $limit: Int
+        $type: String
+        $allowHentai: Boolean
+      ) {
+        comicSearch(
+          query: $query
+          offset: $offset
+          limit: $limit
+          type: $type
+          allowHentai: $allowHentai
+        ) {
+          comics {
+            id
+            name
+            slug
+            thumb
+            type
+            thumbWide
+            altName
+            isHentai
+            released
+            rating
+            views
+            viewsWeek
+          }
+          offset
+          limit
+          processingTimeMs
+          total
+          exhaustiveNbHits
+        }
+      }
+    `,
+    {
+      variables: {
+        query: `${query}`,
+        limit: 5,
+        allowHentai: hMode,
+      },
+      fetchPolicy: "network-only",
+    }
+  );
 
   const { setMode, mode, toggle } = useColorMode();
   const { transparent, transparentMode } = useNavbarStore();
@@ -82,20 +146,20 @@ export default function Navbar() {
         >
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton size="large" edge="start" color="inherit" sx={{ p: 2 }}>
-                <a  href="/">
-                  <Box sx={{ display: { xs: "none", md: "flex" } }}>
-                    <img src="/logo.png" width={250} height={50} alt="logo" />
-                  </Box>
-                </a>
+              <a href="/">
+                <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                  <img src="/logo.png" width={250} height={50} alt="logo" />
+                </Box>
+              </a>
               <Box sx={{ display: { xs: "flex", md: "none" } }}>
-                  <a  href="/">
-                    <img
-                      src="/android-icon-48x48.png"
-                      width={48}
-                      height={48}
-                      alt="logo"
-                    />
-                  </a>
+                <a href="/">
+                  <img
+                    src="/android-icon-48x48.png"
+                    width={48}
+                    height={48}
+                    alt="logo"
+                  />
+                </a>
               </Box>
             </IconButton>
             <Box
@@ -140,17 +204,80 @@ export default function Navbar() {
               ))}
             </Box>
             <Box display="flex" alignItems="center" gap={1}>
-              <form method="GET" action="/list/comic/search">
-                <Search>
-                  <SearchIconWrapper>
-                    <SearchIcon />
-                  </SearchIconWrapper>
-                  <StyledInputBase
-                    placeholder="Cari Komik.."
-                    inputProps={{ "aria-label": "search" }}
-                    name="q"
-                  />
-                </Search>
+              <form autoComplete="off" method="GET" action="/list/comic/search">
+                <Box position="relative">
+                  <Search>
+                    <SearchIconWrapper>
+                      <SearchIcon />
+                    </SearchIconWrapper>
+
+                    <StyledInputBase
+                      placeholder="Cari Komik.."
+                      inputProps={{ "aria-label": "search" }}
+                      name="q"
+                      onChange={(e) => setQuery(e.target.value)}
+                      onFocus={() => setFocused(true)}
+                      onBlur={() => setFocused(false)}
+                    />
+                  </Search>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      zIndex: 99,
+                      width: "100%",
+                    }}
+                  >
+                    {loading && (
+                      <Paper
+                        sx={{
+                          display: "flex",
+                          gap: 1,
+                          p: 1,
+                        }}
+                      >
+                        <Skeleton width={40} height={60} />
+                        <Box width="100%">
+                          <Skeleton height={30} variant="text" width={"100%"} />
+                          <Skeleton height={30} variant="text" width={"100%"} />
+                        </Box>
+                      </Paper>
+                    )}
+                    {focused &&
+                      query?.length > 0 &&
+                      comicSearch?.comics?.map((e) => (
+                        <Link href={"/comic/" + e.slug} key={e.id}>
+                          <a>
+                            <Paper
+                              sx={{
+                                display: "flex",
+                                gap: 1,
+                                p: 1,
+                                ":hover": {
+                                  backgroundColor: "lightgray",
+                                },
+                              }}
+                            >
+                              <img
+                                alt={e.name}
+                                src={e.thumb}
+                                width={40}
+                                height={60}
+                              />
+                              <Box>
+                                <Typography variant="body1">
+                                  <span
+                                    dangerouslySetInnerHTML={{
+                                      __html: e.name,
+                                    }}
+                                  />
+                                </Typography>
+                              </Box>
+                            </Paper>
+                          </a>
+                        </Link>
+                      ))}
+                  </Box>
+                </Box>
               </form>
               <Box display="flex" alignItems="center" gap={0.2}>
                 <IconButton sx={{ ml: 1 }} onClick={toggle} color="inherit">
