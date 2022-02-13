@@ -3,13 +3,13 @@ import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/router";
 import { useR18 } from "../stores/r18";
-import { dontRender } from "../modules/rules";
+import { dontRenderContext } from "../modules/rules";
 
 export default function ContextMenu() {
   const { push, pathname } = useRouter();
   const { mode } = useR18();
 
-  if (dontRender.some((r) => r.test(pathname))) return <></>;
+  if (dontRenderContext.some((r) => r.test(pathname))) return <></>;
 
   return (
     <Paper sx={{ p: 1, mb: 1 }}>
