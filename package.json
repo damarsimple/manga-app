@@ -18,6 +18,7 @@
     "@types/js-cookie": "^3.0.1",
     "babel-plugin-import": "^1.13.3",
     "cookie-js": "^0.0.1",
+    "formik": "^2.2.9",
     "graphql": "^16.3.0",
     "js-cookie": "^3.0.1",
     "moment": "^2.29.1",
@@ -27,9 +28,11 @@
     "nextjs-progressbar": "^0.0.13",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-toastify": "^8.1.1",
     "react-virtualized": "^9.22.3",
     "sharp": "^0.29.3",
     "swiper": "^7.4.1",
+    "yup": "^0.32.11",
     "zustand": "^3.6.9"
   },
   "devDependencies": {

@@ -16,18 +16,19 @@ import { useContext, useState } from "react";
 import Image from "next/image";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { useColorMode } from "../stores/colorMode";
-import { useNavbarStore } from "../stores/navbar";
+import { useColorMode } from "../../stores/colorMode";
+import { useNavbarStore } from "../../stores/navbar";
 import Link from "next/link";
 import { TextField } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 
 import SearchIcon from "@mui/icons-material/Search";
 import Tippy from "@tippyjs/react";
-import { ComicSearch } from "../types";
+import { ComicSearch } from "../../types";
 import { gql, useQuery } from "@apollo/client";
-import { useR18 } from "../stores/r18";
+import { useR18 } from "../../stores/r18";
 import { useRouter } from "next/router";
+import { dontRender } from "../../modules/rules";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -70,7 +71,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Navbar() {
-  const { push } = useRouter();
+  const { push, pathname } = useRouter();
   const [accountEl, setAccountEl] = useState<Element | null>(null);
 
   const [query, setQuery] = useState("");
@@ -137,6 +138,9 @@ export default function Navbar() {
 
   const { setMode, mode, toggle } = useColorMode();
   const { transparent, transparentMode } = useNavbarStore();
+
+  if (dontRender.some((r) => r.test(pathname))) return <></>;
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -223,6 +227,7 @@ export default function Navbar() {
                       placeholder="Cari Komik.."
                       inputProps={{ "aria-label": "search" }}
                       name="q"
+                      sx={{ border: 0.5, borderRadius: 2 }}
                       onChange={(e) => setQuery(e.target.value)}
                       onFocus={() => setFocused(true)}
                       onBlur={() => setTimeout(() => setFocused(false), 200)}
@@ -293,7 +298,7 @@ export default function Navbar() {
                   {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
                 </IconButton>
               </Box>
-              <IconButton
+              {/* <IconButton
                 size="large"
                 edge="start"
                 color="inherit"
@@ -301,7 +306,7 @@ export default function Navbar() {
                 onClick={(e) => setAccountEl(e.currentTarget)}
               >
                 <Avatar alt="Remy Sharp" sx={{ width: 48, height: 48 }} />
-              </IconButton>
+              </IconButton> */}
             </Box>
           </Box>
           <Box

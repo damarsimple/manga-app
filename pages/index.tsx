@@ -244,7 +244,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (!page) page = 1;
 
-  const perPage = 18;
+  const perPage = 42;
 
   const where = allowHentai
     ? {}
@@ -347,7 +347,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
       `,
       variables: {
-        take: 5,
+        take: 10,
         chaptersTake2: 1,
         orderBy: {
           name: "desc",

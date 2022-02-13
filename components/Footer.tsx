@@ -1,10 +1,18 @@
 import React from "react";
 import { Container } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { dontRender } from "../modules/rules";
+import { useRouter } from "next/router";
 /* eslint-disable @next/next/no-img-element */
+
 export default function Footer() {
   const theme = useTheme();
+
+  const { push, pathname } = useRouter();
+
   const { mode } = theme.palette;
+
+  if (dontRender.some((r) => r.test(pathname))) return <></>;
 
   return (
     <Container

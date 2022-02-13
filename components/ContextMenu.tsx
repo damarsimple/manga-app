@@ -3,27 +3,16 @@ import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/router";
 import { useR18 } from "../stores/r18";
-
-const except = ["/comic", "/chapter"];
+import { dontRender } from "../modules/rules";
 
 export default function ContextMenu() {
   const { push, pathname } = useRouter();
   const { mode } = useR18();
 
-  const check = () => {
-    for (const x of except) {
-      if (pathname.includes(x)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  if (!check()) return <></>;
+  if (dontRender.some((r) => r.test(pathname))) return <></>;
 
   return (
-    <Paper sx={{ p: 1 }}>
+    <Paper sx={{ p: 1, mb: 1 }}>
       {[
         {
           label: "Terbaru",

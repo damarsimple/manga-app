@@ -98,7 +98,9 @@ function Catch({ router }: WithRouterProps) {
         query: `${queryCannon}`,
         offset: mode == "Text Mode" ? 0 : page == 1 ? 0 : page * limit,
         limit: mode == "Text Mode" ? 10000 : limit,
-        type: ["Search", "All"].includes(type ?? "")
+        type: ["Search", "All", "Terbaru", "Hot", "Rekomendasi"].includes(
+          type ?? ""
+        )
           ? undefined
           : capitalizeFirstLetter(`${type ?? ""}`),
         allowHentai: hMode,

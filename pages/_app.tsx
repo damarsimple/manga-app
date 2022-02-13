@@ -12,7 +12,7 @@ import type { AppProps } from "next/app";
 import { Box } from "@mui/material";
 import Footer from "../components/Footer";
 import { useColorMode } from "../stores/colorMode";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar/Navbar";
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../modules/client";
 import NextNProgress from "nextjs-progressbar";
@@ -22,6 +22,8 @@ import { useEffect, useState } from "react";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { ArrowUpward } from "@mui/icons-material";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { mode: modeStore } = useColorMode();
@@ -158,6 +160,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
           <Component {...pageProps} />
           <Footer />
+          <ToastContainer />
         </Box>
       </ThemeProvider>
     </ApolloProvider>
