@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache, DefaultOptions } from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
 
 const defaultOptions: DefaultOptions = {
   watchQuery: {
@@ -11,7 +12,23 @@ const defaultOptions: DefaultOptions = {
   },
 };
 
+// Log any GraphQL errors or network error that occurred
+const errorLink = onError(({ graphQLErrors, networkError, ...rest }) => {
+  if (graphQLErrors)
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+      )
+    );
+  if (networkError) {
+    console.log(`[Network error]: ${networkError}`);
+    console.log(`[query] ${rest.operation.query}`);
+    console.log(`[query] ${rest.operation.variables}`);
+  }
+});
+
 export const client = new ApolloClient({
+  link: errorLink,
   uri: process.browser
     ? process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT
     : process.env.NEXT_PUBLIC_USE_INNER_GRAPHQL_ENDPOINT == "true"
