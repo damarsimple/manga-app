@@ -562,19 +562,17 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 
   if (findFirstComic?.id) {
-    client
-      .query({
-        query: gql`
-          mutation Mutation($reportViewId: Int!, $context: String!) {
-            reportView(id: $reportViewId, context: $context)
-          }
-        `,
-        variables: {
-          reportViewId: findFirstComic.id,
-          context: "comic",
-        },
-      })
-      .catch((e) => console.log(e.networkError.result.errors));
+    client.query({
+      query: gql`
+        mutation Mutation($reportViewId: Int!, $context: String!) {
+          reportView(id: $reportViewId, context: $context)
+        }
+      `,
+      variables: {
+        reportViewId: findFirstComic.id,
+        context: "comic",
+      },
+    });
   }
   if (errorComic) {
     console.log(errorComic);
