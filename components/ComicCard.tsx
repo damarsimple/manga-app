@@ -241,7 +241,7 @@ export const ComicCard = ({
                 component="img"
                 src={fallback + "?width=240"}
                 height={"100%"}
-                width={100}
+                width={120}
                 alt={name}
               />
             </a>

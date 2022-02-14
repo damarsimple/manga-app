@@ -32,7 +32,7 @@ import { SEO } from "../modules/seo";
 import { useR18 } from "../stores/r18";
 import { useRouter } from "next/router";
 import Link from "next/link";
-
+import { useState } from "react";
 const Home = ({
   carousel,
   top,
@@ -42,6 +42,7 @@ const Home = ({
   latest: Model["Comic"][];
   carousel: Model["Comic"][];
 }) => {
+  const [page, setPage] = useState(0);
   const { mode } = useR18();
   const where = mode
     ? {}
@@ -66,8 +67,63 @@ const Home = ({
       }
     `,
     {
+      variables: {},
+    }
+  );
+
+  const perPage = 24;
+  const { data: { findManyComic: recomendations } = {} } = useQuery<{
+    findManyComic: Model["Comic"][];
+  }>(
+    gql`
+      query FindManyComic(
+        $take: Int
+        $chaptersTake2: Int
+        $skip: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+          skip: $skip
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          isHentai
+          viewsWeek
+
+          lastChapterUpdateAt
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+          _count {
+            chapters
+          }
+        }
+      }
+    `,
+    {
       variables: {
-        take: 28,
+        take: perPage,
+        chaptersTake2: 3,
+        skip: page == 1 ? 0 : page * perPage,
+        orderBy: {
+          name: "desc",
+        },
+        findManyComicOrderBy2: [
+          {
+            views: "desc",
+          },
+        ],
+        where,
       },
     }
   );
@@ -92,7 +148,7 @@ const Home = ({
             },
             // when window width is >= 640px
             1024: {
-              slidesPerView: 6,
+              slidesPerView: 7,
               spaceBetween: 10,
             },
           }}
@@ -109,7 +165,15 @@ const Home = ({
       </Paper>
 
       <Grid container spacing={1}>
-        <Grid item xs={12} sm={8} md={9} display="flex" flexDirection="column">
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={9}
+          display="flex"
+          flexDirection="column"
+          gap={3}
+        >
           <Paper sx={{ p: 2 }}>
             <Typography variant="h5" component="h3">
               UPDATE KOMIK TERBARU
@@ -149,7 +213,7 @@ const Home = ({
             </Box>
           </Paper>
 
-          {/* <Paper sx={{ p: 2, mt: 2 }}>
+          <Paper sx={{ p: 2 }}>
             <Typography variant="h5" component="h3">
               KOMIK REKOMENDASI
             </Typography>
@@ -165,14 +229,28 @@ const Home = ({
               }}
             >
               <Grid container spacing={3}>
-                {latest?.map((e, i) => (
+                {recomendations?.map((e, i) => (
                   <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
                     <ComicCard {...e} layout="detailed" key={e.id} />
                   </Grid>
                 ))}
               </Grid>
             </Box>
-          </Paper> */}
+            <Divider sx={{ my: 2 }} />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <PaginationMUI
+                count={10}
+                onChange={(_, v) => {
+                  push("/?page=" + v);
+                }}
+              />
+            </Box>
+          </Paper>
         </Grid>
 
         <Grid item xs={12} sm={4} md={3}>
@@ -225,6 +303,7 @@ const Home = ({
                     label={e.name}
                     sx={{
                       margin: 0.5,
+                      cursor: "pointer",
                     }}
                   />
                 </a>
@@ -347,7 +426,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
       `,
       variables: {
-        take: 10,
+        take: 13,
         chaptersTake2: 1,
         orderBy: {
           name: "desc",
