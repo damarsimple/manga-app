@@ -167,7 +167,6 @@ export default function Slug() {
     gkChannel.onmessage = (e) => {
       if (e.data.command == "done") {
         toast.info(`Command ${e.data.payload.data} Finished`);
-        refetch();
         setRng(`${new Date().getTime()}`);
         setLoading(false);
       }
@@ -536,6 +535,14 @@ export default function Slug() {
               )}
             </Grid>
           </Grid>
+
+          {!loading && comic?.thumbWide && (
+            <img
+              src={`${comic?.thumbWide}?t=${rng}`}
+              alt={comic?.name}
+              style={{ margin: 10 }}
+            />
+          )}
         </Paper>
       )}
       {tabIndex == 2 && (
