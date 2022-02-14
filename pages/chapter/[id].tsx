@@ -378,6 +378,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       );
   }
 
+  if (findFirstChapter?.id) {
+    client
+      .query({
+        query: gql`
+          mutation Mutation($reportViewId: Int!, $context: String!) {
+            reportView(id: $reportViewId, context: $context)
+          }
+        `,
+        variables: {
+          reportViewId: findFirstChapter.id,
+          context: "chapter",
+        },
+      })
+      .catch((e) => console.log(e.networkError.result.errors));
+  }
+
   if (errorChapter) {
     console.log(errorChapter);
   }

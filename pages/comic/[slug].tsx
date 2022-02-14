@@ -492,156 +492,6 @@ function Slug({ top, router, comic }: SlugPageProps) {
   );
 }
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const { slug } = context.query;
-//   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
-
-//   const where = allowHentai
-//     ? {}
-//     : {
-//         isHentai: {
-//           equals: false,
-//         },
-//       };
-
-//   const { data: { findManyComic: top } = {}, error: errorTop } =
-//     await client.query<{
-//       findManyComic: Model["Comic"][];
-//     }>({
-//       query: gql`
-//         query TopComic(
-//           $take: Int
-//           $chaptersTake2: Int
-//           $orderBy: ChapterOrderByWithRelationInput
-//           $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-//           $where: ComicWhereInput
-//         ) {
-//           findManyComic(
-//             take: $take
-//             orderBy: $findManyComicOrderBy2
-//             where: $where
-//           ) {
-//             id
-//             name
-//             thumb
-//             thumbWide
-//             slug
-//             rating
-//             isHentai
-//             author {
-//               id
-//               name
-//               slug
-//             }
-//             viewsWeek
-//             lastChapterUpdateAt
-//             genres {
-//               id
-//               name
-//               slug
-//             }
-//             chapters(take: $chaptersTake2, orderBy: $orderBy) {
-//               id
-//               name
-//               createdAt
-//             }
-//             _count {
-//               chapters
-//             }
-//           }
-//         }
-//       `,
-//       variables: {
-//         take: 10,
-//         chaptersTake2: 1,
-//         orderBy: {
-//           name: "desc",
-//         },
-//         findManyComicOrderBy2: [
-//           {
-//             rating: "desc",
-//           },
-//         ],
-//         where,
-//       },
-//     });
-
-//   const { data: { findFirstComic } = {}, error: errorComic } =
-//     await client.query<{
-//       findFirstComic: Model["Comic"];
-//     }>({
-//       query: gql`
-//         query FindFirstComic(
-//           $orderBy: ChapterOrderByWithRelationInput
-//           $where: ComicWhereInput
-//         ) {
-//           findFirstComic(where: $where) {
-//             id
-//             name
-//             thumb
-//             type
-//             thumbWide
-//             altName
-//             slug
-//             isHentai
-//             released
-//             author {
-//               id
-//               name
-//               slug
-//             }
-//             rating
-//             views
-//             viewsWeek
-//             description
-//             age
-//             status
-//             concept
-//             lastChapterUpdateAt
-//             createdAt
-//             updatedAt
-//             authorId
-//             genres {
-//               id
-//               name
-//               slug
-//             }
-//             chapters(orderBy: $orderBy) {
-//               id
-//               name
-//               createdAt
-//             }
-//           }
-//         }
-//       `,
-//       variables: {
-//         orderBy: {
-//           name: "desc",
-//         },
-//         where: {
-//           slug: {
-//             equals: slug,
-//           },
-//         },
-//       },
-//     });
-
-//   if (!findFirstComic) {
-//     console.log(`404 comic ${slug}`);
-//   }
-
-//   if (errorTop || errorComic) {
-//     console.log(errorTop);
-//     console.log(errorComic);
-//   }
-
-//   return {
-//     notFound: !findFirstComic,
-//     props: {
-//       comic: findFirstComic,
-//       top: top ?? [],
-//     },
-//   };
 // };
 
 export const getStaticProps: GetStaticProps = async (context) => {
@@ -710,9 +560,26 @@ export const getStaticProps: GetStaticProps = async (context) => {
       })
       .then(() => console.log(`404 comic ${slug}`));
   }
+
+  if (findFirstComic?.id) {
+    client
+      .query({
+        query: gql`
+          mutation Mutation($reportViewId: Int!, $context: String!) {
+            reportView(id: $reportViewId, context: $context)
+          }
+        `,
+        variables: {
+          reportViewId: findFirstComic.id,
+          context: "comic",
+        },
+      })
+      .catch((e) => console.log(e.networkError.result.errors));
+  }
   if (errorComic) {
     console.log(errorComic);
   }
+
   return {
     notFound: !findFirstComic,
     props: {
