@@ -1,4 +1,10 @@
-import { ApolloClient, InMemoryCache, DefaultOptions } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  DefaultOptions,
+  from,
+  HttpLink,
+} from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 
 const defaultOptions: DefaultOptions = {
@@ -27,13 +33,19 @@ const errorLink = onError(({ graphQLErrors, networkError, ...rest }) => {
   }
 });
 
+const uri = process.browser
+  ? process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT
+  : process.env.NEXT_PUBLIC_USE_INNER_GRAPHQL_ENDPOINT == "true"
+  ? process.env.NEXT_PUBLIC_INNER_GRAPHQL_ENDPOINT
+  : process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
+
+const httpLink = new HttpLink({
+  uri,
+});
+
 export const client = new ApolloClient({
-  link: errorLink,
-  uri: process.browser
-    ? process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT
-    : process.env.NEXT_PUBLIC_USE_INNER_GRAPHQL_ENDPOINT == "true"
-    ? process.env.NEXT_PUBLIC_INNER_GRAPHQL_ENDPOINT
-    : process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+  link: from([errorLink, httpLink]),
+  uri,
   cache: new InMemoryCache(),
   defaultOptions: process.browser ? undefined : defaultOptions,
 });
