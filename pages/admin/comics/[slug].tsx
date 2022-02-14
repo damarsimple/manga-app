@@ -171,7 +171,7 @@ export default function Slug() {
         setLoading(false);
       }
     };
-  }, [refetch]);
+  }, []);
 
   const { data: { findManyGenre } = {} } = useQuery<{
     findManyGenre: Model["Genre"][];
