@@ -188,6 +188,7 @@ export default function Slug() {
   const [searchGenre, setSearchGenre] = useState("");
 
   const handleUpdateThumb = async () => {
+    toast.info(`Downloading ${updateType}`);
     setLoading(true);
     if (updateMethod == "file") {
       gkChannel.postMessage({
