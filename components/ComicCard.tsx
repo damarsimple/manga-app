@@ -221,7 +221,10 @@ export const ComicCard = ({
               <Box
                 component="img"
                 src={fallback + "?width=240"}
-                height={300}
+                height={{
+                  xs: 200,
+                  sm: 340,
+                }}
                 width={"100%"}
                 alt={name}
               />

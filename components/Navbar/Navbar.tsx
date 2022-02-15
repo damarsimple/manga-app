@@ -29,6 +29,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useR18 } from "../../stores/r18";
 import { useRouter } from "next/router";
 import { dontRender } from "../../modules/rules";
+import { client } from "../../modules/client";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -70,72 +71,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const useApolloHalt = ({ hMode, query }: { hMode: boolean; query: string }) => {
-  const {
-    data: { comicSearch } = {},
-    loading,
-    error,
-  } = useQuery<{
-    comicSearch: ComicSearch;
-  }>(
-    gql`
-      query ComicSearchNavbar(
-        $query: String!
-        $offset: Int
-        $limit: Int
-        $type: String
-        $allowHentai: Boolean
-      ) {
-        comicSearch(
-          query: $query
-          offset: $offset
-          limit: $limit
-          type: $type
-          allowHentai: $allowHentai
-        ) {
-          comics {
-            id
-            name
-            slug
-            thumb
-            type
-            thumbWide
-            altName
-            isHentai
-            released
-            rating
-            views
-            viewsWeek
-          }
-          offset
-          limit
-          processingTimeMs
-          total
-          exhaustiveNbHits
-        }
-      }
-    `,
-    {
-      variables: {
-        query: `${query}`,
-        limit: 5,
-        allowHentai: hMode,
-      },
-      fetchPolicy: "network-only",
-    }
-  );
-
-  return {
-    comicSearch,
-    loading,
-  };
-};
-
 export default function Navbar() {
   const { push, pathname } = useRouter();
   const [accountEl, setAccountEl] = useState<Element | null>(null);
 
-  const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const handleClose = () => {
     setAccountEl(null);
@@ -143,7 +82,78 @@ export default function Navbar() {
 
   const { mode: hMode } = useR18();
 
-  const { comicSearch, loading } = useApolloHalt({ hMode, query });
+  const [comicSearch, setComicSearch] = useState<ComicSearch | undefined>(
+    undefined
+  );
+
+  const [loading, setLoading] = useState(false);
+
+  const [timer, setTimer] = useState<null | NodeJS.Timer>(null);
+
+  const handleSearch = (query: string) => {
+    if (query.length < 3) return;
+    setComicSearch(undefined);
+    setLoading(true);
+    timer && clearTimeout(timer);
+
+    const newTimer = setTimeout(() => {
+      client
+        .query<{
+          comicSearch: ComicSearch;
+        }>({
+          query: gql`
+            query ComicSearchNavbar(
+              $query: String!
+              $offset: Int
+              $limit: Int
+              $type: String
+              $allowHentai: Boolean
+            ) {
+              comicSearch(
+                query: $query
+                offset: $offset
+                limit: $limit
+                type: $type
+                allowHentai: $allowHentai
+              ) {
+                comics {
+                  id
+                  name
+                  slug
+                  thumb
+                  type
+                  thumbWide
+                  altName
+                  isHentai
+                  released
+                  rating
+                  views
+                  viewsWeek
+                }
+                offset
+                limit
+                processingTimeMs
+                total
+                exhaustiveNbHits
+              }
+            }
+          `,
+          variables: {
+            query: `${query}`,
+            limit: 5,
+            allowHentai: hMode,
+          },
+          fetchPolicy: "network-only",
+        })
+        .then(({ data }) => {
+          const { comicSearch } = data;
+          setLoading(false);
+          setComicSearch(comicSearch);
+        });
+    }, 150);
+
+    setTimer(newTimer);
+  };
 
   const { setMode, mode, toggle } = useColorMode();
   const { transparent, transparentMode } = useNavbarStore();
@@ -237,7 +247,7 @@ export default function Navbar() {
                       inputProps={{ "aria-label": "search" }}
                       name="q"
                       sx={{ border: 0.5, borderRadius: 2 }}
-                      onChange={(e) => setQuery(e.target.value)}
+                      onChange={(e) => handleSearch(e.target.value)}
                       onFocus={() => setFocused(true)}
                       onBlur={() => setTimeout(() => setFocused(false), 200)}
                     />
@@ -265,7 +275,6 @@ export default function Navbar() {
                       </Paper>
                     )}
                     {focused &&
-                      query?.length > 0 &&
                       comicSearch?.comics?.map((e) => (
                         <Link href={"/comic/" + e.slug} key={e.id}>
                           <a>

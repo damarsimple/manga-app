@@ -132,6 +132,10 @@ const Home = ({
     <Box p={2} display="flex" gap={2} flexDirection={"column"}>
       <NextSeo {...SEO} />
       <Paper sx={{ p: 4 }}>
+        <Typography variant="h5" component="h3">
+          KOMIK HOT
+        </Typography>
+        <Divider sx={{ my: 2 }} />
         <Swiper
           pagination
           navigation
@@ -143,11 +147,15 @@ const Home = ({
             },
             // when window width is >= 480px
             768: {
-              slidesPerView: 4,
+              slidesPerView: 3,
               spaceBetween: 10,
             },
             // when window width is >= 640px
             1024: {
+              slidesPerView: 5,
+              spaceBetween: 10,
+            },
+            1768: {
               slidesPerView: 7,
               spaceBetween: 10,
             },
@@ -433,7 +441,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
         findManyComicOrderBy2: [
           {
-            rating: "desc",
+            viewsWeek: "desc",
           },
         ],
         where,
