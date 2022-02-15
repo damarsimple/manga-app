@@ -122,7 +122,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         findManyAuthor: Model["Author"][];
       }>({
         query: gql`
-          query FindManyAuthor($take: Int) {
+          query FindAllAuthor($take: Int) {
             findManyAuthor(take: $take) {
               id
               name
@@ -140,7 +140,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         findFirstAuthor: Model["Author"];
       }>({
         query: gql`
-          query findFirstAuthor(
+          query FindFirstAuthor(
             $where: AuthorWhereInput
             $take: Int
             $chaptersTake2: Int

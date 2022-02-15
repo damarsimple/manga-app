@@ -48,7 +48,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     findManyChapter: Model["Chapter"][];
   }>(
     gql`
-      query FindManyChapter($where: ChapterWhereInput) {
+      query FindComicChapter($where: ChapterWhereInput) {
         findManyChapter(where: $where) {
           id
           name
@@ -381,7 +381,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (findFirstChapter?.id) {
     client.query({
       query: gql`
-        mutation Mutation($reportViewId: Int!, $context: String!) {
+        mutation ReportViewChapter($reportViewId: Int!, $context: String!) {
           reportView(id: $reportViewId, context: $context)
         }
       `,

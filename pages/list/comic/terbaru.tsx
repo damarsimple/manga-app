@@ -29,7 +29,7 @@ export default function Terbaru() {
     findManyComic: Model["Comic"][];
   }>(
     gql`
-      query FindManyComic(
+      query FindManyComicQuery(
         $take: Int
         $chaptersTake2: Int
         $skip: Int

@@ -19,7 +19,7 @@ interface LoginValue {
 
 export default function Login() {
   const [handle, { loading }] = useMutation(gql`
-    mutation Test {
+    mutation Login {
       test
     }
   `);

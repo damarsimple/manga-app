@@ -123,7 +123,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         findManyGenre: Model["Genre"][];
       }>({
         query: gql`
-          query FindManyGenre($take: Int) {
+          query FindAllGenre($take: Int) {
             findManyGenre(take: $take) {
               id
               name
@@ -141,7 +141,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         findFirstGenre: Model["Genre"];
       }>({
         query: gql`
-          query findFirstGenre(
+          query FindFirstGenre(
             $where: GenreWhereInput
             $take: Int
             $chaptersTake2: Int

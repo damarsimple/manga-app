@@ -52,7 +52,7 @@ export default function Slug() {
     findFirstComic: Model["Comic"];
   }>(
     gql`
-      query Query($where: ComicWhereInput) {
+      query FindAdminSlugComic($where: ComicWhereInput) {
         findFirstComic(where: $where) {
           id
           name
@@ -105,7 +105,7 @@ export default function Slug() {
 
   const [handle] = useMutation(
     gql`
-      mutation Mutation(
+      mutation UpdateOneAdminComic(
         $data: ComicUpdateInput!
         $where: ComicWhereUniqueInput!
       ) {
@@ -176,7 +176,7 @@ export default function Slug() {
   const { data: { findManyGenre } = {} } = useQuery<{
     findManyGenre: Model["Genre"][];
   }>(gql`
-    query FindManyGenre {
+    query FindAllGenre {
       findManyGenre {
         id
         slug

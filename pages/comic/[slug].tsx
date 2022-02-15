@@ -60,7 +60,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
     findManyChapter: Model["Chapter"][];
   }>(
     gql`
-      query FindManyChapter($where: ChapterWhereInput) {
+      query FindChapterComic($where: ChapterWhereInput) {
         findManyChapter(where: $where) {
           id
           name
@@ -548,7 +548,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     client
       .query({
         query: gql`
-          mutation ReportMissing($data: String!, $context: String!) {
+          mutation ReportMissingComic($data: String!, $context: String!) {
             reportMissing(data: $data, context: $context)
           }
         `,
@@ -564,7 +564,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (findFirstComic?.id) {
     client.query({
       query: gql`
-        mutation Mutation($reportViewId: Int!, $context: String!) {
+        mutation ReportViewComic($reportViewId: Int!, $context: String!) {
           reportView(id: $reportViewId, context: $context)
         }
       `,
@@ -588,15 +588,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 };
 
-// This function gets called at build time on server-side.
-// It may be called again, on a serverless function, if
-// the path has not been generated.
 export async function getStaticPaths() {
   const { data: { findManyComic: comics } = {} } = await client.query<{
     findManyComic: Model["Comic"][];
   }>({
     query: gql`
-      query FindFirstComic {
+      query FindAllComic {
         findManyComic {
           id
           name
