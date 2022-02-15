@@ -57,7 +57,7 @@ function Catch({ router }: WithRouterProps) {
     comicSearch: ComicSearch;
   }>(
     gql`
-      query ComicSearch(
+      query ComicSearchList(
         $query: String!
         $offset: Int
         $limit: Int

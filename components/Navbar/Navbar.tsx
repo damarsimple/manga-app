@@ -70,18 +70,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function Navbar() {
-  const { push, pathname } = useRouter();
-  const [accountEl, setAccountEl] = useState<Element | null>(null);
-
-  const [query, setQuery] = useState("");
-  const [focused, setFocused] = useState(false);
-  const handleClose = () => {
-    setAccountEl(null);
-  };
-
-  const { mode: hMode } = useR18();
-
+const useApolloHalt = ({ hMode, query }: { hMode: boolean; query: string }) => {
   const {
     data: { comicSearch } = {},
     loading,
@@ -90,7 +79,7 @@ export default function Navbar() {
     comicSearch: ComicSearch;
   }>(
     gql`
-      query ComicSearch(
+      query ComicSearchNavbar(
         $query: String!
         $offset: Int
         $limit: Int
@@ -135,6 +124,26 @@ export default function Navbar() {
       fetchPolicy: "network-only",
     }
   );
+
+  return {
+    comicSearch,
+    loading,
+  };
+};
+
+export default function Navbar() {
+  const { push, pathname } = useRouter();
+  const [accountEl, setAccountEl] = useState<Element | null>(null);
+
+  const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
+  const handleClose = () => {
+    setAccountEl(null);
+  };
+
+  const { mode: hMode } = useR18();
+
+  const { comicSearch, loading } = useApolloHalt({ hMode, query });
 
   const { setMode, mode, toggle } = useColorMode();
   const { transparent, transparentMode } = useNavbarStore();

@@ -363,7 +363,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     client
       .query({
         query: gql`
-          mutation ReportMissing($data: String!, $context: String!) {
+          mutation ReportMissingChapter($data: String!, $context: String!) {
             reportMissing(data: $data, context: $context)
           }
         `,

@@ -52,7 +52,7 @@ export default function Slug() {
     findFirstComic: Model["Comic"];
   }>(
     gql`
-      query FindAdminSlugComic($where: ComicWhereInput) {
+      query FindAdminSlugComicHomepage($where: ComicWhereInput) {
         findFirstComic(where: $where) {
           id
           name
@@ -105,7 +105,7 @@ export default function Slug() {
 
   const [handle] = useMutation(
     gql`
-      mutation UpdateOneAdminComic(
+      mutation UpdateOneComicAdmin(
         $data: ComicUpdateInput!
         $where: ComicWhereUniqueInput!
       ) {
@@ -176,7 +176,7 @@ export default function Slug() {
   const { data: { findManyGenre } = {} } = useQuery<{
     findManyGenre: Model["Genre"][];
   }>(gql`
-    query FindAllGenre {
+    query FindAllGenreAdmin {
       findManyGenre {
         id
         slug
@@ -287,7 +287,7 @@ export default function Slug() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const [handleDeleteChapters] = useMutation(gql`
-    mutation DeleteManyChapter($where: ChapterWhereInput) {
+    mutation DeleteManyChapterAdmin($where: ChapterWhereInput) {
       deleteManyChapter(where: $where) {
         count
       }

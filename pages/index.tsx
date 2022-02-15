@@ -58,7 +58,7 @@ const Home = ({
     findManyGenre: Model["Genre"][];
   }>(
     gql`
-      query FindAllGenre($take: Int) {
+      query FindAllGenreHomepage($take: Int) {
         findManyGenre(take: $take) {
           id
           name
@@ -76,7 +76,7 @@ const Home = ({
     findManyComic: Model["Comic"][];
   }>(
     gql`
-      query FindRecomendationComics(
+      query RecomendationComicsHomepage(
         $take: Int
         $chaptersTake2: Int
         $skip: Int
@@ -338,7 +338,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       findManyComic: Model["Comic"][];
     }>({
       query: gql`
-        query CarouselComic(
+        query CarouselComicHomepage(
           $take: Int
           $chaptersTake2: Int
           $orderBy: ChapterOrderByWithRelationInput
@@ -386,7 +386,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       findManyComic: Model["Comic"][];
     }>({
       query: gql`
-        query TopComic(
+        query TopComicHomepage(
           $take: Int
           $chaptersTake2: Int
           $orderBy: ChapterOrderByWithRelationInput
@@ -445,7 +445,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       findManyComic: Model["Comic"][];
     }>({
       query: gql`
-        query LatestComic(
+        query LatestComicHomepage(
           $take: Int
           $chaptersTake2: Int
           $skip: Int
