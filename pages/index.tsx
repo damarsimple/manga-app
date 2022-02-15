@@ -58,7 +58,7 @@ const Home = ({
     findManyGenre: Model["Genre"][];
   }>(
     gql`
-      query Query($take: Int) {
+      query FindAllGenre($take: Int) {
         findManyGenre(take: $take) {
           id
           name
@@ -76,7 +76,7 @@ const Home = ({
     findManyComic: Model["Comic"][];
   }>(
     gql`
-      query FindManyComic(
+      query FindRecomendationComics(
         $take: Int
         $chaptersTake2: Int
         $skip: Int
@@ -445,7 +445,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       findManyComic: Model["Comic"][];
     }>({
       query: gql`
-        query TopComic(
+        query LatestComic(
           $take: Int
           $chaptersTake2: Int
           $skip: Int
