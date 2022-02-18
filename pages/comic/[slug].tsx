@@ -43,6 +43,7 @@ import { SEO } from "../../modules/seo";
 import { capitalizeFirstLetter } from "../../modules/helper";
 import RenderXTime from "../../components/RenderXTime";
 import SortIcon from "@mui/icons-material/Sort";
+import LazyImage from "../../components/LazyImage";
 interface SlugPageProps extends WithRouterProps {
   comic: Model["Comic"];
   top: Model["Comic"][];
@@ -212,7 +213,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
                   sm: "auto",
                 }}
               >
-                <img
+                <LazyImage
                   src={comic.thumb}
                   height={320 / 1.2}
                   width={240 / 1.2}

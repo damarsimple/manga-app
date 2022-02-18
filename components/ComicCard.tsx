@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { Model } from "../types";
 import moment from "moment";
 import RenderMany from "./RenderMany";
+import LazyImage from "./LazyImage";
 export type Comic = Model["Comic"];
 
 type LayoutType = "detailed" | "carousel" | "top";
@@ -21,6 +22,7 @@ type LayoutType = "detailed" | "carousel" | "top";
 export interface ComicCardProps extends Comic {
   layout?: LayoutType;
   isFirst?: boolean;
+  home?: boolean;
 }
 
 export const ComicCard = ({
@@ -36,6 +38,7 @@ export const ComicCard = ({
   rating,
   isHentai,
   layout = "detailed",
+  home,
 }: ComicCardProps) => {
   const { push } = useRouter();
 
@@ -221,16 +224,14 @@ export const ComicCard = ({
         <Box sx={{ minWidth: "100%" }}>
           <Link href={myUrl}>
             <a>
-              <Box
-                component="img"
+              <LazyImage
                 src={fallback + "?width=240"}
                 height={{
-                  xs: 150,
+                  xs: home ? 150 : 320,
                   sm: 340,
                 }}
                 width={"100%"}
                 alt={name}
-                loading="lazy"
               />
             </a>
           </Link>
@@ -244,13 +245,11 @@ export const ComicCard = ({
         <Box sx={{ p: 1, minWidth: "100%", display: "flex", gap: 1 }}>
           <Link href={myUrl}>
             <a>
-              <Box
-                component="img"
+              <LazyImage
                 src={fallback + "?width=240"}
                 height={"100%"}
                 width={120}
                 alt={name}
-                loading="lazy"
               />
             </a>
           </Link>
@@ -272,12 +271,11 @@ export const ComicCard = ({
           <Box display="flex" alignItems="center">
             <Link href={myUrl}>
               <a>
-                <img
+                <LazyImage
                   src={fallback + "?width=240"}
                   height={320 / 2}
                   width={100}
                   alt={name}
-                  loading="lazy"
                 />
               </a>
             </Link>

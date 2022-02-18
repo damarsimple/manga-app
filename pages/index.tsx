@@ -362,7 +362,7 @@ const Home = () => {
             carousel?.map((e, i) => (
               <SwiperSlide key={i}>
                 <Box sx={{ mr: 1 }}>
-                  <ComicCard {...e} layout="carousel" />
+                  <ComicCard {...e} layout="carousel" home />
                 </Box>
               </SwiperSlide>
             ))

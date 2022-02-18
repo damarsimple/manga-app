@@ -29,6 +29,7 @@ import { NextSeo } from "next-seo";
 import moment from "moment";
 import { SEO } from "../../modules/seo";
 import Link from "next/link";
+import LazyImage from "../../components/LazyImage";
 function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const { push, query } = useRouter();
 
@@ -217,11 +218,11 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
 
   const Ads = () => (
     <a target="_blank" href="https://bit.ly/3njmpck" rel="noreferrer">
-      <img
+      <LazyImage
+        height="100%"
         width="100%"
         src="/slot-online.webp"
         alt="Slot Online"
-        title="Slot Online"
       />
     </a>
   );
@@ -266,7 +267,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
       <Paper sx={{ mb: 1 }}>
         <Ads />
         {readMode === "single" ? (
-          <img
+          <LazyImage
             src={images[imageIndex]}
             alt="comic"
             height={"100%"}
@@ -287,7 +288,14 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
         ) : (
           <>
             {images.map((e, i) => (
-              <img key={e} src={e} alt={title} height={"100%"} width={"100%"} />
+              <LazyImage
+                key={e}
+                src={e}
+                alt={title}
+                height={"100%"}
+                width={"100%"}
+                skeletonHeight={600}
+              />
             ))}
           </>
         )}

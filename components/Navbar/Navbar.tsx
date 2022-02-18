@@ -295,7 +295,7 @@ export default function Navbar() {
                             >
                               <img
                                 alt={e.name}
-                                src={e.thumb}
+                                src={`${e.thumb}?width=40&height=60`}
                                 width={40}
                                 height={60}
                               />
