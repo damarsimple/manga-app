@@ -12,25 +12,19 @@ import {
   Pagination,
   Skeleton,
 } from "@mui/material";
-import { ComicCard } from "../../../components/ComicCard";
+import { ComicCard, ComicCardSkeleton } from "../../../components/ComicCard";
 import { useState } from "react";
 import Link from "next/link";
-import { NextSeo } from "next-seo";
-import { SEO } from "../../../modules/seo";
-import { client } from "../../../modules/client";
-import { GetServerSideProps } from "next";
 import { gql, useQuery } from "@apollo/client";
 import { ComicSearch, Model } from "../../../types";
-import SearchComicContainer from "../../../components/SearchComicContainer";
 import { useR18 } from "../../../stores/r18";
 import { capitalizeFirstLetter } from "../../../modules/helper";
-
-const capitalize = (s: string) => {
-  return s[0].toUpperCase() + s.slice(1);
-};
+import RenderMany from "../../../components/RenderMany";
+import { FixedSizeList as List } from "react-window";
 
 function Catch({ router }: WithRouterProps) {
-  const { getall: get, q } = useRouter().query;
+  const { getall: get1, q } = useRouter().query;
+  const get: string = get1 as string;
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [mode, setMode] = useState("Card Mode");
@@ -45,6 +39,7 @@ function Catch({ router }: WithRouterProps) {
 
   useEffect(() => {
     setMode(get == "all" ? "Text Mode" : "Card Mode");
+    setType(["manhwa", "manhua", "manga"].includes(get) ? get : undefined);
   }, [get]);
 
   const queryCannon = query.length > 0 ? query : q ?? "";
@@ -96,8 +91,8 @@ function Catch({ router }: WithRouterProps) {
     {
       variables: {
         query: `${queryCannon}`,
-        offset: mode == "Text Mode" ? 0 : page == 1 ? 0 : page * limit,
-        limit: mode == "Text Mode" ? 10000 : limit,
+        offset: page * limit,
+        limit: limit,
         type: ["Search", "All", "Terbaru", "Hot", "Rekomendasi"].includes(
           type ?? ""
         )
@@ -111,6 +106,37 @@ function Catch({ router }: WithRouterProps) {
     }
   );
 
+  const validType = mode == "Text Mode";
+
+  console.log(type);
+
+  const { data: { findManyComic: allComic } = {}, loading: loadingAllText } =
+    useQuery<{
+      findManyComic: Model["Comic"][];
+    }>(
+      gql`
+        query FindManyComicTextMode($where: ComicWhereInput, $take: Int) {
+          findManyComic(where: $where, take: $take) {
+            id
+            name
+            slug
+          }
+        }
+      `,
+      {
+        variables: {
+          take: validType ? undefined : 0,
+          // where: validType
+          //   ? {
+          //       type: {
+          //         equals: capitalizeFirstLetter(`${type}`),
+          //       },
+          //     }
+          //   : undefined,
+        },
+      }
+    );
+
   const getSortedObject = () => {
     const a = 65;
     const z = 91;
@@ -122,7 +148,7 @@ function Catch({ router }: WithRouterProps) {
       map[String.fromCharCode(i)] = [];
     }
 
-    comicSearch?.comics.forEach((item) => {
+    allComic?.forEach((item) => {
       const firstLetter = item.name.charAt(0).toUpperCase();
 
       if (!map[firstLetter]) {
@@ -136,25 +162,6 @@ function Catch({ router }: WithRouterProps) {
   };
 
   const sorted = getSortedObject();
-
-  const PaginationComponent = () => (
-    <Box
-      sx={{
-        height: 600,
-        width: "100%",
-      }}
-    >
-      {[...Array(Math.floor(600 / 30))].map((e, i) => (
-        <Skeleton
-          key={i}
-          variant="rectangular"
-          width={"100%"}
-          height={30}
-          sx={{ mt: 1 }}
-        />
-      ))}
-    </Box>
-  );
 
   return (
     <Box sx={{ m: 1 }} ref={containerRef}>
@@ -190,31 +197,41 @@ function Catch({ router }: WithRouterProps) {
           ))}
           <Divider sx={{ my: 1 }} />
         </>
-        <TextField
-          label="Cari Komik"
-          size="small"
-          fullWidth
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPage(1);
-          }}
-        />
+        {mode != "Text Mode" && (
+          <>
+            <TextField
+              label="Cari Komik"
+              size="small"
+              fullWidth
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
+            />
+            <Divider sx={{ my: 1 }} />
+          </>
+        )}
 
-        <Divider sx={{ my: 1 }} />
-        {loading ? (
-          <PaginationComponent />
-        ) : mode == "Card Mode" ? (
+        {mode == "Card Mode" ? (
           <>
             <Grid
               spacing={1}
               container
               sx={{ pt: 2, px: { xs: undefined, md: 10 } }}
             >
-              {comicSearch?.comics.map((e, i) => (
-                <Grid item key={e.id} xs={6} sm={3} lg={2}>
-                  <ComicCard layout="carousel" {...e} />
-                </Grid>
-              ))}
+              {loading ? (
+                <RenderMany count={20}>
+                  <Grid item xs={6} sm={3} lg={2}>
+                    <ComicCardSkeleton layout="carousel" />
+                  </Grid>
+                </RenderMany>
+              ) : (
+                comicSearch?.comics.map((e, i) => (
+                  <Grid item key={e.id} xs={6} sm={3} lg={2}>
+                    <ComicCard layout="carousel" {...e} />
+                  </Grid>
+                ))
+              )}
             </Grid>
           </>
         ) : (
@@ -223,22 +240,21 @@ function Catch({ router }: WithRouterProps) {
               return (
                 <Box key={e} sx={{ mt: 2 }}>
                   <Typography variant="h5">{e}</Typography>
-                  <Grid container spacing={1} sx={{ mt: 2 }}>
-                    {(!hMode
-                      ? sorted[e].filter((e) => !e.isHentai)
-                      : sorted[e]
-                    ).map((e, i) => (
-                      <Grid item xs={6} sm={3} lg={2} key={e.id}>
-                        <Link href={"/comic/" + e.slug}>
-                          <a>
-                            <Typography variant="body1">
-                              {e.name.replace("<em>", "").replace("</em>", "")}
-                            </Typography>
-                          </a>
-                        </Link>
-                      </Grid>
-                    ))}
-                  </Grid>
+                  {loadingAllText ? (
+                    <Skeleton width="100%" height={30} />
+                  ) : (
+                    <Grid container spacing={1} sx={{ mt: 2 }}>
+                      {sorted[e].map((e, i) => (
+                        <Grid item xs={6} sm={3} lg={2} key={e.id}>
+                          <Link href={"/comic/" + e.slug}>
+                            <a>
+                              <Typography variant="body1">{e.name}</Typography>
+                            </a>
+                          </Link>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
                 </Box>
               );
             })}

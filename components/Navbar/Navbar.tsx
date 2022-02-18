@@ -177,20 +177,24 @@ export default function Navbar() {
         >
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton size="large" edge="start" color="inherit" sx={{ p: 2 }}>
-              <a href="/">
-                <Box sx={{ display: { xs: "none", md: "flex" } }}>
-                  <img src="/logo.png" width={250} height={50} alt="logo" />
-                </Box>
-              </a>
-              <Box sx={{ display: { xs: "flex", md: "none" } }}>
-                <a href="/">
-                  <img
-                    src="/android-icon-48x48.png"
-                    width={48}
-                    height={48}
-                    alt="logo"
-                  />
+              <Link href="/">
+                <a>
+                  <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                    <img src="/logo.png" width={250} height={50} alt="logo" />
+                  </Box>
                 </a>
+              </Link>
+              <Box sx={{ display: { xs: "flex", md: "none" } }}>
+                <Link href="/">
+                  <a>
+                    <img
+                      src="/android-icon-48x48.png"
+                      width={48}
+                      height={48}
+                      alt="logo"
+                    />
+                  </a>
+                </Link>
               </Box>
             </IconButton>
             <Box

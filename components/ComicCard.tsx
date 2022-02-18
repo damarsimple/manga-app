@@ -7,16 +7,19 @@ import {
   StarRate,
   Star,
 } from "@mui/icons-material";
-import { Box, Typography, Chip, Paper, Divider } from "@mui/material";
+import { Box, Typography, Chip, Paper, Divider, Skeleton } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Model } from "../types";
 import moment from "moment";
+import RenderMany from "./RenderMany";
 export type Comic = Model["Comic"];
 
+type LayoutType = "detailed" | "carousel" | "top";
+
 export interface ComicCardProps extends Comic {
-  layout?: "detailed" | "carousel" | "top";
+  layout?: LayoutType;
   isFirst?: boolean;
 }
 
@@ -222,11 +225,12 @@ export const ComicCard = ({
                 component="img"
                 src={fallback + "?width=240"}
                 height={{
-                  xs: 200,
+                  xs: 150,
                   sm: 340,
                 }}
                 width={"100%"}
                 alt={name}
+                loading="lazy"
               />
             </a>
           </Link>
@@ -246,6 +250,7 @@ export const ComicCard = ({
                 height={"100%"}
                 width={120}
                 alt={name}
+                loading="lazy"
               />
             </a>
           </Link>
@@ -272,6 +277,7 @@ export const ComicCard = ({
                   height={320 / 2}
                   width={100}
                   alt={name}
+                  loading="lazy"
                 />
               </a>
             </Link>
@@ -284,6 +290,73 @@ export const ComicCard = ({
             {chapters.map((e, i) => (
               <ChapterTimestamp {...e} key={e.id} />
             ))}
+          </Box>
+        </Box>
+      )}
+    </Paper>
+  );
+};
+
+export const ComicCardSkeleton = ({
+  layout = "detailed",
+}: {
+  layout: LayoutType;
+}) => {
+  const ChapterTimestamp = () => (
+    <Skeleton variant="text" sx={{ height: 30 }} />
+  );
+
+  const TitleFormatted = () => (
+    <Skeleton variant="text" sx={{ height: 50, width: "100%" }} />
+  );
+
+  const fallback = "/static/no-image.png";
+
+  return (
+    <Paper
+      elevation={1}
+      sx={{
+        display: "flex",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
+      {layout == "carousel" && (
+        <Box sx={{ minWidth: "100%" }}>
+          <Skeleton variant="rectangular" height={150} width={"100%"} />
+          <Box sx={{ p: 1 }}>
+            <TitleFormatted />
+            <ChapterTimestamp />
+          </Box>
+        </Box>
+      )}
+      {layout == "top" && (
+        <Box sx={{ p: 1, minWidth: "100%", display: "flex", gap: 1 }}>
+          <Skeleton variant="rectangular" height={"100%"} width={120} />
+
+          <Box sx={{ width: "100%" }}>
+            <TitleFormatted />
+            <Skeleton variant="text" sx={{ height: 30, width: "100%" }} />
+            <Skeleton variant="text" sx={{ height: 30, width: "100%" }} />
+            {/* <TotalChapterFormatted /> */}
+            <Skeleton variant="text" sx={{ height: 30, width: "100%" }} />
+            <Skeleton variant="text" sx={{ height: 30, width: "100%" }} />
+          </Box>
+        </Box>
+      )}
+      {layout == "detailed" && (
+        <Box display="flex" width="100%" gap={0.5}>
+          <Box display="flex" alignItems="center">
+            <Skeleton variant="rectangular" height={320 / 2} width={100} />
+          </Box>
+          <Box width={"100%"} p={1}>
+            <Box display="flex" alignItems="center">
+              <TitleFormatted />
+            </Box>
+            <Divider />
+            <RenderMany count={3}>
+              <ChapterTimestamp />
+            </RenderMany>
           </Box>
         </Box>
       )}

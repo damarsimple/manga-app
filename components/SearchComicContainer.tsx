@@ -90,7 +90,7 @@ export default function SearchComicContainer({
               />
             ))}
             <Divider sx={{ my: 1 }} />
-            {["Card Mode", "Text Mode"].map((e) => (
+            {/* {["Card Mode", "Text Mode"].map((e) => (
               <Chip
                 label={e}
                 key={e}
@@ -110,7 +110,7 @@ export default function SearchComicContainer({
                 }}
               />
             ))}
-            <Divider sx={{ my: 1 }} />
+            <Divider sx={{ my: 1 }} /> */}
           </>
         )}
         <TextField

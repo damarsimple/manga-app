@@ -165,7 +165,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           }
         `,
         variables: {
-          take: all == "true" ? 99999 : 16,
+          take: all == "true" ? 99999 : 24,
           where: {
             slug: {
               equals: getall,

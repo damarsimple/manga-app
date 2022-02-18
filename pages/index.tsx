@@ -23,7 +23,7 @@ import "swiper/css/pagination";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
-import { ComicCard } from "../components/ComicCard";
+import { ComicCard, ComicCardSkeleton } from "../components/ComicCard";
 import { client } from "../modules/client";
 import { gql, useQuery } from "@apollo/client";
 import { Model } from "../types";
@@ -33,15 +33,8 @@ import { useR18 } from "../stores/r18";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useState } from "react";
-const Home = ({
-  carousel,
-  top,
-  latest,
-}: {
-  top: Model["Comic"][];
-  latest: Model["Comic"][];
-  carousel: Model["Comic"][];
-}) => {
+import RenderMany from "../components/RenderMany";
+const Home = () => {
   const [page, setPage] = useState(0);
   const { mode } = useR18();
   const where = mode
@@ -71,8 +64,70 @@ const Home = ({
     }
   );
 
-  const perPage = 24;
-  const { data: { findManyComic: recomendations } = {} } = useQuery<{
+  const {
+    data: { findManyComic: latest } = {},
+    error: errorLatest,
+    loading: loadingLatest,
+  } = useQuery<{
+    findManyComic: Model["Comic"][];
+  }>(
+    gql`
+      query LatestComicHomepage(
+        $take: Int
+        $chaptersTake2: Int
+        $skip: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+          skip: $skip
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          isHentai
+          viewsWeek
+
+          lastChapterUpdateAt
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+          _count {
+            chapters
+          }
+        }
+      }
+    `,
+    {
+      variables: {
+        take: 42,
+        chaptersTake2: 3,
+        skip: page == 1 ? 0 : page * 42,
+        orderBy: {
+          name: "desc",
+        },
+        findManyComicOrderBy2: [
+          {
+            lastChapterUpdateAt: "desc",
+          },
+        ],
+        where,
+      },
+    }
+  );
+
+  const {
+    data: { findManyComic: recomendations } = {},
+    loading: loadingRecomendations,
+  } = useQuery<{
     findManyComic: Model["Comic"][];
   }>(
     gql`
@@ -112,15 +167,132 @@ const Home = ({
     `,
     {
       variables: {
-        take: perPage,
+        take: 24,
         chaptersTake2: 3,
-        skip: page == 1 ? 0 : page * perPage,
+        skip: page == 1 ? 0 : page * 24,
         orderBy: {
           name: "desc",
         },
         findManyComicOrderBy2: [
           {
             views: "desc",
+          },
+        ],
+        where,
+      },
+    }
+  );
+
+  const {
+    data: { findManyComic: top } = {},
+    error: errorTop,
+    loading: loadingTop,
+  } = useQuery<{
+    findManyComic: Model["Comic"][];
+  }>(
+    gql`
+      query TopComicHomepage(
+        $take: Int
+        $chaptersTake2: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          rating
+          isHentai
+          author {
+            id
+            name
+            slug
+          }
+          viewsWeek
+          lastChapterUpdateAt
+          genres {
+            id
+            name
+            slug
+          }
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+        }
+      }
+    `,
+    {
+      variables: {
+        take: 13,
+        chaptersTake2: 1,
+        orderBy: {
+          name: "desc",
+        },
+        findManyComicOrderBy2: [
+          {
+            viewsWeek: "desc",
+          },
+        ],
+        where,
+      },
+    }
+  );
+
+  const {
+    data: { findManyComic: carousel } = {},
+    error: errorCarousel,
+    loading: loadingCarousel,
+  } = useQuery<{
+    findManyComic: Model["Comic"][];
+  }>(
+    gql`
+      query CarouselComicHomepage(
+        $take: Int
+        $chaptersTake2: Int
+        $orderBy: ChapterOrderByWithRelationInput
+        $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
+        $where: ComicWhereInput
+      ) {
+        findManyComic(
+          take: $take
+          orderBy: $findManyComicOrderBy2
+          where: $where
+        ) {
+          id
+          name
+          thumb
+          thumbWide
+          slug
+          isHentai
+          viewsWeek
+          lastChapterUpdateAt
+          chapters(take: $chaptersTake2, orderBy: $orderBy) {
+            id
+            name
+            createdAt
+          }
+        }
+      }
+    `,
+    {
+      variables: {
+        take: 10,
+        chaptersTake2: 1,
+        orderBy: {
+          name: "desc",
+        },
+        findManyComicOrderBy2: [
+          {
+            viewsWeek: "desc",
           },
         ],
         where,
@@ -162,13 +334,39 @@ const Home = ({
           }}
           style={{ paddingBottom: 30 }}
         >
-          {carousel.map((e, i) => (
-            <SwiperSlide key={i}>
-              <Box sx={{ mr: 1 }}>
-                <ComicCard {...e} layout="carousel" />
-              </Box>
-            </SwiperSlide>
-          ))}
+          {loadingCarousel ? (
+            <>
+              <SwiperSlide>
+                <ComicCardSkeleton layout="carousel" />
+              </SwiperSlide>
+              <SwiperSlide>
+                <ComicCardSkeleton layout="carousel" />
+              </SwiperSlide>
+              <SwiperSlide>
+                <ComicCardSkeleton layout="carousel" />
+              </SwiperSlide>
+              <SwiperSlide>
+                <ComicCardSkeleton layout="carousel" />
+              </SwiperSlide>
+              <SwiperSlide>
+                <ComicCardSkeleton layout="carousel" />
+              </SwiperSlide>
+              <SwiperSlide>
+                <ComicCardSkeleton layout="carousel" />
+              </SwiperSlide>
+              <SwiperSlide>
+                <ComicCardSkeleton layout="carousel" />
+              </SwiperSlide>
+            </>
+          ) : (
+            carousel?.map((e, i) => (
+              <SwiperSlide key={i}>
+                <Box sx={{ mr: 1 }}>
+                  <ComicCard {...e} layout="carousel" />
+                </Box>
+              </SwiperSlide>
+            ))
+          )}
         </Swiper>
       </Paper>
 
@@ -198,11 +396,19 @@ const Home = ({
               }}
             >
               <Grid container spacing={3}>
-                {latest?.map((e, i) => (
-                  <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
-                    <ComicCard {...e} layout="detailed" key={e.id} />
-                  </Grid>
-                ))}
+                {loadingLatest ? (
+                  <RenderMany count={10}>
+                    <Grid item sm={12} lg={6} xl={4} width="100%">
+                      <ComicCardSkeleton layout="detailed" />
+                    </Grid>
+                  </RenderMany>
+                ) : (
+                  latest?.map((e, i) => (
+                    <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
+                      <ComicCard {...e} layout="detailed" key={e.id} />
+                    </Grid>
+                  ))
+                )}
               </Grid>
             </Box>
             <Divider sx={{ my: 2 }} />
@@ -237,11 +443,19 @@ const Home = ({
               }}
             >
               <Grid container spacing={3}>
-                {recomendations?.map((e, i) => (
-                  <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
-                    <ComicCard {...e} layout="detailed" key={e.id} />
-                  </Grid>
-                ))}
+                {loadingRecomendations ? (
+                  <RenderMany count={10}>
+                    <Grid item sm={12} lg={6} xl={4} width="100%">
+                      <ComicCardSkeleton layout="detailed" />
+                    </Grid>
+                  </RenderMany>
+                ) : (
+                  recomendations?.map((e, i) => (
+                    <Grid item sm={12} lg={6} xl={4} key={i} width="100%">
+                      <ComicCard {...e} layout="detailed" key={e.id} />
+                    </Grid>
+                  ))
+                )}
               </Grid>
             </Box>
             <Divider sx={{ my: 2 }} />
@@ -268,11 +482,25 @@ const Home = ({
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Grid container spacing={1}>
-              {top.map((e, i) => (
-                <Grid item xs={12} key={i} width="100%">
-                  <ComicCard {...e} layout="top" isFirst={i == 0} key={e.id} />
-                </Grid>
-              ))}
+              {loadingTop ? (
+                <RenderMany count={10}>
+                  <Grid item xs={12} width="100%">
+                    <ComicCardSkeleton layout="top" />
+                  </Grid>
+                </RenderMany>
+              ) : (
+                top?.map((e, i) => (
+                  <Grid item xs={12} key={i} width="100%">
+                    <ComicCard
+                      {...e}
+                      layout="top"
+                      isFirst={i == 0}
+                      key={e.id}
+                    />
+                  </Grid>
+                ))
+              )}
+
               <Grid item xs={6} sm={12} width="100%">
                 <p>
                   RINGBET88 daftar 12 situs judi{" "}
@@ -324,198 +552,24 @@ const Home = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const allowHentai = context.req.cookies.r18 == "enable" ?? false;
-  const { page: p } = context.query;
-  let page = parseInt((p as string) ?? "") ?? 1;
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
+//   const { page: p } = context.query;
+//   let page = parseInt((p as string) ?? "") ?? 1;
 
-  if (!page) page = 1;
+//   if (!page) page = 1;
 
-  const perPage = 42;
+//   const where = allowHentai
+//     ? {}
+//     : {
+//         isHentai: {
+//           equals: false,
+//         },
+//       };
 
-  const where = allowHentai
-    ? {}
-    : {
-        isHentai: {
-          equals: false,
-        },
-      };
+//   return {
 
-  const { data: { findManyComic: carousel } = {}, error: errorCarousel } =
-    await client.query<{
-      findManyComic: Model["Comic"][];
-    }>({
-      query: gql`
-        query CarouselComicHomepage(
-          $take: Int
-          $chaptersTake2: Int
-          $orderBy: ChapterOrderByWithRelationInput
-          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-          $where: ComicWhereInput
-        ) {
-          findManyComic(
-            take: $take
-            orderBy: $findManyComicOrderBy2
-            where: $where
-          ) {
-            id
-            name
-            thumb
-            thumbWide
-            slug
-            isHentai
-            viewsWeek
-            lastChapterUpdateAt
-            chapters(take: $chaptersTake2, orderBy: $orderBy) {
-              id
-              name
-              createdAt
-            }
-          }
-        }
-      `,
-      variables: {
-        take: 10,
-        chaptersTake2: 1,
-        orderBy: {
-          name: "desc",
-        },
-        findManyComicOrderBy2: [
-          {
-            viewsWeek: "desc",
-          },
-        ],
-        where,
-      },
-    });
-
-  const { data: { findManyComic: top } = {}, error: errorTop } =
-    await client.query<{
-      findManyComic: Model["Comic"][];
-    }>({
-      query: gql`
-        query TopComicHomepage(
-          $take: Int
-          $chaptersTake2: Int
-          $orderBy: ChapterOrderByWithRelationInput
-          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-          $where: ComicWhereInput
-        ) {
-          findManyComic(
-            take: $take
-            orderBy: $findManyComicOrderBy2
-            where: $where
-          ) {
-            id
-            name
-            thumb
-            thumbWide
-            slug
-            rating
-            isHentai
-            author {
-              id
-              name
-              slug
-            }
-            viewsWeek
-            lastChapterUpdateAt
-            genres {
-              id
-              name
-              slug
-            }
-            chapters(take: $chaptersTake2, orderBy: $orderBy) {
-              id
-              name
-              createdAt
-            }
-          }
-        }
-      `,
-      variables: {
-        take: 13,
-        chaptersTake2: 1,
-        orderBy: {
-          name: "desc",
-        },
-        findManyComicOrderBy2: [
-          {
-            viewsWeek: "desc",
-          },
-        ],
-        where,
-      },
-    });
-
-  const { data: { findManyComic: latest } = {}, error: errorLatest } =
-    await client.query<{
-      findManyComic: Model["Comic"][];
-    }>({
-      query: gql`
-        query LatestComicHomepage(
-          $take: Int
-          $chaptersTake2: Int
-          $skip: Int
-          $orderBy: ChapterOrderByWithRelationInput
-          $findManyComicOrderBy2: [ComicOrderByWithRelationInput]
-          $where: ComicWhereInput
-        ) {
-          findManyComic(
-            take: $take
-            orderBy: $findManyComicOrderBy2
-            where: $where
-            skip: $skip
-          ) {
-            id
-            name
-            thumb
-            thumbWide
-            slug
-            isHentai
-            viewsWeek
-
-            lastChapterUpdateAt
-            chapters(take: $chaptersTake2, orderBy: $orderBy) {
-              id
-              name
-              createdAt
-            }
-            _count {
-              chapters
-            }
-          }
-        }
-      `,
-      variables: {
-        take: perPage,
-        chaptersTake2: 3,
-        skip: page == 1 ? 0 : page * perPage,
-        orderBy: {
-          name: "desc",
-        },
-        findManyComicOrderBy2: [
-          {
-            lastChapterUpdateAt: "desc",
-          },
-        ],
-        where,
-      },
-    });
-
-  if (errorCarousel || errorTop || errorLatest) {
-    console.log(errorCarousel);
-    console.log(errorTop);
-    console.log(errorLatest);
-  }
-
-  return {
-    props: {
-      carousel,
-      top,
-      latest,
-    },
-  };
-};
+//   };
+// };
 
 export default Home;
