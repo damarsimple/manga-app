@@ -267,7 +267,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
       <Paper sx={{ mb: 1 }}>
         <Ads />
         {readMode === "single" ? (
-          <LazyImage
+          <img
             src={images[imageIndex]}
             alt="comic"
             height={"100%"}
@@ -288,14 +288,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
         ) : (
           <>
             {images.map((e, i) => (
-              <LazyImage
-                key={e}
-                src={e}
-                alt={title}
-                height={"100%"}
-                width={"100%"}
-                skeletonHeight={600}
-              />
+              <img key={e} src={e} alt={title} height={"100%"} width={"100%"} />
             ))}
           </>
         )}
