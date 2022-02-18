@@ -171,6 +171,10 @@ export default function Slug() {
         setLoading(false);
       }
     };
+
+    return () => {
+      gkChannel.onmessage = null;
+    };
   }, []);
 
   const { data: { findManyGenre } = {} } = useQuery<{

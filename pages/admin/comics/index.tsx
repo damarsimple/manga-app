@@ -1,5 +1,6 @@
 import React from "react";
+import Dashboard from "../../../components/Wrapper/Dashboard";
 
 export default function Index() {
-  return <div>index</div>;
+  return <Dashboard>index</Dashboard>;
 }

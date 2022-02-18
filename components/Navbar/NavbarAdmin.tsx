@@ -13,6 +13,7 @@ import {
   Paper,
   Toolbar,
   Typography,
+  Icon,
 } from "@mui/material";
 
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
@@ -128,26 +129,34 @@ export default function NavbarAdmin({ children }: { children: ReactNode }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-            <ListItem button key={text}>
+          {[
+            {
+              name: "Comic",
+              path: "/comics",
+              icon: "book",
+            },
+            {
+              name: "Chapter",
+              path: "/comics",
+            },
+            {
+              name: "Genre",
+              path: "/comics",
+            },
+            {
+              name: "Author",
+              path: "/comics",
+            },
+          ].map((route, index) => (
+            <ListItem button key={route.path}>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                <Icon>{route.icon}</Icon>
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary={route.name} />
             </ListItem>
           ))}
         </List>
         <Divider />
-        <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
