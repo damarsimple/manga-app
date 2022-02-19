@@ -497,6 +497,13 @@ function Slug({ top, router, comic }: SlugPageProps) {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const slug = context?.params?.slug as string;
+
+  if (!slug) {
+    return {
+      notFound: true,
+    };
+  }
+
   const { data: { findFirstComic } = {}, error: errorComic } =
     await client.query<{
       findFirstComic: Model["Comic"];

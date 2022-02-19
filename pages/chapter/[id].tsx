@@ -318,6 +318,12 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
+  if (!id) {
+    return {
+      notFound: true,
+    };
+  }
+
   const { data: { findFirstChapter } = {}, error: errorChapter } =
     await client.query<{
       findFirstChapter: Model["Chapter"];
