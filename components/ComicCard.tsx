@@ -15,6 +15,7 @@ import { Model } from "../types";
 import moment from "moment";
 import RenderMany from "./RenderMany";
 import LazyImage from "./LazyImage";
+
 export type Comic = Model["Comic"];
 
 type LayoutType = "detailed" | "carousel" | "top";
