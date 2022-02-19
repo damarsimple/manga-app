@@ -239,7 +239,7 @@ const Home = () => {
         },
         findManyComicOrderBy2: [
           {
-            viewsWeek: "desc",
+            rating: "desc",
           },
         ],
         where,
