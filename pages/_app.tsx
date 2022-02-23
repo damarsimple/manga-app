@@ -18,12 +18,15 @@ import { client } from "../modules/client";
 import NextNProgress from "nextjs-progressbar";
 import ContextMenu from "../components/ContextMenu";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { ArrowUpward } from "@mui/icons-material";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { Router, useRouter } from "next/router";
+import { GA_TRACKING_ID, pageview } from "../modules/gtag";
+import Script from "next/script";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { mode: modeStore } = useColorMode();
@@ -56,22 +59,22 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (localStorage) {
       setLoadTheme(true);
     }
-
-    // const _Hasync = [];
-    // _Hasync.push(["Histats.start", "1,4473363,4,0,0,0,00010000"]);
-    // _Hasync.push(["Histats.fasi", "1"]);
-    // _Hasync.push(["Histats.track_hits", ""]);
-    // (function () {
-    //   var hs = document.createElement("script");
-    //   hs.type = "text/javascript";
-    //   hs.async = true;
-    //   hs.src = "//s10.histats.com/js15_as.js";
-    //   (
-    //     document.getElementsByTagName("head")[0] ||
-    //     document.getElementsByTagName("body")[0]
-    //   ).appendChild(hs);
-    // })();
   }, []);
+
+  const handle = useCallback((x: string) => {
+    const url = `${window.location.origin}${x.split("?")[0]}`;
+
+    console.log(`reported ${url}`);
+    pageview(new URL(url));
+  }, []);
+
+  useEffect(() => {
+    Router.events.on("routeChangeComplete", handle);
+
+    return () => {
+      Router.events.off("routeChangeComplete", handle);
+    };
+  }, [Router.events]);
 
   const handleTop = () => (document.documentElement.scrollTop = 0);
 
@@ -103,6 +106,28 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ApolloProvider client={client}>
       <Head>
         <>
+          <script
+            src={
+              "https://www.googletagmanager.com/gtag/js?id=" + GA_TRACKING_ID
+            }
+            async
+          />
+          <script id="google-analytics">
+            {`
+          window.dataLayer = window.dataLayer || [];
+
+          function gtag(){window.dataLayer.push(arguments);}
+
+          gtag('js', new Date());
+
+          gtag('config', '${GA_TRACKING_ID}', {
+            send_page_view: false
+          });
+
+
+
+        `}
+          </script>
           <title>
             GudangKomik: Gudangnya Baca Manga Online Bahasa Indonesia
           </title>

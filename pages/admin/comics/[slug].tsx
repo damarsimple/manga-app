@@ -218,8 +218,6 @@ export default function Slug() {
         set: `https://cdn.gudangkomik.com${path}`,
       },
     });
-
-    console.log(path);
   };
 
   type Keys = keyof Model["Comic"];

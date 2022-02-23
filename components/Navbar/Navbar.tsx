@@ -23,13 +23,13 @@ import { TextField } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 
 import SearchIcon from "@mui/icons-material/Search";
-import Tippy from "@tippyjs/react";
 import { ComicSearch } from "../../types";
 import { gql, useQuery } from "@apollo/client";
 import { useR18 } from "../../stores/r18";
 import { useRouter } from "next/router";
 import { dontRender } from "../../modules/rules";
 import { client } from "../../modules/client";
+import { event } from "../../modules/gtag";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -94,6 +94,7 @@ export default function Navbar() {
     if (query.length < 3) return;
     setComicSearch(undefined);
     setLoading(true);
+
     timer && clearTimeout(timer);
 
     const newTimer = setTimeout(() => {
@@ -123,12 +124,6 @@ export default function Navbar() {
                   thumb
                   type
                   thumbWide
-                  altName
-                  isHentai
-                  released
-                  rating
-                  views
-                  viewsWeek
                 }
                 offset
                 limit
@@ -149,6 +144,13 @@ export default function Navbar() {
           const { comicSearch } = data;
           setLoading(false);
           setComicSearch(comicSearch);
+
+          event({
+            action: "search",
+            category: "navbar",
+            label: query,
+            value: comicSearch.processingTimeMs,
+          });
         });
     }, 150);
 
@@ -281,7 +283,15 @@ export default function Navbar() {
                     {focused &&
                       comicSearch?.comics?.map((e) => (
                         <Link href={"/comic/" + e.slug} key={e.id}>
-                          <a>
+                          <a
+                            onClick={() => {
+                              event({
+                                action: "view_search_results",
+                                label: e.slug,
+                                category: e.type,
+                              });
+                            }}
+                          >
                             <Paper
                               sx={{
                                 display: "flex",

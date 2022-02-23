@@ -44,6 +44,7 @@ import { capitalizeFirstLetter } from "../../modules/helper";
 import RenderXTime from "../../components/RenderXTime";
 import SortIcon from "@mui/icons-material/Sort";
 import LazyImage from "../../components/LazyImage";
+import { event } from "../../modules/gtag";
 interface SlugPageProps extends WithRouterProps {
   comic: Model["Comic"];
   top: Model["Comic"][];
@@ -86,6 +87,12 @@ function Slug({ top, router, comic }: SlugPageProps) {
     setTransparent(true);
     setTransparentMode(true);
     window.addEventListener("scroll", listenToScroll);
+
+    event({
+      action: "view_item",
+      category: "comic",
+      label: `${comic.name}`,
+    });
 
     return () => {
       window.removeEventListener("scroll", listenToScroll);

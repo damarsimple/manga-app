@@ -108,8 +108,6 @@ function Catch({ router }: WithRouterProps) {
 
   const validType = mode == "Text Mode";
 
-  console.log(type);
-
   const { data: { findManyComic: allComic } = {}, loading: loadingAllText } =
     useQuery<{
       findManyComic: Model["Comic"][];

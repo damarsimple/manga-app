@@ -30,6 +30,7 @@ import moment from "moment";
 import { SEO } from "../../modules/seo";
 import Link from "next/link";
 import LazyImage from "../../components/LazyImage";
+import { event } from "../../modules/gtag";
 function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const { push, query } = useRouter();
 
@@ -77,6 +78,12 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
       if (chapter.comic.type != "manga") {
         setReadMode("longstrip");
       }
+
+      event({
+        action: "view_item",
+        category: "chapter",
+        label: `${comic.name}-${chapter.name}`,
+      });
 
       images.forEach((e) => {
         const img = new Image();
@@ -140,7 +147,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     //@ts-ignore
     for (const x of sorts) {
       if (x.id == chapter.id) {
-        const sorts = (chapters ?? []).sort((e, x) => e.name - x.name);
+        const sorts = [...(chapters ?? [])].sort((e, x) => e.name - x.name);
 
         const prev = sorts[idx - 1];
         if (prev) {
