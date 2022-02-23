@@ -52,9 +52,9 @@ const logTimeLink = new ApolloLink((operation, forward) => {
     // data from a previous link
     const time = performance.now() - operation.getContext().start;
 
-    console.log(
-      `operation ${operation.operationName} took ${time} to complete`
-    );
+    // console.log(
+    // `operation ${operation.operationName} took ${time} to complete`
+    // );
 
     event({
       action: "timing_complete",

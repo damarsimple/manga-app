@@ -64,7 +64,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const handle = useCallback((x: string) => {
     const url = `${window.location.origin}${x.split("?")[0]}`;
 
-    console.log(`reported ${url}`);
+    // console.log(`reported ${url}`);
     pageview(new URL(url));
   }, []);
 
