@@ -138,14 +138,17 @@ export default function NavbarAdmin({ children }: { children: ReactNode }) {
             {
               name: "Chapter",
               path: "/comics",
+              icon: "library_books",
             },
             {
               name: "Genre",
               path: "/comics",
+              icon: "local_offer",
             },
             {
               name: "Author",
               path: "/comics",
+              icon: "engineering",
             },
           ].map((route, index) => (
             <ListItem button key={route.path}>

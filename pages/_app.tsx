@@ -144,6 +144,11 @@ function MyApp({ Component, pageProps }: AppProps) {
             name="keywords"
             content="Gudangkomik, gudang komik, baca manga, baca komik, baca manga online, baca komik online"
           ></meta>
+
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          />
         </>
       </Head>
       <ThemeProvider theme={theme}>
