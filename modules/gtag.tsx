@@ -1,8 +1,9 @@
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GTAG_ID as string;
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
-export const pageview = (url: URL): void => {
-  window.gtag &&
+export const pageview = async (url: URL) => {
+  window &&
+    window.gtag &&
     window.gtag("event", "page_view", {
       page_title: document.title,
       page_location: url,
@@ -21,7 +22,7 @@ type GTagEvent = {
 };
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
-export const event = ({
+export const event = async ({
   action,
   category,
   label,
@@ -29,8 +30,9 @@ export const event = ({
   description,
   fatal,
   name,
-}: GTagEvent): void => {
-  window.gtag &&
+}: GTagEvent) => {
+  window &&
+    window.gtag &&
     window.gtag("event", action, {
       event_category: category,
       event_label: label,
