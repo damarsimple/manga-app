@@ -61,20 +61,20 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, []);
 
-  const handle = useCallback((x: string) => {
-    const url = `${window.location.origin}${x.split("?")[0]}`;
+  // const handle = useCallback((x: string) => {
+  //   const url = `${window.location.origin}${x.split("?")[0]}`;
 
-    // console.log(`reported ${url}`);
-    pageview(new URL(url));
-  }, []);
+  //   // console.log(`reported ${url}`);
+  //   pageview(new URL(url));
+  // }, []);
 
-  useEffect(() => {
-    Router.events.on("routeChangeComplete", handle);
+  // useEffect(() => {
+  //   Router.events.on("routeChangeComplete", handle);
 
-    return () => {
-      Router.events.off("routeChangeComplete", handle);
-    };
-  }, [Router.events]);
+  //   return () => {
+  //     Router.events.off("routeChangeComplete", handle);
+  //   };
+  // }, [Router.events]);
 
   const handleTop = () => (document.documentElement.scrollTop = 0);
 
@@ -121,7 +121,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           gtag('js', new Date());
 
           gtag('config', '${GA_TRACKING_ID}', {
-            send_page_view: false
+            send_page_view: true
           });
 
 
