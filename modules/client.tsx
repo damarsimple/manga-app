@@ -56,12 +56,12 @@ const logTimeLink = new ApolloLink((operation, forward) => {
     // `operation ${operation.operationName} took ${time} to complete`
     // );
 
-    event({
-      action: "timing_complete",
-      category: "gql",
-      label: operation.operationName,
-      value: time,
-    });
+    // event({
+    //   action: "timing_complete",
+    //   category: "gql",
+    //   label: operation.operationName,
+    //   value: time,
+    // });
 
     return data;
   });
