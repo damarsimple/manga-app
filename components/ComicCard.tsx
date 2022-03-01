@@ -228,7 +228,7 @@ export const ComicCard = ({
               <LazyImage
                 src={fallback + "?width=240"}
                 height={{
-                  xs: home ? 150 : 320,
+                  xs: home ? 180 : 320,
                   sm: 340,
                 }}
                 width={"100%"}

@@ -182,14 +182,14 @@ export default function Navbar() {
               <Link href="/">
                 <a>
                   <Box sx={{ display: { xs: "none", md: "flex" } }}>
-                    <img src="/logo.png" width={250} height={50} alt="logo" />
+                    <Image src="/logo.png" width={250} height={50} alt="logo" />
                   </Box>
                 </a>
               </Link>
               <Box sx={{ display: { xs: "flex", md: "none" } }}>
                 <Link href="/">
                   <a>
-                    <img
+                    <Image
                       src="/android-icon-48x48.png"
                       width={48}
                       height={48}
@@ -303,7 +303,7 @@ export default function Navbar() {
                               }}
                               onClick={() => push("/comic/" + e.slug)}
                             >
-                              <img
+                              <Image
                                 alt={e.name}
                                 src={`${e.thumb}?width=40&height=60`}
                                 width={40}

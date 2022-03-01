@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { Box, Skeleton } from "@mui/material";
+import Image from "next/image";
 import React from "react";
 import { useEffect, useState, Fragment } from "react";
 import { useInView } from "react-intersection-observer";
@@ -25,45 +26,60 @@ export default function LazyImage({
   skeletonHeight,
   skeletonWidth,
 }: LazyImageProp) {
-  const { ref, inView, entry } = useInView({});
+  // const { ref, inView, entry } = useInView({});
 
-  const [loaded, setLoaded] = useState(false);
+  // const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    if (!inView) return;
-    const img = new Image();
-    img.src = src;
-    img.onload = () => {
-      setLoaded(true);
-    };
-  }, [src, inView]);
+  // useEffect(() => {
+  //   if (!inView) return;
+  //   const img = new Image();
+  //   img.src = src;
+  //   img.onload = () => {
+  //     setLoaded(true);
+  //   };
+  // }, [src, inView]);
+
+  console.log(width);
+  console.log(height);
 
   return (
-    <div
-      ref={ref}
-      style={{
-        width,
-        height,
+    <Box
+      sx={{
+        width: width,
+        height: height,
+        position: "relative",
       }}
+      onClick={onClick}
     >
-      {loaded ? (
-        <Box
-          component="img"
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          onClick={onClick}
-        />
-      ) : (
-        <Skeleton
-          sx={{
-            width: skeletonWidth ?? width,
-            height: skeletonHeight ?? height,
-          }}
-          variant="rectangular"
-        />
-      )}
-    </div>
+      <Image src={src} alt={alt} layout="fill" />
+    </Box>
   );
+
+  // return (
+  //   <div
+  //     ref={ref}
+  //     style={{
+  //       width,
+  //       height,
+  //     }}
+  //   >
+  //     {loaded ? (
+  //       <Image
+  //         src={src}
+  //         alt={alt}
+  //         width={width}
+  //         height={height}
+  //         onClick={onClick}
+  //       />
+  //     ) : (
+  //       <Skeleton
+  //         sx={{
+  //           width: skeletonWidth ?? width,
+  //           height: skeletonHeight ?? height,
+  //         }}
+  //         variant="rectangular"
+  //       />
+  //     )}
+  //   </div>
+  // );
 }
