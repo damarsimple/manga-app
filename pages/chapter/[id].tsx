@@ -225,7 +225,7 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
 
   const Ads = () => (
     <a target="_blank" href="https://bit.ly/3njmpck" rel="noreferrer">
-      <LazyImage
+      <img
         height="100%"
         width="100%"
         src="/slot-online.webp"
