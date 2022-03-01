@@ -39,9 +39,6 @@ export default function LazyImage({
   //   };
   // }, [src, inView]);
 
-  console.log(width);
-  console.log(height);
-
   return (
     <Box
       sx={{
