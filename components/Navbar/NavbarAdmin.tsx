@@ -179,7 +179,7 @@ export default function NavbarAdmin({ children }: { children: ReactNode }) {
               icon: "report",
             },
           ].map((route, index) => (
-            <Link href={"/admin/" + route.path} key={route.path}>
+            <Link href={"/admin" + route.path} key={route.path}>
               <a>
                 <ListItem button>
                   <ListItemIcon>
