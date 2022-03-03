@@ -2,7 +2,6 @@ import React, { ReactNode, useState } from "react";
 import {
   Drawer as MuiDrawer,
   Box,
-  Button,
   CssBaseline,
   Divider,
   IconButton,
@@ -10,20 +9,16 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Paper,
   Toolbar,
   Typography,
   Icon,
 } from "@mui/material";
-
-import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
+import { styled, Theme, CSSObject } from "@mui/material/styles";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 
 import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import Link from "next/link";
 
 const drawerWidth = 240;
 
@@ -52,7 +47,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
@@ -97,7 +91,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function NavbarAdmin({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -107,7 +101,7 @@ export default function NavbarAdmin({ children }: { children: ReactNode }) {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={() => setOpen(true)}
+            onClick={() => setOpen(!open)}
             edge="start"
             sx={{
               marginRight: "36px",
@@ -116,14 +110,18 @@ export default function NavbarAdmin({ children }: { children: ReactNode }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
-          </Typography>
+          <Link href="/admin/comics">
+            <a>
+              <Typography variant="h6" noWrap component="div">
+                Gudangkomik
+              </Typography>
+            </a>
+          </Link>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
-          <IconButton onClick={() => setOpen(false)}>
+          <IconButton onClick={() => setOpen(!open)}>
             <ChevronRightIcon />
           </IconButton>
         </DrawerHeader>
@@ -137,33 +135,66 @@ export default function NavbarAdmin({ children }: { children: ReactNode }) {
             },
             {
               name: "Chapter",
-              path: "/comics",
+              path: "/chapters",
               icon: "library_books",
             },
             {
               name: "Genre",
-              path: "/comics",
+              path: "/genres",
               icon: "local_offer",
             },
             {
               name: "Author",
-              path: "/comics",
+              path: "/authors",
               icon: "engineering",
             },
+            {
+              name: "Ads",
+              path: "/ads",
+              icon: "feed",
+            },
+            {
+              name: "User",
+              path: "/users",
+              icon: "face",
+            },
+            {
+              name: "Updater",
+              path: "/updater",
+              icon: "update",
+            },
+            {
+              name: "Analytics",
+              path: "/analytics",
+              icon: "trending_up",
+            },
+            {
+              name: "Social",
+              path: "/social",
+              icon: "question_answer",
+            },
+            {
+              name: "Report",
+              path: "/reports",
+              icon: "report",
+            },
           ].map((route, index) => (
-            <ListItem button key={route.path}>
-              <ListItemIcon>
-                <Icon>{route.icon}</Icon>
-              </ListItemIcon>
-              <ListItemText primary={route.name} />
-            </ListItem>
+            <Link href={"/admin/" + route.path} key={route.path}>
+              <a>
+                <ListItem button>
+                  <ListItemIcon>
+                    <Icon>{route.icon}</Icon>
+                  </ListItemIcon>
+                  {open && <ListItemText primary={route.name} />}
+                </ListItem>
+              </a>
+            </Link>
           ))}
         </List>
         <Divider />
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <DrawerHeader />
-
         {children}
       </Box>
     </Box>

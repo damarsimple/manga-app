@@ -289,7 +289,7 @@ export default function Slug() {
         </Tabs>
       </Paper>
       {tabIndex == 0 && (
-        <Paper sx={{ minHeight: 600, p: 4 }}>
+        <Paper sx={{ minHeight: 600, p: 4, width: "100%" }}>
           <Grid container spacing={2}>
             <Grid item xs={3} sm={4}>
               <Box p={4} sx={{ display: "flex", flexDirection: "column" }}>
@@ -471,7 +471,7 @@ export default function Slug() {
                     gap: 4,
                   }}
                 >
-                  <Typography variant="h5">Tambah Genre</Typography>
+                  <Typography variant="h5">Tambah </Typography>
                   <TextField
                     fullWidth
                     size="small"
@@ -509,7 +509,7 @@ export default function Slug() {
                     gap: 4,
                   }}
                 >
-                  <Typography variant="h5">Kurang Genre</Typography>
+                  <Typography variant="h5">Kurang </Typography>
                   <TextField
                     fullWidth
                     size="small"

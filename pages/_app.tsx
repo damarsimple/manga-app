@@ -27,6 +27,7 @@ import { ToastContainer } from "react-toastify";
 import { Router, useRouter } from "next/router";
 import { GA_TRACKING_ID, pageview } from "../modules/gtag";
 import Script from "next/script";
+import Dashboard from "../components/Wrapper/Dashboard";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { mode: modeStore } = useColorMode();
@@ -188,7 +189,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           <Navbar />
           <ContextMenu />
 
-          <Component {...pageProps} />
+          <Dashboard>
+            <Component {...pageProps} />
+          </Dashboard>
           <Footer />
           <ToastContainer />
         </Box>

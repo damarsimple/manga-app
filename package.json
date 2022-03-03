@@ -25,6 +25,7 @@
     "formik": "^2.2.9",
     "graphql": "^16.3.0",
     "js-cookie": "^3.0.1",
+    "lodash": "^4.17.21",
     "logrocket": "^2.2.0",
     "logrocket-react": "^5.0.1",
     "moment": "^2.29.1",

@@ -11,24 +11,53 @@ import {
   IconButton,
   TablePagination,
   Typography,
+  TextField,
 } from "@mui/material";
 import React, { useState } from "react";
+import get from "lodash/get";
+import { tooltipClasses, TooltipProps } from "@mui/material/Tooltip";
 
+const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "#f5f5f9",
+    color: "rgba(0, 0, 0, 0.87)",
+    maxWidth: 220,
+    fontSize: theme.typography.pxToRem(12),
+    border: "1px solid #dadde9",
+  },
+}));
 interface BaseModel {
   id: number;
 }
 
-interface Action<T> {
-  type: "edit" | "delete";
-  callback: (e: T) => void;
-}
+type Action = "edit" | "delete";
 
 interface TableProp<T> {
   headcells: HeadCell<T>[];
+  action?: Action[];
+  name: string;
+  deleteQuery?: DocumentNode;
+  query: DocumentNode;
+  countQuery: DocumentNode;
+  keys: string;
+  countKeys: string;
+  TooltipChildren?: (row: T) => React.ReactNode;
+  editPush?: (row: T) => string;
 }
 
-export default function MUITable<T extends BaseModel, QType>({
+export default function MUITable<T extends BaseModel>({
   headcells,
+  name,
+  deleteQuery,
+  action,
+  query,
+  keys,
+  TooltipChildren,
+  countQuery,
+  countKeys,
+  editPush,
 }: TableProp<T>) {
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof T>("id");
@@ -85,40 +114,61 @@ export default function MUITable<T extends BaseModel, QType>({
 
   const isSelected = (name: number) => selected.indexOf(name) !== -1;
 
-  const [handleDelete] = useMutation(gql`
-    mutation DeleteManyChapterAdmin($where: ChapterWhereInput) {
-      deleteManyChapter(where: $where) {
-        count
-      }
-    }
-  `);
-
   const handleSelectedDelete = () => {
-    toast.info(`${selected.length} chapters will be deleted`);
+    toast.info(`${selected.length} ${name.toLowerCase()}s will be deleted`);
 
-    handleDelete({
-      variables: {
-        where: {
-          id: {
-            in: selected,
+    deleteQuery &&
+      client.query({
+        query: deleteQuery,
+        variables: {
+          where: {
+            id: {
+              in: selected,
+            },
           },
         },
-      },
-    });
+      });
 
     setSelected([]);
   };
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [search, setSearch] = useState("");
+  const { data, loading, error } = useQuery(query, {
+    variables: {
+      where: {
+        ...(search.length !== 0 && {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        }),
+      },
+      take: rowsPerPage,
+      skip: page * rowsPerPage,
+      orderBy: [
+        {
+          [orderBy]: order,
+        },
+      ],
+    },
+  });
 
-  const rows: T[] = [];
+  const handleSearch = (e: string) => {
+    setSearch(e);
+  };
+
+  const { data: cc } = useQuery(countQuery);
+
+  const rows: T[] = get(data, keys, []);
+  const count: number = get(cc, countKeys, 0);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  // end chapter
+  const { push } = useRouter();
 
   return (
     <Paper sx={{ p: 1 }}>
@@ -127,6 +177,8 @@ export default function MUITable<T extends BaseModel, QType>({
           <EnhancedTableToolbar
             numSelected={selected.length}
             handleSelectedDelete={handleSelectedDelete}
+            name={name}
+            handleSearch={handleSearch}
           />
           <TableContainer>
             <Table
@@ -142,57 +194,71 @@ export default function MUITable<T extends BaseModel, QType>({
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
+                name={name}
+                action={action}
               />
               <TableBody>
-                {[...rows]
-                  .sort((a, b) =>
-                    order == "asc"
-                      ? //@ts-ignore
-                        b[orderBy] - a[orderBy]
-                      : //@ts-ignore
-                        a[orderBy] - b[orderBy]
-                  )
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                {rows.map((row, index) => {
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                    return (
+                  return (
+                    <HtmlTooltip
+                      key={row.id}
+                      title={
+                        <React.Fragment>
+                          {TooltipChildren && TooltipChildren(row)}
+                        </React.Fragment>
+                      }
+                    >
                       <TableRow
                         hover
-                        onClick={(event) => handleClick(event, row.id)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
-                        key={row.id}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
+                        <TableCell
+                          padding="checkbox"
+                          onClick={(event) => handleClick(event, row.id)}
+                        >
                           <Checkbox color="primary" checked={isItemSelected} />
                         </TableCell>
-                        <TableCell component="th" id={labelId} scope="row">
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          onClick={(event) => handleClick(event, row.id)}
+                        >
                           {row.id}
                         </TableCell>
-                        {/* <TableCell component="th" id={labelId} scope="row">
-                          {row.name}
-                        </TableCell> */}
+                        {headcells.map((headcell) => (
+                          <TableCell
+                            onClick={(event) => handleClick(event, row.id)}
+                            component="th"
+                            scope="row"
+                            key={`${row.id}-${headcell.name}`}
+                          >
+                            {row[headcell.name]}
+                          </TableCell>
+                        ))}
 
-                        <TableCell component="th" id={labelId} scope="row">
-                          <IconButton
-                          // onClick={() => push("/admin/chapters/" + row.id)}
-                          >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                          // onClick={() => push("/chapter/" + row.id)}
-                          >
-                            <RemoveRedEye />
-                          </IconButton>
-                        </TableCell>
+                        {action && (
+                          <TableCell component="th" id={labelId} scope="row">
+                            {action.includes("edit") && (
+                              <IconButton
+                                onClick={() => editPush && push(editPush(row))}
+                              >
+                                <Edit />
+                              </IconButton>
+                            )}
+                          </TableCell>
+                        )}
                       </TableRow>
-                    );
-                  })}
-                {emptyRows > 0 && (
+                    </HtmlTooltip>
+                  );
+                })}
+                {loading && (
                   <TableRow
                     style={{
                       height: 33 * emptyRows,
@@ -207,7 +273,7 @@ export default function MUITable<T extends BaseModel, QType>({
           <TablePagination
             rowsPerPageOptions={[25, 50, 100]}
             component="div"
-            count={rows.length}
+            count={count}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -219,7 +285,7 @@ export default function MUITable<T extends BaseModel, QType>({
   );
 }
 
-import { alpha } from "@mui/material/styles";
+import { alpha, styled } from "@mui/material/styles";
 import TableHead from "@mui/material/TableHead";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
@@ -229,15 +295,18 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import { Model } from "../types";
 import { toast } from "react-toastify";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation, gql, DocumentNode, useQuery } from "@apollo/client";
+import { client } from "../modules/client";
+import MuiAppBar from "@mui/material/AppBar";
+import { useRouter } from "next/router";
 
 type Order = "asc" | "desc";
 
 interface HeadCell<T> {
-  disablePadding: boolean;
-  id: keyof T;
+  disablePadding?: boolean;
+  name: keyof T;
   label: string;
-  numeric: boolean;
+  numeric?: boolean;
 }
 
 interface EnhancedTableProps<T> {
@@ -248,6 +317,8 @@ interface EnhancedTableProps<T> {
   orderBy: string;
   rowCount: number;
   headcells: HeadCell<T>[];
+  name: string;
+  action?: Action[];
 }
 
 function EnhancedTableHead<T extends BaseModel>(props: EnhancedTableProps<T>) {
@@ -259,6 +330,8 @@ function EnhancedTableHead<T extends BaseModel>(props: EnhancedTableProps<T>) {
     rowCount,
     onRequestSort,
     headcells,
+    name,
+    action,
   } = props;
   const createSortHandler =
     (property: keyof T) => (event: React.MouseEvent<unknown>) => {
@@ -275,22 +348,30 @@ function EnhancedTableHead<T extends BaseModel>(props: EnhancedTableProps<T>) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              "aria-label": "select all chapters",
+              "aria-label": `select all ${name.toLocaleLowerCase()}s`,
             }}
           />
         </TableCell>
-        {headcells.map((headCell) => (
+        {[
+          {
+            name: "id" as keyof T,
+            label: "ID",
+            numeric: true,
+            disablePadding: true,
+          },
+          ...headcells,
+        ].map((headCell) => (
           <TableCell
-            key={`headcell-${headCell.id}`}
-            sortDirection={orderBy === headCell.id ? order : false}
+            key={`headcell-${headCell.name}`}
+            sortDirection={orderBy === headCell.name ? order : false}
           >
             <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
+              active={orderBy === headCell.name}
+              direction={orderBy === headCell.name ? order : "asc"}
+              onClick={createSortHandler(headCell.name)}
             >
               {headCell.label}
-              {orderBy === headCell.id ? (
+              {orderBy === headCell.name ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === "desc" ? "sorted descending" : "sorted ascending"}
                 </Box>
@@ -298,7 +379,7 @@ function EnhancedTableHead<T extends BaseModel>(props: EnhancedTableProps<T>) {
             </TableSortLabel>
           </TableCell>
         ))}
-        <TableCell>Lihat</TableCell>
+        {action && <TableCell>Aksi</TableCell>}
       </TableRow>
     </TableHead>
   );
@@ -307,10 +388,12 @@ function EnhancedTableHead<T extends BaseModel>(props: EnhancedTableProps<T>) {
 interface EnhancedTableToolbarProps {
   numSelected: number;
   handleSelectedDelete: () => void;
+  handleSearch: (e: string) => void;
+  name: string;
 }
 
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const { numSelected } = props;
+  const { numSelected, name, handleSearch } = props;
 
   return (
     <Toolbar
@@ -342,7 +425,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           id="tableTitle"
           component="div"
         >
-          Chapter
+          {name}
         </Typography>
       )}
       {numSelected > 0 ? (
@@ -352,11 +435,11 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <TextField
+          placeholder="Search"
+          size="small"
+          onChange={(e) => handleSearch(e.target.value)}
+        />
       )}
     </Toolbar>
   );
