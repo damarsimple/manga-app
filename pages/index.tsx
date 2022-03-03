@@ -274,6 +274,7 @@ const Home = () => {
           slug
           isHentai
           viewsWeek
+          viewsHourly
           lastChapterUpdateAt
           chapters(take: $chaptersTake2, orderBy: $orderBy) {
             id
@@ -292,7 +293,7 @@ const Home = () => {
         },
         findManyComicOrderBy2: [
           {
-            viewsWeek: "desc",
+            viewsHourly: "desc",
           },
         ],
         where,
