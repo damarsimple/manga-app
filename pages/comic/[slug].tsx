@@ -618,7 +618,7 @@ export async function getStaticPaths() {
     `,
   });
 
-  // Get the paths we want to pre-render based on posts
+  // Get the paths we want to pre-render based on comics
   const paths =
     comics?.map((comic) => ({
       params: { slug: comic.slug },

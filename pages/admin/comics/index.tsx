@@ -139,6 +139,10 @@ export default function Index() {
 
     setFinished(finishedDls);
 
+    setCandidates(
+      candidates.filter((candidate) => !finishedDls.includes(candidate.slug))
+    );
+
     setLoading(false);
   };
 
