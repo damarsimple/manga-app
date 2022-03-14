@@ -4124,7 +4124,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-    AdsPosition: "BOTTOM" | "TOP" | "TOP_COMIC"
+    AdsPosition: "HOME_TOP_COMIC" | "COMIC_RECOMENDATION" | "CHAPTER_BOTTOM" | "CHAPTER_TOP"
     AdsScalarFieldEnum: "createdAt" | "id" | "index" | "name" | "position" | "updatedAt" | "url"
     AuthorScalarFieldEnum: "createdAt" | "id" | "name" | "slug" | "updatedAt"
     ChapterBookmarkScalarFieldEnum: "chapterId" | "createdAt" | "id" | "updatedAt" | "userId"
@@ -4162,6 +4162,7 @@ export interface NexusGenObjects {
         id: number; // Int!
         index: number; // Int!
         name: string; // String!
+        image?: string; // String!
         position: NexusGenEnums['AdsPosition']; // AdsPosition!
         updatedAt: NexusGenScalars['DateTime']; // DateTime!
         url: string; // String!
@@ -4878,6 +4879,7 @@ export interface NexusGenFieldTypes {
         id: number; // Int!
         index: number; // Int!
         name: string; // String!
+        image?: string; // String!
         position: NexusGenEnums['AdsPosition']; // AdsPosition!
         updatedAt: NexusGenScalars['DateTime']; // DateTime!
         url: string; // String!

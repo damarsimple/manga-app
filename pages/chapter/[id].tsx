@@ -29,8 +29,9 @@ import { NextSeo } from "next-seo";
 import moment from "moment";
 import { SEO } from "../../modules/seo";
 import Link from "next/link";
-import LazyImage from "../../components/LazyImage";
 import { event } from "../../modules/gtag";
+import { Ads } from "../../components/Ads";
+
 function Id({ chapter }: { chapter: Model["Chapter"] }) {
   const { push, query } = useRouter();
 
@@ -223,17 +224,40 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
     </Paper>
   );
 
-  const Ads = () => (
-    <a target="_blank" href="https://bit.ly/3M9Mlme" rel="noreferrer">
-      <img
-        height="100%"
-        width="100%"
-        src="/slot-online.webp"
-        alt="Slot Online"
-        title="Slot Online"
-      />
-    </a>
+  const { data: { findManyAds } = {} } = useQuery<{
+    findManyAds: Model["Ads"][];
+  }>(
+    gql`
+      query FindChapterAds($where: AdsWhereInput) {
+        findManyAds(where: $where) {
+          id
+          name
+          position
+          image
+          url
+          createdAt
+          index
+          updatedAt
+        }
+      }
+    `,
+    {
+      variables: {
+        where: {
+          position: {
+            in: ["CHAPTER_TOP", "CHAPTER_BOTTOM"],
+          },
+        },
+      },
+    }
   );
+
+  const UPPER_ADS = findManyAds
+    ?.filter((e) => e.position == "CHAPTER_TOP")
+    .sort((a, b) => a.index - b.index);
+  const BOTTOM_ADS = findManyAds
+    ?.filter((e) => e.position == "CHAPTER_BOTTOM")
+    .sort((a, b) => a.index - b.index);
 
   return (
     <Container>
@@ -273,7 +297,9 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
       <Navigation />
       <div ref={containerRef} />
       <Paper sx={{ mb: 1 }}>
-        <Ads />
+        {UPPER_ADS?.map((e) => (
+          <Ads {...e} key={e.id} />
+        ))}
         {readMode === "single" ? (
           <img
             src={images[imageIndex]}
@@ -300,7 +326,9 @@ function Id({ chapter }: { chapter: Model["Chapter"] }) {
             ))}
           </>
         )}
-        <Ads />
+        {BOTTOM_ADS?.map((e) => (
+          <Ads {...e} key={e.id} />
+        ))}
       </Paper>
 
       <Navigation />

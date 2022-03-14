@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import MUITable from "../../../components/MUITable";
-import Dashboard from "../../../components/Wrapper/Dashboard";
 import { gql, useMutation } from "@apollo/client";
 import { Model } from "../../../types";
-import Image from "next/image";
 import {
   Tabs,
   Tab,
@@ -19,12 +17,14 @@ import { toast } from "react-toastify";
 import { useCallback } from "react";
 import { Delete, Newspaper, Upload, UploadFile } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
+import { useRouter } from "next/router";
 
 const Input = styled("input")({
   display: "none",
 });
 
 export default function Index() {
+  const { push } = useRouter();
   const [tab, setTab] = useState(0);
 
   const [candidates, setCandidates] = useState<
@@ -358,7 +358,8 @@ export default function Index() {
               }
             `}
             action={["edit", "delete"]}
-            editPush={(row) => `/admin/comics/` + row.slug}
+            editAction="function"
+            editFunction={(row) => push(`/admin/comics/` + row.slug)}
             query={gql`
               query (
                 $take: Int

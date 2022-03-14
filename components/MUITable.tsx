@@ -1,4 +1,4 @@
-import { Edit, RemoveRedEye } from "@mui/icons-material";
+import { Delete, Edit, RemoveRedEye } from "@mui/icons-material";
 import {
   Paper,
   Box,
@@ -12,10 +12,20 @@ import {
   TablePagination,
   Typography,
   TextField,
+  Button,
+  Modal,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import React, { useState } from "react";
 import get from "lodash/get";
 import { tooltipClasses, TooltipProps } from "@mui/material/Tooltip";
+
+const ignores = ["id", "__typename", "createdAt", "updatedAt"];
+
+const Input = styled("input")({
+  display: "none",
+});
 
 const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -32,8 +42,22 @@ interface BaseModel {
   id: number;
 }
 
-type Action = "edit" | "delete";
+type Action = "edit" | "delete" | "create";
 
+export interface InputSchema<T> {
+  name: keyof T;
+  label: string;
+  type?:
+    | "text"
+    | "number"
+    | "file"
+    | "date"
+    | "time"
+    | "datetime-local"
+    | "select";
+  selects?: string[];
+  dontRender?: (e: Record<string, any>) => boolean;
+}
 interface TableProp<T> {
   headcells: HeadCell<T>[];
   action?: Action[];
@@ -44,7 +68,19 @@ interface TableProp<T> {
   keys: string;
   countKeys: string;
   TooltipChildren?: (row: T) => React.ReactNode;
-  editPush?: (row: T) => string;
+
+  editAction?: "function" | "schema";
+  editSchema?: InputSchema<T>[];
+  editQuery?: DocumentNode;
+  editModifier?: (data: Partial<T>) => Record<string, any>;
+  editFunction?: (row: T) => void;
+
+  createAction?: "function" | "schema";
+  createSchema?: InputSchema<T>[];
+  createQuery?: DocumentNode;
+  createDefaultValue?: Record<keyof T, any>;
+  createModifier?: (data: Record<keyof T, any>) => Record<string, any>;
+  createFunction?: () => void;
 }
 
 export default function MUITable<T extends BaseModel>({
@@ -57,7 +93,19 @@ export default function MUITable<T extends BaseModel>({
   TooltipChildren,
   countQuery,
   countKeys,
-  editPush,
+
+  editAction,
+  editSchema,
+  editQuery,
+  editFunction,
+  editModifier,
+
+  createAction,
+  createSchema,
+  createQuery,
+  createFunction,
+  createModifier,
+  createDefaultValue,
 }: TableProp<T>) {
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof T>("id");
@@ -135,7 +183,7 @@ export default function MUITable<T extends BaseModel>({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [search, setSearch] = useState("");
-  const { data, loading, error } = useQuery(query, {
+  const { data, loading, error, refetch } = useQuery(query, {
     variables: {
       where: {
         ...(search.length !== 0 && {
@@ -168,10 +216,412 @@ export default function MUITable<T extends BaseModel>({
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const { push } = useRouter();
+  const handleDelete = async (data: number[]) => {
+    if (!deleteQuery) {
+      toast.error("deleteQuery not defined !");
+      return;
+    }
+    client
+      .mutate({
+        mutation: deleteQuery,
+        variables: {
+          where: {
+            id: {
+              in: data,
+            },
+          },
+        },
+      })
+      .then((e) => {
+        toast.success("Deleted " + data.join(","));
+        refetch();
+      })
+      .catch((e) => {
+        toast.error(e.message);
+      });
+  };
+
+  const [showEdit, setShowEdit] = useState(false);
+  const [editData, setEditData] = useState<Partial<T>>({});
+
+  const handleEdit = async () => {
+    if (!editQuery) {
+      toast.error("editQuery not defined !");
+      return;
+    }
+
+    if (!editData) {
+      toast.error("editData not defined !");
+      return;
+    }
+
+    const cp = { ...editData };
+
+    for (const key of ignores) {
+      //@ts-ignore
+      delete cp[key];
+    }
+
+    const data = editModifier ? await editModifier(cp) : cp;
+
+    const schemas: Record<string, InputSchema<T>> = editSchema?.reduce(
+      (acc, cur) => {
+        return {
+          ...acc,
+          [cur.name]: {
+            ...cur,
+          },
+        };
+      },
+      {}
+    ) || {};
+
+    for (const key in data) {
+      if (ignores.includes(key)) continue;
+
+      const schema = schemas?.[key];
+
+      if (!schema) {
+        toast.error("schema not defined for " + key);
+        return;
+      }
+
+      if (schema.type == "number") {
+        data[key] = parseInt(data[key] as string, 10);
+      }
+    }
+    const modified: Record<string, { set: any }> = {};
+
+    for (const key in data) {
+      modified[key] = {
+        set: data[key],
+      };
+    }
+
+    client
+      .mutate({
+        mutation: editQuery,
+        variables: {
+          data: modified,
+          where: {
+            id: editData.id,
+          },
+        },
+      })
+      .then((e) => {
+        toast.success("Edited " + name);
+        setEditData({});
+        setShowEdit(false);
+        refetch();
+      })
+      .catch((e) => {
+        toast.error(e.message);
+      });
+  };
+
+  const [showCreate, setShowCreate] = useState(false);
+
+  const [createData, setCreateData] = useState<Record<any, any> | null>(null);
+
+  const handleCreate = async () => {
+    if (!createQuery) {
+      toast.error("createQuery not defined !");
+      return;
+    }
+
+    if (!createData) {
+      toast.error("createData not defined !");
+      return;
+    }
+
+    const data = createModifier ? await createModifier(createData) : createData;
+
+    const schemas: Record<string, InputSchema<T>> = createSchema?.reduce(
+      (acc, cur) => {
+        return {
+          ...acc,
+          [cur.name]: {
+            ...cur,
+          },
+        };
+      },
+      {}
+    ) || {};
+
+    for (const key in data) {
+      const schema = schemas?.[key];
+
+      if (!schema) {
+        toast.error("Sum Tim Wong !");
+        return;
+      }
+
+      if (schema.type == "number") {
+        data[key] = parseInt(data[key] as string, 10);
+      }
+    }
+
+    client
+      .mutate({
+        mutation: createQuery,
+        variables: { data },
+      })
+      .then((e) => {
+        toast.success("Created " + name);
+        setCreateData(null);
+        setShowCreate(false);
+        refetch();
+      })
+      .catch((e) => {
+        toast.error(e.message);
+      });
+  };
 
   return (
     <Paper sx={{ p: 1 }}>
+      <Modal open={showCreate} onClose={() => setShowCreate(false)}>
+        <Box
+          sx={{
+            position: "absolute" as "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Buat {name}
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: 3,
+              flexDirection: "column",
+            }}
+          >
+            {createSchema?.map((e, i) => {
+              if (
+                e.dontRender &&
+                e.dontRender({ ...createDefaultValue, ...createData })
+              )
+                return <Box key={`${i}-${e.name}-unused`}></Box>;
+
+              if (e.type == "select") {
+                return (
+                  <Select
+                    label={e.label}
+                    key={`${i}-${e.name}`}
+                    onChange={(x) => {
+                      setCreateData({
+                        ...createDefaultValue,
+                        ...createData,
+                        [e.name]: x.target.value,
+                      });
+                    }}
+                    defaultValue={
+                      createDefaultValue && createDefaultValue[e.name]
+                    }
+                  >
+                    {e.selects?.map((e, i) => (
+                      <MenuItem key={e} value={e}>
+                        {e}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                );
+              }
+
+              if (e.type == "file") {
+                return (
+                  <label key={`${i}-${e.name}`} htmlFor="contained-button-file">
+                    {createData && createData[e.name] && (
+                      <Typography>
+                        {(createData && (createData[e.name] as File))?.name}
+                      </Typography>
+                    )}
+                    <Input
+                      accept="image/*"
+                      id="contained-button-file"
+                      multiple
+                      type="file"
+                      onChange={(x) => {
+                        const file = x.target.files && x.target.files[0];
+                        if (file)
+                          setCreateData({
+                            ...createDefaultValue,
+                            ...createData,
+                            [e.name]: file,
+                          });
+                      }}
+                    />
+                    <Button
+                      variant="contained"
+                      component="span"
+                      fullWidth
+                      sx={{
+                        height: "100%",
+                      }}
+                    >
+                      Upload {e.label}
+                    </Button>
+                  </label>
+                );
+              }
+
+              return (
+                <TextField
+                  key={`${i}-${e.name}`}
+                  label={e.label}
+                  defaultValue={
+                    createDefaultValue && createDefaultValue[e.name]
+                  }
+                  type={e.type}
+                  onChange={(x) => {
+                    setCreateData({
+                      ...createDefaultValue,
+                      ...createData,
+                      [e.name]: x.target.value,
+                    });
+                  }}
+                />
+              );
+            })}
+          </Box>
+
+          <Button onClick={handleCreate}>Buat data</Button>
+
+          <Button
+            onClick={() => {
+              setShowCreate(false);
+            }}
+          >
+            Batal
+          </Button>
+        </Box>
+      </Modal>
+      <Modal open={showEdit} onClose={() => setShowEdit(false)}>
+        <Box
+          sx={{
+            position: "absolute" as "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Edit {name} {editData?.id}
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: 3,
+              flexDirection: "column",
+            }}
+          >
+            {editSchema?.map((e, i) => {
+              if (e.dontRender && e.dontRender({ ...editData, ...editData }))
+                return <Box key={`${i}-${e.name}-unused`}></Box>;
+
+              if (e.type == "select") {
+                return (
+                  <Select
+                    label={e.label}
+                    key={`${i}-${e.name}`}
+                    onChange={(x) => {
+                      setEditData({
+                        ...editData,
+                        [e.name]: x.target.value,
+                      });
+                    }}
+                    defaultValue={editData && editData[e.name]}
+                  >
+                    {e.selects?.map((e, i) => (
+                      <MenuItem key={e} value={e}>
+                        {e}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                );
+              }
+
+              if (e.type == "file") {
+                return (
+                  <label key={`${i}-${e.name}`} htmlFor="contained-button-file">
+                    {editData && editData[e.name] && (
+                      <Typography>
+                        {
+                          (editData && (editData[e.name] as unknown as File))
+                            ?.name
+                        }
+                      </Typography>
+                    )}
+                    <Input
+                      accept="image/*"
+                      id="contained-button-file"
+                      multiple
+                      type="file"
+                      onChange={(x) => {
+                        const file = x.target.files && x.target.files[0];
+                        if (file)
+                          setEditData({
+                            ...editData,
+                            [e.name]: file,
+                          });
+                      }}
+                    />
+                    <Button
+                      variant="contained"
+                      component="span"
+                      fullWidth
+                      sx={{
+                        height: "100%",
+                      }}
+                    >
+                      Upload {e.label}
+                    </Button>
+                  </label>
+                );
+              }
+
+              return (
+                <TextField
+                  key={`${i}-${e.name}`}
+                  label={e.label}
+                  defaultValue={editData && editData[e.name]}
+                  type={e.type}
+                  onChange={(x) => {
+                    setEditData({
+                      ...editData,
+                      [e.name]: x.target.value,
+                    });
+                  }}
+                />
+              );
+            })}
+          </Box>
+
+          <Button onClick={handleEdit}>Edit Data</Button>
+
+          <Button
+            onClick={() => {
+              setShowEdit(false);
+            }}
+          >
+            Batal
+          </Button>
+        </Box>
+      </Modal>
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
           <EnhancedTableToolbar
@@ -179,6 +629,14 @@ export default function MUITable<T extends BaseModel>({
             handleSelectedDelete={handleSelectedDelete}
             name={name}
             handleSearch={handleSearch}
+            withCreate={action?.includes("create")}
+            onCreate={() => {
+              if (createAction == "function") {
+                createFunction && createFunction();
+              } else {
+                setShowCreate(true);
+              }
+            }}
           />
           <TableContainer>
             <Table
@@ -247,9 +705,23 @@ export default function MUITable<T extends BaseModel>({
                           <TableCell component="th" id={labelId} scope="row">
                             {action.includes("edit") && (
                               <IconButton
-                                onClick={() => editPush && push(editPush(row))}
+                                onClick={() => {
+                                  if (editAction == "function") {
+                                    editFunction && editFunction(row);
+                                  } else {
+                                    setShowEdit(true);
+                                    setEditData(row);
+                                  }
+                                }}
                               >
                                 <Edit />
+                              </IconButton>
+                            )}
+                            {action.includes("delete") && (
+                              <IconButton
+                                onClick={() => handleDelete([row.id])}
+                              >
+                                <Delete />
                               </IconButton>
                             )}
                           </TableCell>
@@ -298,7 +770,7 @@ import { toast } from "react-toastify";
 import { useMutation, gql, DocumentNode, useQuery } from "@apollo/client";
 import { client } from "../modules/client";
 import MuiAppBar from "@mui/material/AppBar";
-import { useRouter } from "next/router";
+import { isFunction } from "util";
 
 type Order = "asc" | "desc";
 
@@ -390,11 +862,17 @@ interface EnhancedTableToolbarProps {
   handleSelectedDelete: () => void;
   handleSearch: (e: string) => void;
   name: string;
+  withCreate?: boolean;
+  onCreate?: () => void;
 }
 
-const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const { numSelected, name, handleSearch } = props;
-
+const EnhancedTableToolbar = ({
+  numSelected,
+  name,
+  handleSearch,
+  withCreate,
+  onCreate,
+}: EnhancedTableToolbarProps) => {
   return (
     <Toolbar
       sx={{
@@ -427,6 +905,17 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         >
           {name}
         </Typography>
+      )}
+      {withCreate && (
+        <Button
+          onClick={() => {
+            onCreate && onCreate();
+          }}
+          variant="contained"
+          sx={{ mr: 2 }}
+        >
+          Buat
+        </Button>
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">

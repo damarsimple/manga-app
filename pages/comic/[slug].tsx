@@ -129,6 +129,38 @@ function Slug({ top, router, comic }: SlugPageProps) {
   const sortFunction = (e: Model["Chapter"], x: Model["Chapter"]) =>
     sortMode == "desc" ? x.name - e.name : e.name - x.name;
 
+  const { data: { findManyAds } = {} } = useQuery<{
+    findManyAds: Model["Ads"][];
+  }>(
+    gql`
+      query FindComicAds($where: AdsWhereInput) {
+        findManyAds(where: $where) {
+          id
+          name
+          position
+          image
+          url
+          createdAt
+          index
+          updatedAt
+        }
+      }
+    `,
+    {
+      variables: {
+        where: {
+          position: {
+            in: ["COMIC_RECOMENDATION"],
+          },
+        },
+      },
+    }
+  );
+
+  const COMIC_ADS = findManyAds
+    ?.filter((e) => e.position == "COMIC_RECOMENDATION")
+    .sort((a, b) => a.index - b.index);
+
   return (
     <div>
       <NextSeo
@@ -492,6 +524,9 @@ function Slug({ top, router, comic }: SlugPageProps) {
             <Divider />
             {top.map((e, i) => (
               <ComicCard {...e} key={e.id} layout="top" />
+            ))}
+            {COMIC_ADS?.map((e) => (
+              <Ads {...e} key={e.id} />
             ))}
           </Paper>
         </Grid>

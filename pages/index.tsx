@@ -34,6 +34,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useState } from "react";
 import RenderMany from "../components/RenderMany";
+import { Ads } from "../components/Ads";
 const Home = () => {
   const [page, setPage] = useState(0);
   const { mode } = useR18();
@@ -301,6 +302,38 @@ const Home = () => {
     }
   );
 
+  const { data: { findManyAds } = {} } = useQuery<{
+    findManyAds: Model["Ads"][];
+  }>(
+    gql`
+      query FindHomeAds($where: AdsWhereInput) {
+        findManyAds(where: $where) {
+          id
+          name
+          position
+          image
+          url
+          createdAt
+          index
+          updatedAt
+        }
+      }
+    `,
+    {
+      variables: {
+        where: {
+          position: {
+            in: ["HOME_TOP_COMIC"],
+          },
+        },
+      },
+    }
+  );
+
+  const HOME_ADS = findManyAds
+    ?.filter((e) => e.position == "HOME_TOP_COMIC")
+    .sort((a, b) => a.index - b.index);
+
   return (
     <Box p={2} display="flex" gap={2} flexDirection={"column"}>
       <NextSeo {...SEO} />
@@ -525,6 +558,10 @@ const Home = () => {
                   jam non stop di IGCPLAY.
                 </p>
               </Grid>
+
+              {HOME_ADS?.map((e) => (
+                <Ads {...e} key={e.id} />
+              ))}
             </Grid>
           </Paper>
 
