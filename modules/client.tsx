@@ -7,6 +7,7 @@ import {
   ApolloLink,
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
+import { createUploadLink } from "apollo-upload-client";
 import { event } from "./gtag";
 
 const defaultOptions: DefaultOptions = {
@@ -27,12 +28,16 @@ const errorLink = onError(({ graphQLErrors, networkError, ...rest }) => {
       console.log(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       );
-      event({
-        action: "exception",
-        label: rest.operation.operationName ?? "unnamed-operation",
-        category: "gql-error",
-        description: message,
-        fatal: true,
+
+      new Promise((res) => {
+        event({
+          action: "exception",
+          label: rest.operation.operationName ?? "unnamed-operation",
+          category: "gql-error",
+          description: message,
+          fatal: true,
+        });
+        res(0);
       });
     });
   if (networkError) {
@@ -73,12 +78,17 @@ const uri = process.browser
   ? process.env.NEXT_PUBLIC_INNER_GRAPHQL_ENDPOINT
   : process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
 
+const uploadLink = createUploadLink({
+  uri,
+});
+
 const httpLink = new HttpLink({
   uri,
 });
 
 const BROWSER_LINK = from([errorLink, timeStartLink, logTimeLink]).concat(
-  httpLink
+  //@ts-ignore
+  uploadLink
 );
 const SERVER_LINK = from([errorLink]).concat(httpLink);
 

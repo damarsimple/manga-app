@@ -156,20 +156,6 @@ export default function Slug() {
     });
   };
 
-  useEffect(() => {
-    gkChannel.onmessage = (e) => {
-      if (e.data.command == "done") {
-        toast.info(`Command ${e.data.payload.data} Finished`);
-        setRng(`${new Date().getTime()}`);
-        setLoading(false);
-      }
-    };
-
-    return () => {
-      gkChannel.onmessage = null;
-    };
-  }, []);
-
   const { data: { findManyGenre } = {} } = useQuery<{
     findManyGenre: Model["Genre"][];
   }>(gql`
@@ -184,33 +170,70 @@ export default function Slug() {
 
   const [searchGenre, setSearchGenre] = useState("");
 
+  const [handleChangeThumb] = useMutation<{ uploadFile: boolean }>(gql`
+    mutation UploadFile($file: Upload, $path: String!) {
+      uploadFile(file: $file, path: $path)
+    }
+  `);
+
   const handleUpdateThumb = async () => {
     toast.info(`Downloading ${updateType}`);
     setLoading(true);
+    let data: File;
     if (updateMethod == "file") {
-      gkChannel.postMessage({
-        command: "upload",
-        payload: {
-          file: await file?.arrayBuffer(),
-          path,
-        },
-      });
+      if (!file) {
+        setLoading(false);
+        return;
+      }
+      data = file;
     } else {
-      gkChannel.postMessage({
-        command: "downloadAndUpload",
-        payload: {
-          url,
-          path,
-        },
-      });
-    }
-    setOpenThumbUpdate(false);
+      try {
+        // check if user input valid url or not
+        new URL(url);
 
-    handleUpdateComic({
-      [updateType]: {
-        set: `https://cdn.gudangkomik.com${path}`,
-      },
-    });
+        let f = await fetch(url);
+        let blob = await f.blob();
+
+        data = new File([blob], "thumb.jpg");
+      } catch (error) {
+        toast.error("Failed to download images ... " + error);
+        setLoading(false);
+        return;
+      }
+    }
+
+    const variables = {
+      file: data,
+      path,
+    };
+
+    console.log(variables);
+
+    handleChangeThumb({
+      variables,
+    })
+      .then(({ data }) => {
+        if (data?.uploadFile) {
+          setOpenThumbUpdate(false);
+
+          handleUpdateComic({
+            [updateType]: {
+              set: `https://cdn.gudangkomik.com${path}`,
+            },
+          });
+
+          toast.success("Berhasil mengupload gambar ke server gudangkomik");
+
+          setTimeout(() => {
+            setRng(`${new Date().getTime()}`);
+            setLoading(false);
+          }, 1000);
+        }
+      })
+      .catch((e) => {
+        toast.error(e.message);
+        setLoading(false);
+      });
   };
 
   type Keys = keyof Model["Comic"];
