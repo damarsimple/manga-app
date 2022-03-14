@@ -45,6 +45,7 @@ import RenderXTime from "../../components/RenderXTime";
 import SortIcon from "@mui/icons-material/Sort";
 import LazyImage from "../../components/LazyImage";
 import { event } from "../../modules/gtag";
+import { Ads } from "../../components/Ads";
 interface SlugPageProps extends WithRouterProps {
   comic: Model["Comic"];
   top: Model["Comic"][];
