@@ -98,7 +98,7 @@ function Id({
         img.src = e
       })
     }
-  }, [chapter, images])
+  }, [chapter, images, comic])
 
   const Navigation = () =>
     readMode == 'single' ? (
