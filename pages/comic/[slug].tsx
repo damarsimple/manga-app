@@ -15,10 +15,10 @@ import {
   TextField,
   Stack,
   Skeleton,
-} from "@mui/material";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
-import { useEffect, useState } from "react";
+} from '@mui/material'
+import { WithRouterProps } from 'next/dist/client/with-router'
+import { withRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import {
   AccessTime,
   Bento,
@@ -29,38 +29,39 @@ import {
   RemoveRedEye,
   Report,
   Star,
-} from "@mui/icons-material";
-import { ComicCard } from "../../components/ComicCard";
-import { useNavbarStore } from "../../stores/navbar";
-import Link from "next/link";
-import { GetServerSideProps, GetStaticProps } from "next";
-import { Model } from "../../types";
-import { gql, useQuery } from "@apollo/client";
-import { client } from "../../modules/client";
-import moment from "moment";
-import { NextSeo } from "next-seo";
-import { SEO } from "../../modules/seo";
-import { capitalizeFirstLetter } from "../../modules/helper";
-import RenderXTime from "../../components/RenderXTime";
-import SortIcon from "@mui/icons-material/Sort";
-import LazyImage from "../../components/LazyImage";
-import { event } from "../../modules/gtag";
-import { Ads } from "../../components/Ads";
+} from '@mui/icons-material'
+import { ComicCard } from '../../components/ComicCard'
+import { useNavbarStore } from '../../stores/navbar'
+import Link from 'next/link'
+import { GetServerSideProps, GetStaticProps } from 'next'
+import { Model } from '../../types'
+import { gql, useQuery } from '@apollo/client'
+import { client } from '../../modules/client'
+import moment from 'moment'
+import { NextSeo } from 'next-seo'
+import { SEO } from '../../modules/seo'
+import { capitalizeFirstLetter } from '../../modules/helper'
+import RenderXTime from '../../components/RenderXTime'
+import SortIcon from '@mui/icons-material/Sort'
+import LazyImage from '../../components/LazyImage'
+import { event } from '../../modules/gtag'
+import { Ads } from '../../components/Ads'
 interface SlugPageProps extends WithRouterProps {
-  comic: Model["Comic"];
-  top: Model["Comic"][];
+  comic: Model['Comic']
+  top: Model['Comic'][]
+  COMIC_ADS: Model['Ads'][]
 }
 
-function Slug({ top, router, comic }: SlugPageProps) {
-  const [chapMode, setChapMode] = useState<"grid" | "list">("list");
+function Slug({ top, router, comic, COMIC_ADS }: SlugPageProps) {
+  const [chapMode, setChapMode] = useState<'grid' | 'list'>('list')
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('')
 
-  const [sortMode, setSortMode] = useState<"desc" | "asc">("desc");
-  const { setTransparent, setTransparentMode } = useNavbarStore();
+  const [sortMode, setSortMode] = useState<'desc' | 'asc'>('desc')
+  const { setTransparent, setTransparentMode } = useNavbarStore()
 
   const { data: { findManyChapter: chaptersRaw } = {}, loading } = useQuery<{
-    findManyChapter: Model["Chapter"][];
+    findManyChapter: Model['Chapter'][]
   }>(
     gql`
       query FindChapterComic($where: ChapterWhereInput) {
@@ -79,104 +80,72 @@ function Slug({ top, router, comic }: SlugPageProps) {
           },
         },
       },
-    }
-  );
+    },
+  )
 
-  const chapters = chaptersRaw ? [...chaptersRaw] : [];
+  const chapters = chaptersRaw ? [...chaptersRaw] : []
 
   useEffect(() => {
-    setTransparent(true);
-    setTransparentMode(true);
-    window.addEventListener("scroll", listenToScroll);
+    setTransparent(true)
+    setTransparentMode(true)
+    window.addEventListener('scroll', listenToScroll)
 
     event({
-      action: "view_item",
-      category: "comic",
+      action: 'view_item',
+      category: 'comic',
       label: `${comic.name}`,
-    });
+    })
 
     return () => {
-      window.removeEventListener("scroll", listenToScroll);
-      setTransparentMode(false);
-      setTransparent(false);
-    };
+      window.removeEventListener('scroll', listenToScroll)
+      setTransparentMode(false)
+      setTransparent(false)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const listenToScroll = () => {
     const winScroll =
-      document.body.scrollTop || document.documentElement.scrollTop;
+      document.body.scrollTop || document.documentElement.scrollTop
 
     const height =
       document.documentElement.scrollHeight -
-      document.documentElement.clientHeight;
+      document.documentElement.clientHeight
 
-    const scrolled = winScroll / height;
+    const scrolled = winScroll / height
 
-    setTransparent(scrolled == 0);
-  };
+    setTransparent(scrolled == 0)
+  }
 
-  const { push } = router;
+  const { push } = router
 
   const chaptersFiltered = search
     ? chapters?.filter((chapter) => {
         return chapter.name
           .toString()
           .toLowerCase()
-          .includes(search.toLowerCase());
+          .includes(search.toLowerCase())
       })
-    : chapters;
+    : chapters
 
-  const sortFunction = (e: Model["Chapter"], x: Model["Chapter"]) =>
-    sortMode == "desc" ? x.name - e.name : e.name - x.name;
-
-  const { data: { findManyAds } = {} } = useQuery<{
-    findManyAds: Model["Ads"][];
-  }>(
-    gql`
-      query FindComicAds($where: AdsWhereInput) {
-        findManyAds(where: $where) {
-          id
-          name
-          position
-          image
-          url
-          createdAt
-          index
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: {
-          position: {
-            in: ["COMIC_RECOMENDATION"],
-          },
-        },
-      },
-    }
-  );
-
-  const COMIC_ADS = findManyAds
-    ?.filter((e) => e.position == "COMIC_RECOMENDATION")
-    .sort((a, b) => a.index - b.index);
+  const sortFunction = (e: Model['Chapter'], x: Model['Chapter']) =>
+    sortMode == 'desc' ? x.name - e.name : e.name - x.name
 
   return (
     <div>
       <NextSeo
-        title={"Komik " + comic.name + SEO.padding}
-        description={comic.description ?? ""}
-        canonical={SEO.canonical + "/comic/" + comic.slug}
+        title={'Komik ' + comic.name + SEO.padding}
+        description={comic.description ?? ''}
+        canonical={SEO.canonical + '/comic/' + comic.slug}
         openGraph={{
-          url: SEO.canonical + "/comic/" + comic.slug,
-          title: "Komik " + comic.name + SEO.padding,
-          description: comic.description ?? "",
-          type: "article",
+          url: SEO.canonical + '/comic/' + comic.slug,
+          title: 'Komik ' + comic.name + SEO.padding,
+          description: comic.description ?? '',
+          type: 'article',
           article: {
             publishedTime: moment(comic.createdAt).format(),
             modifiedTime: moment(comic.updatedAt).format(),
-            authors: [SEO.canonical + "/list/author/" + comic.author.slug],
+            authors: [SEO.canonical + '/list/author/' + comic.author.slug],
             tags: comic.genres.map((e) => e.name),
           },
           images: [
@@ -184,20 +153,20 @@ function Slug({ top, router, comic }: SlugPageProps) {
               url: comic.thumb,
               width: 200,
               height: 250,
-              alt: "Komik " + comic.name,
+              alt: 'Komik ' + comic.name,
             },
           ],
         }}
         twitter={{
-          handle: "@gudang_komik",
-          site: "@gudang_komik",
-          cardType: "summary_large_image",
+          handle: '@gudang_komik',
+          site: '@gudang_komik',
+          cardType: 'summary_large_image',
         }}
       />
       <Paper>
         <Box
           sx={{
-            position: "relative",
+            position: 'relative',
             height: {
               xs: 600,
               md: 570,
@@ -210,47 +179,47 @@ function Slug({ top, router, comic }: SlugPageProps) {
               background: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 90%),linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),url('${
                 comic.thumbWide ?? comic.thumb
               }')`,
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}
           ></Box>
 
           <Box
             sx={{
               bottom: 125,
-              position: "absolute",
-              width: "100%",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
+              position: 'absolute',
+              width: '100%',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
               pl: {
                 xs: 2,
                 sm: 6,
               },
               flexDirection: {
-                xs: "colurn",
-                md: "row",
+                xs: 'colurn',
+                md: 'row',
               },
             }}
           >
             <Box
               sx={{
-                textAlign: "center",
+                textAlign: 'center',
                 width: {
-                  xs: "100%",
-                  sm: "auto",
+                  xs: '100%',
+                  sm: 'auto',
                 },
               }}
             >
               <Box
                 display="flex"
-                justifyContent={"center"}
+                justifyContent={'center'}
                 alignItems="center"
                 width={{
-                  xs: "100%",
-                  sm: "auto",
+                  xs: '100%',
+                  sm: 'auto',
                 }}
               >
                 <LazyImage
@@ -263,21 +232,21 @@ function Slug({ top, router, comic }: SlugPageProps) {
               <Box
                 sx={{
                   display: {
-                    xs: "block",
-                    sm: "none",
+                    xs: 'block',
+                    sm: 'none',
                   },
                 }}
               >
                 <Typography
                   variant="body2"
-                  textTransform={"uppercase"}
+                  textTransform={'uppercase'}
                   fontWeight="bold"
                 >
                   {comic.name}
                 </Typography>
-                <Link href={"/list/author/" + comic.author.slug}>
+                <Link href={'/list/author/' + comic.author.slug}>
                   <a>
-                    <Typography variant="body1" textTransform={"uppercase"}>
+                    <Typography variant="body1" textTransform={'uppercase'}>
                       {comic.author.name}
                     </Typography>
                   </a>
@@ -287,25 +256,25 @@ function Slug({ top, router, comic }: SlugPageProps) {
             <Box
               sx={{
                 display: {
-                  xs: "none",
-                  md: "flex",
+                  xs: 'none',
+                  md: 'flex',
                 },
-                justifyContent: "space-between",
-                flexDirection: "column",
+                justifyContent: 'space-between',
+                flexDirection: 'column',
               }}
             >
               <Box>
                 <Typography
                   variant="h2"
-                  textTransform={"uppercase"}
+                  textTransform={'uppercase'}
                   fontWeight="bold"
                 >
                   {comic.name}
                 </Typography>
 
-                <Link href={"/list/author/" + comic.author.slug}>
+                <Link href={'/list/author/' + comic.author.slug}>
                   <a>
-                    <Typography variant="h4" textTransform={"uppercase"}>
+                    <Typography variant="h4" textTransform={'uppercase'}>
                       {comic.author.name}
                     </Typography>
                   </a>
@@ -344,15 +313,15 @@ function Slug({ top, router, comic }: SlugPageProps) {
               direction="row"
               sx={{
                 display: {
-                  xs: "none",
-                  md: "flex",
+                  xs: 'none',
+                  md: 'flex',
                 },
               }}
             >
               <Chip
                 sx={{ mx: 0.5 }}
                 label={capitalizeFirstLetter(comic.type)}
-                onClick={() => push("/list/comic/" + comic.type)}
+                onClick={() => push('/list/comic/' + comic.type)}
               />
               <Divider orientation="vertical" flexItem />
               {comic.genres.map((e, i) => (
@@ -360,7 +329,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
                   sx={{ mx: 0.5 }}
                   key={e.id}
                   label={e.name}
-                  onClick={() => push("/list/genre/" + e.slug)}
+                  onClick={() => push('/list/genre/' + e.slug)}
                 />
               ))}
             </Stack>
@@ -369,27 +338,27 @@ function Slug({ top, router, comic }: SlugPageProps) {
       </Paper>
       <Paper
         sx={{
-          width: "100%",
-          overflowX: "auto",
+          width: '100%',
+          overflowX: 'auto',
           my: 2,
           p: 1,
           display: {
-            xs: "undefined",
-            sm: "none",
+            xs: 'undefined',
+            sm: 'none',
           },
         }}
       >
         <Chip
           sx={{ mx: 0.5 }}
           label={capitalizeFirstLetter(comic.type)}
-          onClick={() => push("/list/comic/" + comic.type)}
+          onClick={() => push('/list/comic/' + comic.type)}
         />
         {comic.genres.map((e, i) => (
           <Chip
             sx={{ m: 0.5 }}
             key={e.id}
             label={e.name}
-            onClick={() => push("/list/genre/" + e.slug)}
+            onClick={() => push('/list/genre/' + e.slug)}
           />
         ))}
       </Paper>
@@ -403,29 +372,29 @@ function Slug({ top, router, comic }: SlugPageProps) {
         </Grid>
         <Grid item xs={12} sm={9} xl={10}>
           <Paper sx={{ p: 2 }}>
-            <Box display="flex" justifyContent={"space-between"}>
+            <Box display="flex" justifyContent={'space-between'}>
               <Typography variant="h5">Daftar Chapter</Typography>
 
               <Divider />
               <Box display="flex" gap={1}>
                 <IconButton
-                  color={sortMode == "desc" ? "primary" : undefined}
+                  color={sortMode == 'desc' ? 'primary' : undefined}
                   onClick={() =>
-                    setSortMode(sortMode == "desc" ? "asc" : "desc")
+                    setSortMode(sortMode == 'desc' ? 'asc' : 'desc')
                   }
                 >
                   <SortIcon />
                 </IconButton>
                 <Divider orientation="vertical" />
                 <IconButton
-                  color={chapMode == "list" ? "primary" : undefined}
-                  onClick={() => setChapMode("list")}
+                  color={chapMode == 'list' ? 'primary' : undefined}
+                  onClick={() => setChapMode('list')}
                 >
                   <ListAlt />
                 </IconButton>
                 <IconButton
-                  color={chapMode == "grid" ? "primary" : undefined}
-                  onClick={() => setChapMode("grid")}
+                  color={chapMode == 'grid' ? 'primary' : undefined}
+                  onClick={() => setChapMode('grid')}
                 >
                   <Bento />
                 </IconButton>
@@ -439,8 +408,8 @@ function Slug({ top, router, comic }: SlugPageProps) {
               value={search}
             />
 
-            {chapMode == "list" ? (
-              <List sx={{ maxHeight: 600, overflowY: "auto" }}>
+            {chapMode == 'list' ? (
+              <List sx={{ maxHeight: 600, overflowY: 'auto' }}>
                 {loading && (
                   <RenderXTime x={20}>
                     <Box width="100%">
@@ -455,14 +424,14 @@ function Slug({ top, router, comic }: SlugPageProps) {
                         <ListItemButton>
                           <Box
                             display="flex"
-                            justifyContent={"space-between"}
+                            justifyContent={'space-between'}
                             width="100%"
                           >
-                            <Box display="flex" gap={1} alignItems={"center"}>
+                            <Box display="flex" gap={1} alignItems={'center'}>
                               <RemoveRedEye />
                               <ListItemText primary={`Chapter ${e.name}`} />
                             </Box>
-                            <Box display="flex" gap={1} alignItems={"center"}>
+                            <Box display="flex" gap={1} alignItems={'center'}>
                               <AccessTime />
                               <ListItemText
                                 primary={moment(e.createdAt).fromNow()}
@@ -495,9 +464,9 @@ function Slug({ top, router, comic }: SlugPageProps) {
                         <Paper
                           sx={{
                             p: 2,
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
                           }}
                         >
                           <IconButton>
@@ -519,7 +488,7 @@ function Slug({ top, router, comic }: SlugPageProps) {
 
         <Grid item xs={12} sm={3} xl={2}>
           <Paper
-            sx={{ p: 2, display: "flex", gap: 2, flexDirection: "column" }}
+            sx={{ p: 2, display: 'flex', gap: 2, flexDirection: 'column' }}
           >
             <Typography variant="h5">Rekomendasi</Typography>
             <Divider />
@@ -533,68 +502,100 @@ function Slug({ top, router, comic }: SlugPageProps) {
         </Grid>
       </Grid>
     </div>
-  );
+  )
 }
 
 // };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const slug = context?.params?.slug as string;
+  const slug = context?.params?.slug as string
+
+  const { data: { findManyAds } = {} } = await client.query<{
+    findManyAds: Model['Ads'][]
+  }>({
+    query: gql`
+      query FindHomeAds($where: AdsWhereInput) {
+        findManyAds(where: $where) {
+          id
+          name
+          position
+          image
+          url
+          createdAt
+          index
+          updatedAt
+        }
+      }
+    `,
+    variables: {
+      where: {
+        position: {
+          in: ['COMIC_RECOMENDATION'],
+        },
+      },
+    },
+  })
+
+  const COMIC_ADS = findManyAds
+    ?.filter((e) => e.position == 'COMIC_RECOMENDATION')
+    .sort((a, b) => a.index - b.index)
 
   if (!slug) {
     return {
       notFound: true,
-    };
+    }
   }
 
-  const { data: { findFirstComic } = {}, error: errorComic } =
-    await client.query<{
-      findFirstComic: Model["Comic"];
-    }>({
-      query: gql`
-        query FindFirstComic($where: ComicWhereInput) {
-          findFirstComic(where: $where) {
+  const {
+    data: { findFirstComic } = {},
+    error: errorComic,
+  } = await client.query<{
+    findFirstComic: Model['Comic']
+  }>({
+    query: gql`
+      query FindFirstComic($where: ComicWhereInput) {
+        findFirstComic(where: $where) {
+          id
+          name
+          thumb
+          type
+          thumbWide
+          altName
+          slug
+          isHentai
+          released
+          rating
+          views
+          viewsWeek
+          description
+          age
+          status
+          concept
+          lastChapterUpdateAt
+          createdAt
+          updatedAt
+          authorId
+          author {
             id
             name
-            thumb
-            type
-            thumbWide
-            altName
             slug
-            isHentai
-            released
-            rating
-            views
-            viewsWeek
-            description
-            age
-            status
-            concept
-            lastChapterUpdateAt
-            createdAt
-            updatedAt
-            authorId
-            author {
-              id
-              name
-              slug
-            }
-            genres {
-              id
-              name
-              slug
-            }
+          }
+          genres {
+            id
+            name
+            slug
           }
         }
-      `,
-      variables: {
-        where: {
-          slug: {
-            equals: slug,
-          },
+      }
+    `,
+    variables: {
+      where: {
+        slug: {
+          equals: slug,
         },
       },
-    });
+    },
+  })
   if (!findFirstComic && slug != undefined) {
     client
       .query({
@@ -605,11 +606,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
         `,
 
         variables: {
-          context: "comic",
+          context: 'comic',
           data: slug,
         },
       })
-      .then(() => console.log(`404 comic ${slug}`));
+      .then(() => console.log(`404 comic ${slug}`))
   }
 
   if (findFirstComic?.id) {
@@ -621,12 +622,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
       `,
       variables: {
         reportViewId: findFirstComic.id,
-        context: "comic",
+        context: 'comic',
       },
-    });
+    })
   }
   if (errorComic) {
-    console.log(errorComic);
+    console.log(errorComic)
   }
 
   return {
@@ -634,14 +635,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
     props: {
       comic: findFirstComic,
       top: [],
+      COMIC_ADS,
     },
     revalidate: 60 * 60, // 1 hours
-  };
-};
+  }
+}
 
 export async function getStaticPaths() {
   const { data: { findManyComic: comics } = {} } = await client.query<{
-    findManyComic: Model["Comic"][];
+    findManyComic: Model['Comic'][]
   }>({
     query: gql`
       query FindAllComic {
@@ -652,18 +654,18 @@ export async function getStaticPaths() {
         }
       }
     `,
-  });
+  })
 
   // Get the paths we want to pre-render based on comics
   const paths =
     comics?.map((comic) => ({
       params: { slug: comic.slug },
-    })) ?? [];
+    })) ?? []
 
   // We'll pre-render only these paths at build time.
   // { fallback: blocking } will server-render pages
   // on-demand if the path doesn't exist.
-  return { paths, fallback: "blocking" };
+  return { paths, fallback: 'blocking' }
 }
 
-export default withRouter(Slug);
+export default withRouter(Slug)

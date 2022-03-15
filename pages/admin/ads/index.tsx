@@ -1,79 +1,80 @@
-import { gql, useMutation } from "@apollo/client";
-import React from "react";
-import MUITable, { InputSchema } from "../../../components/MUITable";
-import { Model } from "../../../types";
-import { toast } from "react-toastify";
+/* eslint-disable @next/next/no-img-element */
+import { gql, useMutation } from '@apollo/client'
+import React from 'react'
+import MUITable, { InputSchema } from '../../../components/MUITable'
+import { Model } from '../../../types'
+import { toast } from 'react-toastify'
 
 export default function Index() {
   const [handleUpload] = useMutation<{ uploadFile: boolean }>(gql`
     mutation UploadFile($file: Upload, $path: String!) {
       uploadFile(file: $file, path: $path)
     }
-  `);
+  `)
   //@ts-ignore
-  const schema: InputSchema<Model["Ads"]> = [
+  const schema: InputSchema<Model['Ads']> = [
     {
-      name: "name",
-      label: "Name",
+      name: 'name',
+      label: 'Name',
     },
     {
-      name: "position",
-      label: "Position",
-      type: "select",
+      name: 'position',
+      label: 'Position',
+      type: 'select',
       selects: [
-        "CHAPTER_BOTTOM",
-        "CHAPTER_TOP",
-        "COMIC_RECOMENDATION",
-        "HOME_TOP_COMIC",
+        'CHAPTER_BOTTOM',
+        'CHAPTER_TOP',
+        'COMIC_RECOMENDATION',
+        'HOME_TOP_COMIC',
       ],
     },
     {
-      name: "url",
-      label: "Url",
+      name: 'url',
+      label: 'Url',
     },
     {
-      name: "index",
-      label: "Index",
-      type: "number",
+      name: 'index',
+      label: 'Index',
+      type: 'number',
     },
     {
       //@ts-ignore
-      name: "image-type",
-      label: "Tipe Gambar File / URL",
-      type: "select",
-      selects: ["File", "URL"],
+      name: 'image-type',
+      label: 'Tipe Gambar File / URL',
+      type: 'select',
+      selects: ['File', 'URL'],
     },
     {
-      name: "image",
-      label: "Gambar Upload",
-      type: "file",
-      dontRender: (e: { [x: string]: string }) => e["image-type"] === "URL",
+      name: 'image',
+      label: 'Gambar Upload',
+      type: 'file',
+      dontRender: (e: { [x: string]: string }) => e['image-type'] === 'URL',
     },
     {
-      name: "image",
-      label: "Gambar URL",
-      type: "text",
-      dontRender: (e: { [x: string]: string }) => e["image-type"] === "File",
+      name: 'image',
+      label: 'Gambar URL',
+      type: 'text',
+      dontRender: (e: { [x: string]: string }) => e['image-type'] === 'File',
     },
-  ];
+  ]
 
   const modifier = async (e: { [x: string]: string; image: string }) => {
-    const data = { ...e };
+    const data = { ...e }
 
     try {
-      if (e["image"]) {
-        const imagePath = `/ads/${data.name}.jpg`;
+      if (e['image']) {
+        const imagePath = `/images-backups/${data.name}.jpg`
 
-        let file = null;
+        let file = null
         //@ts-ignore
-        if (e["image-type"] === "URL") {
-          const f = await fetch(e.image);
+        if (e['image-type'] === 'URL') {
+          const f = await fetch(e.image)
 
-          const blob = await f.blob();
+          const blob = await f.blob()
 
-          file = new File([blob], `${data.name}.jpg`, { type: "image/jpeg" });
+          file = new File([blob], `${data.name}.jpg`, { type: 'image/jpeg' })
         } else {
-          file = e.image;
+          file = e.image
         }
 
         const { data: ul } = await handleUpload({
@@ -81,64 +82,64 @@ export default function Index() {
             file,
             path: imagePath,
           },
-        });
+        })
 
         if (!ul?.uploadFile) {
-          toast.error("Gagal Upload Gambar");
-          throw Error("Gagal Upload Gambar");
+          toast.error('Gagal Upload Gambar')
+          throw Error('Gagal Upload Gambar')
         }
 
-        data["image"] = "https://cdn.gudangkomik.com" + imagePath;
+        data['image'] = 'https://cdn.gudangkomik.com' + imagePath
       }
     } catch (error) {
-      toast.error("WARNING : Gagal Upload Gambar " + error);
+      toast.error('WARNING : Gagal Upload Gambar ' + error)
     }
 
     //@ts-ignore
-    delete data["image-type"];
+    delete data['image-type']
 
-    return data;
-  };
+    return data
+  }
 
   return (
     <div>
-      <MUITable<Model["Ads"]>
+      <MUITable<Model['Ads']>
         headcells={[
           {
-            name: "name",
-            label: "Name",
+            name: 'name',
+            label: 'Name',
           },
           {
-            name: "position",
-            label: "Posisi",
+            name: 'position',
+            label: 'Posisi',
           },
           {
-            name: "index",
-            label: "Index",
+            name: 'index',
+            label: 'Index',
           },
           {
-            name: "url",
-            label: "URL",
+            name: 'url',
+            label: 'URL',
           },
           {
-            name: "updatedAt",
-            label: "Berubah Pada",
+            name: 'updatedAt',
+            label: 'Berubah Pada',
           },
         ]}
-        name={"Iklan"}
-        keys={"findManyAds"}
+        name={'Iklan'}
+        keys={'findManyAds'}
         TooltipChildren={(row) => (
           <>
             <img src={row.image} height="100%" width="600px" alt={row.name} />
           </>
         )}
-        countKeys={"findManyAdsCount"}
+        countKeys={'findManyAdsCount'}
         countQuery={gql`
           query Query {
             findManyAdsCount
           }
         `}
-        action={["edit", "delete", "create"]}
+        action={['edit', 'delete', 'create']}
         deleteQuery={gql`
           mutation DeleteManyAds($where: AdsWhereInput) {
             deleteManyAds(where: $where) {
@@ -156,9 +157,9 @@ export default function Index() {
         `}
         createAction="schema"
         createDefaultValue={{
-          position: "CHAPTER_TOP",
+          position: 'CHAPTER_TOP',
           //@ts-ignore
-          "image-type": "URL",
+          'image-type': 'URL',
         }}
         //@ts-ignore
         createSchema={schema}
@@ -211,5 +212,5 @@ export default function Index() {
         `}
       />
     </div>
-  );
+  )
 }
