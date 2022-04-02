@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { useQuery, gql, useMutation } from "@apollo/client";
-import { Model } from "../../../types";
+import { Comic, Genre } from "../../../types";
 import { useRouter } from "next/router";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -50,7 +50,7 @@ export default function Slug() {
   const [file, setFile] = useState<File | null>(null);
 
   const { data: { findFirstComic: comic } = {}, refetch } = useQuery<{
-    findFirstComic: Model["Comic"];
+    findFirstComic: Comic;
   }>(
     gql`
       query FindAdminSlugComicHomepage($where: ComicWhereInput) {
@@ -157,7 +157,7 @@ export default function Slug() {
   };
 
   const { data: { findManyGenre } = {} } = useQuery<{
-    findManyGenre: Model["Genre"][];
+    findManyGenre: Genre[];
   }>(gql`
     query FindAllGenreAdmin {
       findManyGenre {
@@ -236,7 +236,7 @@ export default function Slug() {
       });
   };
 
-  type Keys = keyof Model["Comic"];
+  type Keys = keyof Comic;
 
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -344,7 +344,7 @@ export default function Slug() {
             </Grid>
             <Grid item xs={9} sm={8}>
               {comic && (
-                <Formik<Partial<Model["Comic"]>>
+                <Formik<Partial<Comic>>
                   validationSchema={Yup.object({
                     name: Yup.string().required(),
                   })}

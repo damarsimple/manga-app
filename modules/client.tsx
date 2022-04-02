@@ -6,8 +6,10 @@ import {
   HttpLink,
   ApolloLink,
 } from "@apollo/client";
+import { setContext } from '@apollo/client/link/context';
 import { onError } from "@apollo/client/link/error";
 import { createUploadLink } from "apollo-upload-client";
+import { useUserStore } from "../stores/user";
 import { event } from "./gtag";
 
 const defaultOptions: DefaultOptions = {
@@ -86,7 +88,28 @@ const httpLink = new HttpLink({
   uri,
 });
 
-const BROWSER_LINK = from([errorLink, timeStartLink, logTimeLink]).concat(
+const authLink = setContext((_, { headers }) => {
+
+  const {token} = useUserStore.getState()
+
+  return {
+
+    headers: {
+
+      ...headers,
+
+      authorization: token ? `${token}` : "",
+
+    }
+
+  }
+
+});
+
+
+
+
+const BROWSER_LINK = from([errorLink, timeStartLink, logTimeLink,authLink]).concat(
   //@ts-ignore
   uploadLink
 );

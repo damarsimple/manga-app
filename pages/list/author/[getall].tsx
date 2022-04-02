@@ -13,15 +13,15 @@ import {
 import { ComicCard } from "../../../components/ComicCard";
 import { useState } from "react";
 import Link from "next/link";
-import { Model } from "../../../types";
+import { Comic,Author } from "../../../types";
 import { client } from "../../../modules/client";
 import { gql } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import SearchComicContainer from "../../../components/SearchComicContainer";
 
 interface AuthorPageProps extends WithRouterProps {
-  authors: Model["Author"][];
-  comics: Model["Comic"][];
+  authors:Author[];
+  comics: Comic[];
 }
 
 function Catch({ comics, authors, router }: AuthorPageProps) {
@@ -31,7 +31,7 @@ function Catch({ comics, authors, router }: AuthorPageProps) {
     const a = 65;
     const z = 91;
 
-    const map: Record<string, Model["Author"][]> = {};
+    const map: Record<string,Author[]> = {};
     map["*"] = [];
 
     for (let i = a; i <= z; i++) {
@@ -113,13 +113,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       equals: type,
     };
   }
-  let authors: Model["Author"][] = [];
-  let comics: Model["Comic"][] = [];
+  let authors:Author[] = [];
+  let comics: Comic[] = [];
 
   if (getall == "all" || all == "true") {
     await client
       .query<{
-        findManyAuthor: Model["Author"][];
+        findManyAuthor:Author[];
       }>({
         query: gql`
           query FindAllAuthor($take: Int) {
@@ -137,7 +137,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } else {
     await client
       .query<{
-        findFirstAuthor: Model["Author"];
+        findFirstAuthor:Author;
       }>({
         query: gql`
           query FindFirstAuthor(
@@ -181,7 +181,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       })
       .then(({ data }) => {
-        comics = (data.findFirstAuthor.comics ?? []) as Model["Comic"][];
+        comics = (data.findFirstAuthor.comics ?? []) as Comic[];
       });
   }
 

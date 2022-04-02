@@ -7,49 +7,49 @@ import {
   Typography,
   Pagination as PaginationMUI,
   Chip,
-} from '@mui/material'
-import type { GetServerSideProps, NextPage } from 'next'
+} from "@mui/material";
+import type { GetServerSideProps, NextPage } from "next";
 // import Swiper core and required modules
 
-import SwiperCore, { Navigation, Pagination } from 'swiper'
+import SwiperCore, { Navigation, Pagination } from "swiper";
 
 // install Swiper modules
-SwiperCore.use([Navigation, Pagination])
+SwiperCore.use([Navigation, Pagination]);
 
 // Import Swiper styles
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 // Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { ComicCard, ComicCardSkeleton } from '../components/ComicCard'
-import { client } from '../modules/client'
-import { gql, useQuery } from '@apollo/client'
-import { Model } from '../types'
-import { NextSeo } from 'next-seo'
-import { SEO } from '../modules/seo'
-import { useR18 } from '../stores/r18'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
-import { useState } from 'react'
-import RenderMany from '../components/RenderMany'
-import { Ads } from '../components/Ads'
-const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
-  const [page, setPage] = useState(0)
-  const { mode } = useR18()
+import { Swiper, SwiperSlide } from "swiper/react";
+import { ComicCard, ComicCardSkeleton } from "../components/ComicCard";
+import { client } from "../modules/client";
+import { gql, useQuery } from "@apollo/client";
+import { Comic, Genre, Ads as AdsType, AdsPosition } from "../types";
+import { NextSeo } from "next-seo";
+import { SEO } from "../modules/seo";
+import { useR18 } from "../stores/r18";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { useState } from "react";
+import RenderMany from "../components/RenderMany";
+import { Ads } from "../components/Ads";
+const Home = ({ HOME_ADS }: { HOME_ADS: AdsType[] }) => {
+  const [page, setPage] = useState(0);
+  const { mode } = useR18();
   const where = mode
     ? {}
     : {
         isHentai: {
           equals: false,
         },
-      }
+      };
 
-  const { push } = useRouter()
+  const { push } = useRouter();
 
   const { data: { findManyGenre: genres } = {} } = useQuery<{
-    findManyGenre: Model['Genre'][]
+    findManyGenre: Genre[];
   }>(
     gql`
       query FindAllGenreHomepage($take: Int) {
@@ -62,15 +62,15 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
     `,
     {
       variables: {},
-    },
-  )
+    }
+  );
 
   const {
     data: { findManyComic: latest } = {},
     error: errorLatest,
     loading: loadingLatest,
   } = useQuery<{
-    findManyComic: Model['Comic'][]
+    findManyComic: Comic[];
   }>(
     gql`
       query LatestComicHomepage(
@@ -113,23 +113,23 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
         chaptersTake2: 3,
         skip: page == 1 ? 0 : page * 42,
         orderBy: {
-          name: 'desc',
+          name: "desc",
         },
         findManyComicOrderBy2: [
           {
-            lastChapterUpdateAt: 'desc',
+            lastChapterUpdateAt: "desc",
           },
         ],
         where,
       },
-    },
-  )
+    }
+  );
 
   const {
     data: { findManyComic: recomendations } = {},
     loading: loadingRecomendations,
   } = useQuery<{
-    findManyComic: Model['Comic'][]
+    findManyComic: Comic[];
   }>(
     gql`
       query RecomendationComicsHomepage(
@@ -172,24 +172,24 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
         chaptersTake2: 3,
         skip: page == 1 ? 0 : page * 24,
         orderBy: {
-          name: 'desc',
+          name: "desc",
         },
         findManyComicOrderBy2: [
           {
-            views: 'desc',
+            views: "desc",
           },
         ],
         where,
       },
-    },
-  )
+    }
+  );
 
   const {
     data: { findManyComic: top } = {},
     error: errorTop,
     loading: loadingTop,
   } = useQuery<{
-    findManyComic: Model['Comic'][]
+    findManyComic: Comic[];
   }>(
     gql`
       query TopComicHomepage(
@@ -236,24 +236,24 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
         take: 13,
         chaptersTake2: 1,
         orderBy: {
-          name: 'desc',
+          name: "desc",
         },
         findManyComicOrderBy2: [
           {
-            rating: 'desc',
+            rating: "desc",
           },
         ],
         where,
       },
-    },
-  )
+    }
+  );
 
   const {
     data: { findManyComic: carousel } = {},
     error: errorCarousel,
     loading: loadingCarousel,
   } = useQuery<{
-    findManyComic: Model['Comic'][]
+    findManyComic: Comic[];
   }>(
     gql`
       query CarouselComicHomepage(
@@ -290,20 +290,20 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
         take: 10,
         chaptersTake2: 1,
         orderBy: {
-          name: 'desc',
+          name: "desc",
         },
         findManyComicOrderBy2: [
           {
-            viewsHourly: 'desc',
+            viewsHourly: "desc",
           },
         ],
         where,
       },
-    },
-  )
+    }
+  );
 
   return (
-    <Box p={2} display="flex" gap={2} flexDirection={'column'}>
+    <Box p={2} display="flex" gap={2} flexDirection={"column"}>
       <NextSeo {...SEO} />
       <Paper sx={{ p: 4 }}>
         <Typography variant="h5" component="h3">
@@ -416,14 +416,14 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
             <Divider sx={{ my: 2 }} />
             <Box
               sx={{
-                display: 'flex',
-                justifyContent: 'center',
+                display: "flex",
+                justifyContent: "center",
               }}
             >
               <PaginationMUI
                 count={10}
                 onChange={(_, v) => {
-                  push('/?page=' + v)
+                  push("/?page=" + v);
                 }}
               />
             </Box>
@@ -463,14 +463,14 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
             <Divider sx={{ my: 2 }} />
             <Box
               sx={{
-                display: 'flex',
-                justifyContent: 'center',
+                display: "flex",
+                justifyContent: "center",
               }}
             >
               <PaginationMUI
                 count={10}
                 onChange={(_, v) => {
-                  push('/?page=' + v)
+                  push("/?page=" + v);
                 }}
               />
             </Box>
@@ -505,10 +505,10 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
 
               <Grid item xs={6} sm={12} width="100%">
                 <p>
-                  RINGBET88 daftar 12 situs judi{' '}
+                  RINGBET88 daftar 12 situs judi{" "}
                   <a href="https://carolesundfoundation.com/">
                     <strong>slot online</strong>
-                  </a>{' '}
+                  </a>{" "}
                   joker123 terpercaya di Indonesia degan games slot online
                   terlengkap, judi bola online terbaik yang ada di Indonesia,
                   judi online 24 jam non stop, proses deposit dan withdraw
@@ -517,10 +517,10 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
               </Grid>
               <Grid item xs={6} sm={12} width="100%">
                 <p>
-                  IGCPLAY Daftar 12 situs{' '}
+                  IGCPLAY Daftar 12 situs{" "}
                   <a href="https://172.104.60.132/">
                     <strong>judi online slot</strong>
-                  </a>{' '}
+                  </a>{" "}
                   terbaik dan terpercaya di Indonesia IGCPLAY, judi bola online
                   terbaik, situs judi online terpercaya, casino online resmi, 24
                   jam non stop di IGCPLAY.
@@ -545,7 +545,7 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
                     label={e.name}
                     sx={{
                       margin: 0.5,
-                      cursor: 'pointer',
+                      cursor: "pointer",
                     }}
                   />
                 </a>
@@ -555,12 +555,12 @@ const Home = ({ HOME_ADS }: { HOME_ADS: Model['Ads'][] }) => {
         </Grid>
       </Grid>
     </Box>
-  )
-}
+  );
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { data: { findManyAds } = {} } = await client.query<{
-    findManyAds: Model['Ads'][]
+  const { data,error } = await client.query<{
+    findManyAds: AdsType[];
   }>({
     query: gql`
       query FindHomeAds($where: AdsWhereInput) {
@@ -579,21 +579,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     variables: {
       where: {
         position: {
-          in: ['HOME_TOP_COMIC'],
+          hasEvery: ["HOME_TOP_COMIC"],
         },
       },
     },
-  })
+  });
 
-  const HOME_ADS = findManyAds
-    ?.filter((e) => e.position == 'HOME_TOP_COMIC')
-    .sort((a, b) => a.index - b.index)
+  console.log(error)
+
+  // const HOME_ADS = findManyAds
+  //   ?.filter((e) => e.position.includes(AdsPosition.Home_top_comic))
+  //   .sort((a, b) => a.index - b.index);
 
   return {
     props: {
-      HOME_ADS,
+      HOME_ADS : [],
     },
-  }
-}
+  };
+};
 
-export default Home
+export default Home;

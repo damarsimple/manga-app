@@ -11,12 +11,10 @@ import { Box, Typography, Chip, Paper, Divider, Skeleton } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { Model } from "../types";
+import { Comic, Chapter } from "../types";
 import moment from "moment";
 import RenderMany from "./RenderMany";
 import LazyImage from "./LazyImage";
-
-export type Comic = Model["Comic"];
 
 type LayoutType = "detailed" | "carousel" | "top";
 
@@ -51,7 +49,7 @@ export const ComicCard = ({
     name,
     createdAt,
     id,
-  }: Pick<Model["Chapter"], "id" | "name" | "createdAt">) => (
+  }: Pick<Chapter, "id" | "name" | "createdAt">) => (
     <Link href={"/chapter/" + id}>
       <a>
         <Box

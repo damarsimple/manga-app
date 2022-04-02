@@ -16,7 +16,7 @@ import { ComicCard, ComicCardSkeleton } from "../../../components/ComicCard";
 import { useState } from "react";
 import Link from "next/link";
 import { gql, useQuery } from "@apollo/client";
-import { ComicSearch, Model } from "../../../types";
+import { ComicSearch, Comic } from "../../../types";
 import { useR18 } from "../../../stores/r18";
 import { capitalizeFirstLetter } from "../../../modules/helper";
 import RenderMany from "../../../components/RenderMany";
@@ -110,7 +110,7 @@ function Catch({ router }: WithRouterProps) {
 
   const { data: { findManyComic: allComic } = {}, loading: loadingAllText } =
     useQuery<{
-      findManyComic: Model["Comic"][];
+      findManyComic: Comic[];
     }>(
       gql`
         query FindManyComicTextMode($where: ComicWhereInput, $take: Int) {
@@ -139,7 +139,7 @@ function Catch({ router }: WithRouterProps) {
     const a = 65;
     const z = 91;
 
-    const map: Record<string, Model["Comic"][]> = {};
+    const map: Record<string, Comic[]> = {};
     map["*"] = [];
 
     for (let i = a; i <= z; i++) {
@@ -224,7 +224,7 @@ function Catch({ router }: WithRouterProps) {
                   </Grid>
                 </RenderMany>
               ) : (
-                comicSearch?.comics.map((e, i) => (
+                comicSearch?.comics?.map((e, i) => (
                   <Grid item key={e.id} xs={6} sm={3} lg={2}>
                     <ComicCard layout="carousel" {...e} />
                   </Grid>
@@ -259,7 +259,7 @@ function Catch({ router }: WithRouterProps) {
           </Box>
         )}
 
-        {comicSearch?.comics.length == 0 && (
+        {comicSearch?.comics?.length == 0 && (
           <Typography textAlign="center" variant="h5">
             Komik `{queryCannon}` tidak ditemukan{" "}
           </Typography>
@@ -277,15 +277,15 @@ function Catch({ router }: WithRouterProps) {
               gap: 2,
             }}
           >
-            <Box>
+            {comicSearch && comicSearch.total && comicSearch.limit && <Box>
               <Pagination
                 onChange={(_, e) => {
                   setPage(e);
                 }}
                 page={page}
-                count={Math.floor(comicSearch.total / comicSearch.limit)}
+                count={Math.floor(comicSearch.total ?? 0 / comicSearch.limit)}
               />
-            </Box>
+            </Box>}
             <Box>
               <Typography>
                 menampilkan{" "}

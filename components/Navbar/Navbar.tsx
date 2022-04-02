@@ -11,6 +11,11 @@ import {
   Paper,
   Skeleton,
   Divider,
+  Button,
+  ListItemIcon,
+  ListItemText,
+  MenuList,
+  Modal, InputAdornment, TextField
 } from "@mui/material";
 import { useContext, useState } from "react";
 import Image from "next/image";
@@ -19,7 +24,6 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useColorMode } from "../../stores/colorMode";
 import { useNavbarStore } from "../../stores/navbar";
 import Link from "next/link";
-import { TextField } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -30,6 +34,15 @@ import { useRouter } from "next/router";
 import { dontRender } from "../../modules/rules";
 import { client } from "../../modules/client";
 import { event } from "../../modules/gtag";
+import { useUserStore } from "../../stores/user";
+import {
+  AdminPanelSettings,
+  AccountCircle, Dashboard, Logout, Visibility, VisibilityOff
+} from "@mui/icons-material";
+import * as Yup from "yup";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { useLoginModalStore } from "../../stores/loginModal";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -71,11 +84,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+interface LoginValue {
+  email: string;
+  password: string;
+}
+
 export default function Navbar() {
   const { push, pathname } = useRouter();
   const [accountEl, setAccountEl] = useState<Element | null>(null);
 
   const [focused, setFocused] = useState(false);
+
   const handleClose = () => {
     setAccountEl(null);
   };
@@ -149,7 +168,7 @@ export default function Navbar() {
             action: "search",
             category: "navbar",
             label: query,
-            value: comicSearch.processingTimeMs,
+            value: comicSearch?.processingTimeMs ?? 0,
           });
         });
     }, 150);
@@ -160,10 +179,115 @@ export default function Navbar() {
   const { setMode, mode, toggle } = useColorMode();
   const { transparent, transparentMode } = useNavbarStore();
 
+
+  const { user, login, logout } = useUserStore();
+
+  const { showLoginModal, setShowLoginModal } = useLoginModalStore();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  const showLogin = () => {
+    setShowLoginModal(true)
+  }
+
+  const hideLogin = () => {
+    setShowLoginModal(false);
+    setError('');
+    setShowPassword(false)
+  }
+
+  const handleError = (err: Error) => {
+    setError(`${err.message}`)
+  }
+
+
   if (dontRender.some((r) => r.test(pathname))) return <></>;
 
   return (
     <>
+      <Modal
+        open={showLoginModal}
+        onClose={() => hideLogin()}
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          border: '2px solid #000',
+          boxShadow: 24,
+          p: 4,
+        }}>
+          <Box display="flex" justifyContent={"flex-end"}>
+            <Button onClick={() => hideLogin()}>
+              x
+            </Button>
+          </Box>
+          <Formik<LoginValue>
+            validationSchema={Yup.object({
+              email: Yup.string().required(),
+              password: Yup.string().required(),
+            })}
+            initialValues={{ email: "", password: "" }}
+            onSubmit={(data) => login(data.email, data.password).then(() => {
+              hideLogin();
+              toast.success("Berhasil terautentikasi !", {
+                position: "bottom-right"
+              })
+            }).catch(handleError)}
+          >
+            {({ values, errors, handleChange, handleBlur, handleSubmit }) => (
+              <Box my={4} gap={3} display="flex" flexDirection="column">
+
+                <TextField
+                  fullWidth
+                  InputProps={{
+                    startAdornment: <IconButton >
+                      <AccountCircle />
+                    </IconButton>
+                  }}
+                  label="Email"
+                  name="email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  helperText={errors.email}
+                  error={!!errors.email}
+                  value={values.email}
+                  type="email"
+                />
+                <TextField
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  InputProps={{
+                    endAdornment:
+                      <IconButton onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                  }}
+                  label="Password"
+                  name="password"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  helperText={errors.password}
+                  error={!!errors.password}
+                  value={values.password}
+                />
+                <Typography color={"error"} component="p" variant="body2" >{error}</Typography>
+
+                <Button type="submit" onClick={() => handleSubmit()} fullWidth variant="contained" >
+                  masuk
+                </Button>
+              </Box>
+            )}
+
+          </Formik>
+
+
+        </Box>
+      </Modal>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar
           elevation={0}
@@ -173,8 +297,8 @@ export default function Navbar() {
             backgroundColor: transparent
               ? "transparent"
               : mode == "dark"
-              ? "#1e1e1e"
-              : "white",
+                ? "#1e1e1e"
+                : "white",
           }}
         >
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -329,16 +453,22 @@ export default function Navbar() {
                 <IconButton sx={{ ml: 1 }} onClick={toggle} color="inherit">
                   {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
                 </IconButton>
+                {user ?
+                  <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    sx={{ mr: 2 }}
+                    onClick={(e) => setAccountEl(e.currentTarget)}
+                  >
+                    <Avatar alt={user.name ?? ""} sx={{ width: 32, height: 32 }} />
+                  </IconButton > :
+                  <Button onClick={showLogin}>
+                    Login
+                  </Button>
+                }
               </Box>
-              {/* <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                sx={{ mr: 2 }}
-                onClick={(e) => setAccountEl(e.currentTarget)}
-              >
-                <Avatar alt="Remy Sharp" sx={{ width: 48, height: 48 }} />
-              </IconButton> */}
+
             </Box>
           </Box>
           <Box
@@ -380,7 +510,6 @@ export default function Navbar() {
         </AppBar>
       </Box>
       <Menu
-        id="menu-appbar"
         anchorEl={accountEl}
         anchorOrigin={{
           vertical: "top",
@@ -393,10 +522,40 @@ export default function Navbar() {
         }}
         open={Boolean(accountEl)}
         onClose={handleClose}
+
       >
-        <MenuItem onClick={handleClose}>Dashboard</MenuItem>
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuList>
+          <MenuItem onClick={() => push("/dashboard")}>
+            <ListItemIcon>
+              <Dashboard fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Dashboard</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={() => push("/profile")}>
+            <ListItemIcon>
+              <AccountCircle fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Profile</ListItemText>
+          </MenuItem>
+          {user?.isAdmin &&
+            <MenuItem onClick={() => push("/admin")}>
+              <ListItemIcon>
+                <AdminPanelSettings fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Admin</ListItemText>
+            </MenuItem>
+          }
+          <Divider />
+          <MenuItem onClick={() => {
+            logout();
+            handleClose()
+          }}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Logout</ListItemText>
+          </MenuItem>
+        </MenuList>
       </Menu>
       {!transparentMode && (
         <Box

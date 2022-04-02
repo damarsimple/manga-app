@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState } from 'react'
-import MUITable from '../../../components/MUITable'
-import { gql, useMutation } from '@apollo/client'
-import { Model } from '../../../types'
+import React, { useState } from "react";
+import MUITable from "../../../components/MUITable";
+import { gql, useMutation } from "@apollo/client";
+import { Comic } from "../../../types";
 import {
   Tabs,
   Tab,
@@ -13,38 +13,38 @@ import {
   MenuItem,
   TextField,
   IconButton,
-} from '@mui/material'
-import { toast } from 'react-toastify'
-import { useCallback } from 'react'
-import { Delete, Newspaper, Upload, UploadFile } from '@mui/icons-material'
-import { styled } from '@mui/material/styles'
-import { useRouter } from 'next/router'
+} from "@mui/material";
+import { toast } from "react-toastify";
+import { useCallback } from "react";
+import { Delete, Newspaper, Upload, UploadFile } from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
+import { useRouter } from "next/router";
 
-const Input = styled('input')({
-  display: 'none',
-})
+const Input = styled("input")({
+  display: "none",
+});
 
 export default function Index() {
-  const { push } = useRouter()
-  const [tab, setTab] = useState(0)
+  const { push } = useRouter();
+  const [tab, setTab] = useState(0);
 
   const [candidates, setCandidates] = useState<
     {
-      slug: string
-      data?: string
-      file?: File
-      type: 'File' | 'String'
+      slug: string;
+      data?: string;
+      file?: File;
+      type: "File" | "String";
     }[]
-  >([])
-  const [loading, setLoading] = useState(false)
+  >([]);
+  const [loading, setLoading] = useState(false);
 
-  const [finished, setFinished] = useState<string[]>([])
+  const [finished, setFinished] = useState<string[]>([]);
 
   const [handleChangeThumb] = useMutation<{ uploadFile: boolean }>(gql`
     mutation UploadFile($file: Upload, $path: String!) {
       uploadFile(file: $file, path: $path)
     }
-  `)
+  `);
 
   const [handle] = useMutation(
     gql`
@@ -57,8 +57,8 @@ export default function Index() {
           name
         }
       }
-    `,
-  )
+    `
+  );
 
   const handleUpdateComic = useCallback(
     (data: any, slug: string) => {
@@ -69,50 +69,50 @@ export default function Index() {
           },
           data,
         },
-      })
+      });
     },
-    [handle],
-  )
+    [handle]
+  );
 
-  const [updateType, setUpdateType] = useState<'thumb' | 'thumbWide'>('thumb')
+  const [updateType, setUpdateType] = useState<"thumb" | "thumbWide">("thumb");
 
   const handleMassDownload = async () => {
-    setLoading(true)
-    const finishedDls: string[] = []
+    setLoading(true);
+    const finishedDls: string[] = [];
     for (const candidate of candidates) {
-      let data: File
+      let data: File;
 
-      if (candidate.type == 'String') {
+      if (candidate.type == "String") {
         try {
           if (!candidate.data) {
-            toast.error('You didnt input any url ! ' + candidate.slug)
-            return
+            toast.error("You didnt input any url ! " + candidate.slug);
+            return;
           }
 
           // check if user input valid url or not
-          new URL(candidate.data)
+          new URL(candidate.data);
 
-          let f = await fetch(candidate.data)
-          let blob = await f.blob()
+          let f = await fetch(candidate.data);
+          let blob = await f.blob();
 
-          data = new File([blob], 'thumb.jpg')
+          data = new File([blob], "thumb.jpg");
         } catch (error) {
           toast.error(
-            'Failed to download images ... try other link or just upload file 🤷‍♂️ duh ' +
-              error,
-          )
-          setLoading(false)
-          return
+            "Failed to download images ... try other link or just upload file 🤷‍♂️ duh " +
+              error
+          );
+          setLoading(false);
+          return;
         }
       } else {
         if (!candidate.file) {
-          toast.error('You didnt select any file ! ' + candidate.slug)
-          return
+          toast.error("You didnt select any file ! " + candidate.slug);
+          return;
         }
 
-        data = candidate.file
+        data = candidate.file;
       }
-      const path = `/${candidate.slug}/${updateType}.jpg`
+      const path = `/${candidate.slug}/${updateType}.jpg`;
 
       await handleChangeThumb({
         variables: {
@@ -120,11 +120,11 @@ export default function Index() {
           path,
         },
       }).then(async ({ data }) => {
-        const { uploadFile } = data || {}
+        const { uploadFile } = data || {};
 
         if (uploadFile) {
-          finishedDls.push(candidate.slug)
-          toast.success('Successfully downloaded ' + candidate.slug)
+          finishedDls.push(candidate.slug);
+          toast.success("Successfully downloaded " + candidate.slug);
 
           await handleUpdateComic(
             {
@@ -132,28 +132,28 @@ export default function Index() {
                 set: `https://cdn.gudangkomik.com${path}`,
               },
             },
-            candidate.slug,
-          )
+            candidate.slug
+          );
         }
-      })
+      });
     }
 
-    setFinished(finishedDls)
+    setFinished(finishedDls);
 
     setCandidates(
-      candidates.filter((candidate) => !finishedDls.includes(candidate.slug)),
-    )
+      candidates.filter((candidate) => !finishedDls.includes(candidate.slug))
+    );
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const [colomAdd, setColomAdd] = useState(1)
+  const [colomAdd, setColomAdd] = useState(1);
 
   const handleAdd = () => {
     setCandidates([
-      ...Array(colomAdd).fill({ slug: '', data: '', type: 'String' }),
-    ])
-  }
+      ...Array(colomAdd).fill({ slug: "", data: "", type: "String" }),
+    ]);
+  };
 
   return (
     <>
@@ -164,40 +164,40 @@ export default function Index() {
         </Tabs>
 
         {tab == 1 && (
-          <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column', mt: 4 }}>
+          <Box sx={{ display: "flex", gap: 2, flexDirection: "column", mt: 4 }}>
             <Select
-              sx={{ width: '30%' }}
+              sx={{ width: "30%" }}
               value={updateType}
               onChange={(e) => {
-                setUpdateType(e.target.value as any)
+                setUpdateType(e.target.value as any);
               }}
             >
-              <MenuItem value={'thumb'}>Thumbnail</MenuItem>
-              <MenuItem value={'thumbWide'}>Wide Thumbnail</MenuItem>
+              <MenuItem value={"thumb"}>Thumbnail</MenuItem>
+              <MenuItem value={"thumbWide"}>Wide Thumbnail</MenuItem>
             </Select>
             {candidates.map((candidate, index) => (
-              <Box key={index} sx={{ display: 'flex', gap: 1 }}>
+              <Box key={index} sx={{ display: "flex", gap: 1 }}>
                 <TextField
                   fullWidth
                   label="Slug"
                   onChange={(e) =>
                     setCandidates(
                       candidates.map((c, i) =>
-                        i == index ? { ...c, slug: e.target.value } : c,
-                      ),
+                        i == index ? { ...c, slug: e.target.value } : c
+                      )
                     )
                   }
                 />
 
-                {candidate.type == 'String' ? (
+                {candidate.type == "String" ? (
                   <TextField
                     fullWidth
                     label="URL"
                     onChange={(e) =>
                       setCandidates(
                         candidates.map((c, i) =>
-                          i == index ? { ...c, data: e.target.value } : c,
-                        ),
+                          i == index ? { ...c, data: e.target.value } : c
+                        )
                       )
                     }
                   />
@@ -205,10 +205,10 @@ export default function Index() {
                   <label
                     htmlFor="contained-button-file"
                     style={{
-                      width: '50%',
-                      height: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
+                      width: "50%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
                     }}
                   >
                     {candidate.file.name}
@@ -216,7 +216,7 @@ export default function Index() {
                 ) : (
                   <label
                     htmlFor="contained-button-file"
-                    style={{ width: '50%' }}
+                    style={{ width: "50%" }}
                   >
                     <Input
                       accept="image/*"
@@ -224,13 +224,13 @@ export default function Index() {
                       multiple
                       type="file"
                       onChange={(e) => {
-                        const file = e.target.files && e.target.files[0]
+                        const file = e.target.files && e.target.files[0];
                         if (file)
                           setCandidates(
                             candidates.map((c, i) =>
-                              i == index ? { ...c, file } : c,
-                            ),
-                          )
+                              i == index ? { ...c, file } : c
+                            )
+                          );
                       }}
                     />
                     <Button
@@ -238,7 +238,7 @@ export default function Index() {
                       component="span"
                       fullWidth
                       sx={{
-                        height: '100%',
+                        height: "100%",
                       }}
                     >
                       Upload
@@ -253,30 +253,30 @@ export default function Index() {
                           ? {
                               ...c,
                               type:
-                                candidate.type == 'File' ? 'String' : 'File',
+                                candidate.type == "File" ? "String" : "File",
                             }
-                          : c,
-                      ),
-                    )
+                          : c
+                      )
+                    );
                   }}
                 >
-                  {candidate.type == 'File' ? <Upload /> : <Newspaper />}
+                  {candidate.type == "File" ? <Upload /> : <Newspaper />}
                 </IconButton>
                 <IconButton
                   onClick={() => {
-                    setCandidates(candidates.filter((c, i) => i != index))
+                    setCandidates(candidates.filter((c, i) => i != index));
                   }}
                 >
                   <Delete />
                 </IconButton>
               </Box>
             ))}
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: "flex" }}>
               <Select
-                sx={{ width: '10%' }}
+                sx={{ width: "10%" }}
                 value={colomAdd}
                 onChange={(e) => {
-                  setColomAdd(parseInt(e.target.value as string))
+                  setColomAdd(parseInt(e.target.value as string));
                 }}
               >
                 <MenuItem value={1}>1</MenuItem>
@@ -287,7 +287,7 @@ export default function Index() {
               <Button
                 onClick={handleAdd}
                 variant="contained"
-                sx={{ width: '90%' }}
+                sx={{ width: "90%" }}
               >
                 Tambah Kolom
               </Button>
@@ -296,7 +296,7 @@ export default function Index() {
             <Button
               onClick={handleMassDownload}
               variant="contained"
-              sx={{ width: '90%' }}
+              sx={{ width: "90%" }}
             >
               PATCH THUMBNAIL
             </Button>
@@ -304,44 +304,44 @@ export default function Index() {
         )}
 
         {tab == 0 && (
-          <MUITable<Model['Comic']>
+          <MUITable<Comic>
             headcells={[
               {
-                name: 'name',
-                label: 'Name',
+                name: "name",
+                label: "Name",
               },
               {
-                name: 'isHentai',
-                label: 'Hentai',
+                name: "isHentai",
+                label: "Hentai",
               },
               {
-                name: 'type',
-                label: 'Type',
+                name: "type",
+                label: "Type",
               },
 
               {
-                name: 'views',
-                label: 'Views',
+                name: "views",
+                label: "Views",
               },
               {
-                name: 'viewsHourly',
-                label: 'Views Hourly',
+                name: "viewsHourly",
+                label: "Views Hourly",
               },
               {
-                name: 'viewsDaily',
-                label: 'Views Daily',
+                name: "viewsDaily",
+                label: "Views Daily",
               },
               {
-                name: 'viewsWeek',
-                label: 'Views Week',
+                name: "viewsWeek",
+                label: "Views Week",
               },
               {
-                name: 'lastChapterUpdateAt',
-                label: 'Last Update',
+                name: "lastChapterUpdateAt",
+                label: "Last Update",
               },
             ]}
-            name={'Comic'}
-            keys={'findManyComic'}
+            name={"Comic"}
+            keys={"findManyComic"}
             TooltipChildren={(row) => (
               <>
                 <img
@@ -352,17 +352,17 @@ export default function Index() {
                 />
               </>
             )}
-            countKeys={'findManyComicCount'}
+            countKeys={"findManyComicCount"}
             countQuery={gql`
               query Query {
                 findManyComicCount
               }
             `}
-            action={['edit', 'delete']}
+            action={["edit", "delete"]}
             editAction="function"
             editFunction={(row) => push(`/admin/comics/` + row.slug)}
             query={gql`
-              query(
+              query (
                 $take: Int
                 $skip: Int
                 $orderBy: [ComicOrderByWithRelationInput]
@@ -402,5 +402,5 @@ export default function Index() {
         )}
       </Paper>
     </>
-  )
+  );
 }

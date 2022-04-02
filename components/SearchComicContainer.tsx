@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import React, { useState } from "react";
 import { SEO } from "../modules/seo";
-import { Model } from "../types";
+import { Comic } from "../types";
 import { ComicCard } from "./ComicCard";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -25,7 +25,7 @@ export default function SearchComicContainer({
   query: string;
   title: string;
   context: "comic" | "genre" | "author";
-  comics: Model["Comic"][];
+  comics: Comic[];
 }) {
   const { push, pathname } = useRouter();
   const [type, setType] = useState<undefined | string>(
@@ -37,7 +37,7 @@ export default function SearchComicContainer({
     const a = 65;
     const z = 91;
 
-    const map: Record<string, Model["Comic"][]> = {};
+    const map: Record<string, Comic[]> = {};
     map["*"] = [];
 
     for (let i = a; i <= z; i++) {

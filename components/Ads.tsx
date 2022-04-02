@@ -5,11 +5,11 @@ export const Ads = ({
   url,
   name,
 }: {
-  image?: string
-  url: string
-  name: string
+  image?: string | null
+  url?: string | null
+  name?: string | null
 }) => (
-  <a target="_blank" href={url} rel="noreferrer">
-    <img height="100%" width="100%" src={image} alt={name} title={name} />
+  <a target="_blank" href={url?? ""} rel="noreferrer">
+    <img height="100%" width="100%" src={image??""} alt={name?? ""} title={name??""} />
   </a>
 )

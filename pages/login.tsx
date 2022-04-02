@@ -18,11 +18,7 @@ interface LoginValue {
 }
 
 export default function Login() {
-  const [handle, { loading }] = useMutation(gql`
-    mutation Login {
-      test
-    }
-  `);
+
 
   const handleSubmit = (e: LoginValue) => {
     console.log(e);
@@ -90,7 +86,7 @@ export default function Login() {
                 </a>
               </Link>
 
-              <Button variant="contained" type="submit" disabled={loading}>
+              <Button variant="contained" type="submit" disabled={true}>
                 MASUK
               </Button>
             </Box>

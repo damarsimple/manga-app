@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useQuery, gql } from "@apollo/client";
 import { useR18 } from "../../../stores/r18";
-import { Model } from "../../../types";
+import { Comic } from "../../../types";
 import { ComicCard } from "../../../components/ComicCard";
 
 export default function Terbaru() {
@@ -26,7 +26,7 @@ export default function Terbaru() {
 
   const perPage = 48;
   const { data: { findManyComic } = {} } = useQuery<{
-    findManyComic: Model["Comic"][];
+    findManyComic: Comic[];
   }>(
     gql`
       query FindManyComicQuery(

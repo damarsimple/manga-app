@@ -4,10 +4,13 @@ import React from "react";
 import { useRouter } from "next/router";
 import { useR18 } from "../stores/r18";
 import { dontRenderContext } from "../modules/rules";
+import { useUserStore } from "../stores/user";
 
 export default function ContextMenu() {
   const { push, pathname } = useRouter();
   const { mode } = useR18();
+
+  const { user } = useUserStore()
 
   if (dontRenderContext.some((r) => r.test(pathname))) return <></>;
 
@@ -43,6 +46,14 @@ export default function ContextMenu() {
           path: "/r18/active",
           color: mode ? "success" : "error",
         },
+
+        ...(user ? [
+          {
+            label: `Bookmark ()`,
+            path: "/dashboard/bookmarks",
+          },
+        ] : [])
+
       ].map(({ label, path, color }) => (
         <Link href={path} key={label}>
           <a>

@@ -28,6 +28,7 @@ import { Router, useRouter } from "next/router";
 import { GA_TRACKING_ID, pageview } from "../modules/gtag";
 import Script from "next/script";
 import Dashboard from "../components/Wrapper/Dashboard";
+import { useUserStore } from "../stores/user";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { mode: modeStore } = useColorMode();
@@ -55,11 +56,17 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const { mode } = theme.palette;
 
+  const { check } = useUserStore();
+
   // wait till csr kicks in to set theme
   useEffect(() => {
     if (localStorage) {
       setLoadTheme(true);
+      check()
+
     }
+    
+
   }, []);
 
   // const handle = useCallback((x: string) => {

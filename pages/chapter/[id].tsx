@@ -9,53 +9,54 @@ import {
   FormControl,
   MenuItem,
   Select,
-} from '@mui/material'
-import { WithRouterProps } from 'next/dist/client/with-router'
-import { withRouter, useRouter } from 'next/router'
-import React, { useRef } from 'react'
-import { useState, useEffect } from 'react'
+} from "@mui/material";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter, useRouter } from "next/router";
+import React, { useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   ChangeCircle,
   NavigateBefore,
   NavigateNext,
   Report,
   SkipPrevious,
-} from '@mui/icons-material'
-import { gql, useQuery } from '@apollo/client'
-import { GetServerSideProps } from 'next'
-import { client } from '../../modules/client'
-import { Model } from '../../types'
-import { NextSeo } from 'next-seo'
-import moment from 'moment'
-import { SEO } from '../../modules/seo'
-import Link from 'next/link'
-import { event } from '../../modules/gtag'
-import { Ads } from '../../components/Ads'
+} from "@mui/icons-material";
+import { gql, useQuery } from "@apollo/client";
+import { GetServerSideProps } from "next";
+import { client } from "../../modules/client";
+import { Comic, Chapter, Ads as AdsType, AdsPosition } from "../../types";
+import { NextSeo } from "next-seo";
+import moment from "moment";
+import { SEO } from "../../modules/seo";
+import Link from "next/link";
+import { event } from "../../modules/gtag";
+import { Ads } from "../../components/Ads";
 
 function Id({
   chapter,
   UPPER_ADS,
   BOTTOM_ADS,
 }: {
-  chapter: Model['Chapter']
-  UPPER_ADS: Model['Ads'][]
-  BOTTOM_ADS: Model['Ads'][]
+  chapter: Chapter;
+  UPPER_ADS: AdsType[];
+  BOTTOM_ADS: AdsType[];
 }) {
-  const { push, query } = useRouter()
+  const { push, query } = useRouter();
 
-  const { page } = query
-  const comic: Model['Comic'] = chapter.comic as Model['Comic']
-  const title = 'Baca ' + comic.name + ` Chapter ${chapter.name} ` + SEO.padding
-  const [readMode, setReadMode] = useState<'single' | 'longstrip'>('longstrip')
+  const { page } = query;
+  const comic: Comic = chapter.comic as Comic;
+  const title =
+    "Baca " + comic.name + ` Chapter ${chapter.name} ` + SEO.padding;
+  const [readMode, setReadMode] = useState<"single" | "longstrip">("longstrip");
   const [imageIndex, setImageIndex] = useState(
-    isNaN(parseInt(page as string)) ? 0 : parseInt(page as string),
-  )
-  const containerRef = useRef<HTMLDivElement>(null)
+    isNaN(parseInt(page as string)) ? 0 : parseInt(page as string)
+  );
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const images = chapter.imageUrls
+  const images = chapter.imageUrls;
 
   const { data: { findManyChapter: chapters } = {}, loading } = useQuery<{
-    findManyChapter: Model['Chapter'][]
+    findManyChapter: Chapter[];
   }>(
     gql`
       query FindComicChapter($where: ChapterWhereInput) {
@@ -74,40 +75,40 @@ function Id({
           },
         },
       },
-    },
-  )
+    }
+  );
 
   useEffect(() => {
-    page && setImageIndex(parseInt(page as string))
-  }, [page])
+    page && setImageIndex(parseInt(page as string));
+  }, [page]);
 
   useEffect(() => {
     if (chapter) {
-      if (chapter.comic.type != 'manga') {
-        setReadMode('longstrip')
+      if (chapter.comic.type != "manga") {
+        setReadMode("longstrip");
       }
 
       event({
-        action: 'view_item',
-        category: 'chapter',
+        action: "view_item",
+        category: "chapter",
         label: `${comic.name}-${chapter.name}`,
-      })
+      });
 
       images.forEach((e) => {
-        const img = new Image()
-        img.src = e
-      })
+        const img = new Image();
+        img.src = e;
+      });
     }
-  }, [chapter, images, comic])
+  }, [chapter, images, comic]);
 
   const Navigation = () =>
-    readMode == 'single' ? (
+    readMode == "single" ? (
       <Paper sx={{ mb: 1 }}>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <IconButton onClick={prev}>
@@ -123,49 +124,49 @@ function Id({
       </Paper>
     ) : (
       <></>
-    )
+    );
 
   const next = () => {
-    if (imageIndex < images.length - 1) setImageIndex((i) => i + 1)
-  }
+    if (imageIndex < images.length - 1) setImageIndex((i) => i + 1);
+  };
   const prev = () => {
-    if (imageIndex > 0) setImageIndex((i) => i - 1)
-  }
+    if (imageIndex > 0) setImageIndex((i) => i - 1);
+  };
 
-  const sorts = chapters ? [...chapters].sort((e, x) => e.name - x.name) : []
+  const sorts = chapters ? [...chapters].sort((e, x) => e.name - x.name) : [];
 
   const nextChapter = () => {
-    let idx = 0
+    let idx = 0;
     //@ts-ignore
     for (const x of sorts) {
       if (x.id == chapter.id) {
-        const next = sorts[idx + 1]
+        const next = sorts[idx + 1];
 
         if (next) {
-          push(`/chapter/${next.id}?page=0`)
+          push(`/chapter/${next.id}?page=0`);
         }
       }
 
-      idx++
+      idx++;
     }
-  }
+  };
   const prevChapter = () => {
-    let idx = 0
+    let idx = 0;
 
     //@ts-ignore
     for (const x of sorts) {
       if (x.id == chapter.id) {
-        const sorts = [...(chapters ?? [])].sort((e, x) => e.name - x.name)
+        const sorts = [...(chapters ?? [])].sort((e, x) => e.name - x.name);
 
-        const prev = sorts[idx - 1]
+        const prev = sorts[idx - 1];
         if (prev) {
-          push(`/chapter/${prev.id}?page=0`)
+          push(`/chapter/${prev.id}?page=0`);
         }
       }
 
-      idx++
+      idx++;
     }
-  }
+  };
 
   const Header = () => (
     <Paper sx={{ mb: 1 }}>
@@ -173,7 +174,7 @@ function Id({
         <Link href={`/comic/${comic.slug}`}>
           <a>
             <Typography
-              textAlign={'center'}
+              textAlign={"center"}
               variant="h6"
               textTransform="uppercase"
             >
@@ -185,9 +186,9 @@ function Id({
       <Box>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             p: 1,
             gap: 0.2,
           }}
@@ -206,7 +207,7 @@ function Id({
           <FormControl fullWidth>
             <Select
               onChange={(e) => {
-                push('/chapter/' + e.target.value)
+                push("/chapter/" + e.target.value);
               }}
               size="small"
               value={chapter.id}
@@ -229,24 +230,24 @@ function Id({
         </Box>
       </Box>
     </Paper>
-  )
+  );
 
   return (
     <Container>
       <NextSeo
         title={title}
-        description={comic.description ?? ''}
-        canonical={SEO.canonical + '/comic/' + comic.slug}
+        description={comic.description ?? ""}
+        canonical={SEO.canonical + "/comic/" + comic.slug}
         openGraph={{
-          url: SEO.canonical + '/comic/' + comic.slug,
+          url: SEO.canonical + "/comic/" + comic.slug,
           title: title,
-          description: comic.description ?? '',
-          type: 'article',
+          description: comic.description ?? "",
+          type: "article",
           article: {
             publishedTime: moment(comic.createdAt).format(),
             modifiedTime: moment(comic.updatedAt).format(),
             //@ts-ignore
-            authors: [SEO.canonical + '/list/author/' + comic.author.slug],
+            authors: [SEO.canonical + "/list/author/" + comic.author.slug],
             //@ts-ignore
             tags: comic.genres.map((e) => e.name),
           },
@@ -255,14 +256,14 @@ function Id({
               url: comic.thumb,
               width: 200,
               height: 250,
-              alt: 'Komik ' + comic.name,
+              alt: "Komik " + comic.name,
             },
           ],
         }}
         twitter={{
-          handle: '@gudang_komik',
-          site: '@gudang_komik',
-          cardType: 'summary_large_image',
+          handle: "@gudang_komik",
+          site: "@gudang_komik",
+          cardType: "summary_large_image",
         }}
       />
       <Header />
@@ -272,29 +273,29 @@ function Id({
         {UPPER_ADS?.map((e) => (
           <Ads {...e} key={e.id} />
         ))}
-        {readMode === 'single' ? (
+        {readMode === "single" ? (
           <img
             src={images[imageIndex]}
             alt="comic"
-            height={'100%'}
-            width={'100%'}
+            height={"100%"}
+            width={"100%"}
             onClick={(e) => {
               //@ts-ignore
-              var x = e.pageX - e.target.offsetLeft
+              var x = e.pageX - e.target.offsetLeft;
               //@ts-ignore
               if (x < e.target.width / 2) {
                 //left
-                prev()
+                prev();
               } else {
                 //right
-                next()
+                next();
               }
             }}
           />
         ) : (
           <>
             {images.map((e, i) => (
-              <img key={e} src={e} alt={title} height={'100%'} width={'100%'} />
+              <img key={e} src={e} alt={title} height={"100%"} width={"100%"} />
             ))}
           </>
         )}
@@ -305,7 +306,7 @@ function Id({
 
       <Navigation />
       <Header />
-      <Paper sx={{ mb: 1, p: 1, display: 'flex', gap: 1 }}>
+      <Paper sx={{ mb: 1, p: 1, display: "flex", gap: 1 }}>
         <Button variant="contained" endIcon={<Report />}>
           LAPOR
         </Button>
@@ -313,68 +314,66 @@ function Id({
           variant="contained"
           endIcon={<ChangeCircle />}
           onClick={() => {
-            setReadMode(readMode === 'single' ? 'longstrip' : 'single')
-            document.documentElement.scrollTop = 0 // For Chrome, Firefox, IE and Opera
+            setReadMode(readMode === "single" ? "longstrip" : "single");
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
           }}
         >
           UBAH MODE BACA
         </Button>
       </Paper>
     </Container>
-  )
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.query
+  const { id } = context.query;
   if (!id) {
     return {
       notFound: true,
-    }
+    };
   }
 
-  const {
-    data: { findFirstChapter } = {},
-    error: errorChapter,
-  } = await client.query<{
-    findFirstChapter: Model['Chapter']
-  }>({
-    query: gql`
-      query FindFirstChapter($where: ChapterWhereInput) {
-        findFirstChapter(where: $where) {
-          id
-          name
-          title
-          comic {
+  const { data: { findFirstChapter } = {}, error: errorChapter } =
+    await client.query<{
+      findFirstChapter: Chapter;
+    }>({
+      query: gql`
+        query FindFirstChapter($where: ChapterWhereInput) {
+          findFirstChapter(where: $where) {
             id
             name
-            slug
-            type
+            title
+            comic {
+              id
+              name
+              slug
+              type
 
-            thumb
-            description
-            author {
-              id
-              name
-              slug
+              thumb
+              description
+              author {
+                id
+                name
+                slug
+              }
+              genres {
+                id
+                name
+                slug
+              }
             }
-            genres {
-              id
-              name
-              slug
-            }
+            imageUrls
           }
-          imageUrls
         }
-      }
-    `,
-    variables: {
-      where: {
-        id: {
-          equals: parseInt(id as string),
+      `,
+      variables: {
+        where: {
+          id: {
+            equals: parseInt(id as string),
+          },
         },
       },
-    },
-  })
+    });
 
   if (!findFirstChapter && id != undefined) {
     client
@@ -386,15 +385,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         `,
 
         variables: {
-          context: 'chapter',
+          context: "chapter",
           data: id,
         },
       })
       .then(() =>
-        console.log(
-          `404 chapter ${id} referrer ${context.req.headers.referer}`,
-        ),
-      )
+        console.log(`404 chapter ${id} referrer ${context.req.headers.referer}`)
+      );
   }
 
   if (findFirstChapter?.id) {
@@ -406,17 +403,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       `,
       variables: {
         reportViewId: findFirstChapter.id,
-        context: 'chapter',
+        context: "chapter",
       },
-    })
+    });
   }
 
   if (errorChapter) {
-    console.log(errorChapter)
+    console.log(errorChapter);
   }
 
   const { data: { findManyAds } = {} } = await client.query<{
-    findManyAds: Model['Ads'][]
+    findManyAds: AdsType[];
   }>({
     query: gql`
       query FindHomeAds($where: AdsWhereInput) {
@@ -435,18 +432,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     variables: {
       where: {
         position: {
-          in: ['CHAPTER_TOP', 'CHAPTER_BOTTOM'],
+          hasEvery: ["CHAPTER_TOP", "CHAPTER_BOTTOM"],
         },
       },
     },
-  })
+  });
 
   const UPPER_ADS = findManyAds
-    ?.filter((e) => e.position == 'CHAPTER_TOP')
-    .sort((a, b) => a.index - b.index)
+    ?.filter((e) => e.position.includes(AdsPosition.Chapter_top))
+    .sort((a, b) => a.index - b.index);
   const BOTTOM_ADS = findManyAds
-    ?.filter((e) => e.position == 'CHAPTER_BOTTOM')
-    .sort((a, b) => a.index - b.index)
+    ?.filter((e) => e.position.includes(AdsPosition.Chapter_bottom))
+    .sort((a, b) => a.index - b.index);
 
   return {
     notFound: !findFirstChapter,
@@ -455,7 +452,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       UPPER_ADS,
       BOTTOM_ADS,
     },
-  }
-}
+  };
+};
 
-export default Id
+export default Id;

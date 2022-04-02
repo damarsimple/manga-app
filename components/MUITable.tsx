@@ -16,6 +16,7 @@ import {
   Modal,
   Select,
   MenuItem,
+  Chip, FormGroup, FormControlLabel
 } from "@mui/material";
 import React, { useState } from "react";
 import get from "lodash/get";
@@ -48,13 +49,14 @@ export interface InputSchema<T> {
   name: keyof T;
   label: string;
   type?:
-    | "text"
-    | "number"
-    | "file"
-    | "date"
-    | "time"
-    | "datetime-local"
-    | "select";
+  | "text"
+  | "number"
+  | "file"
+  | "date"
+  | "time"
+  | "datetime-local"
+  | "select"
+  | "select-multi";
   selects?: string[];
   dontRender?: (e: Record<string, any>) => boolean;
 }
@@ -411,6 +413,43 @@ export default function MUITable<T extends BaseModel>({
               )
                 return <Box key={`${i}-${e.name}-unused`}></Box>;
 
+              if (e.type == "select-multi") {
+
+                return (
+                  <Box key={`${i}-${e.name}`} sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
+                    {e.selects?.map(x =>
+                      <FormGroup key={x}>
+                        <FormControlLabel control={
+                          <Checkbox
+                            checked={(createData?.[e.name] as any[])?.includes(x) ?? false}
+                            onChange={(z) => {
+                              const cp = { ...createDefaultValue, ...(createData ?? {}) }
+
+                              //@ts-ignore
+                              if (!cp[e.name]) cp[e.name] = []
+                              //@ts-ignore
+                              if (z.target.checked) {
+                                //@ts-ignore
+                                cp[e.name] = [...new Set([...cp[e.name], x])];
+                                //@ts-ignore
+                              } else {
+                                //@ts-ignore
+                                cp[e.name] = cp[e.name].filter(
+                                  //@ts-ignore
+                                  (y: string) => y != x
+                                );
+
+                              }
+                              setCreateData({ ...cp });
+                            }}
+                          />} label={x} />
+                      </FormGroup>
+                    )}
+                  </Box>
+                )
+
+              }
+
               if (e.type == "select") {
                 return (
                   <Select
@@ -765,7 +804,6 @@ import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import { Model } from "../types";
 import { toast } from "react-toastify";
 import { useMutation, gql, DocumentNode, useQuery } from "@apollo/client";
 import { client } from "../modules/client";

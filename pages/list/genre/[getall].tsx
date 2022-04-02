@@ -13,15 +13,15 @@ import {
 import { ComicCard } from "../../../components/ComicCard";
 import { useState } from "react";
 import Link from "next/link";
-import { Model } from "../../../types";
+import { Comic,Genre } from "../../../types";
 import { client } from "../../../modules/client";
 import { gql } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import SearchComicContainer from "../../../components/SearchComicContainer";
 
 interface GenrePageProps extends WithRouterProps {
-  genres: Model["Genre"][];
-  comics: Model["Comic"][];
+  genres: Genre[];
+  comics: Comic[];
 }
 
 function Catch({ comics, genres, router }: GenrePageProps) {
@@ -31,7 +31,7 @@ function Catch({ comics, genres, router }: GenrePageProps) {
     const a = 65;
     const z = 91;
 
-    const map: Record<string, Model["Genre"][]> = {};
+    const map: Record<string, Genre[]> = {};
     map["*"] = [];
 
     for (let i = a; i <= z; i++) {
@@ -99,8 +99,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const allowHentai = context.req.cookies.r18 == "enable" ?? false;
   const { getall, q, all, type } = context.query;
 
-  let genres: Model["Genre"][] = [];
-  let comics: Model["Comic"][] = [];
+  let genres: Genre[] = [];
+  let comics: Comic[] = [];
 
   const where = allowHentai
     ? {}
@@ -120,7 +120,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (getall == "all") {
     await client
       .query<{
-        findManyGenre: Model["Genre"][];
+        findManyGenre: Genre[];
       }>({
         query: gql`
           query FindAllGenre($take: Int) {
@@ -138,7 +138,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } else {
     await client
       .query<{
-        findFirstGenre: Model["Genre"];
+        findFirstGenre: Genre;
       }>({
         query: gql`
           query FindFirstGenre(
@@ -182,7 +182,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       })
       .then(({ data }) => {
-        comics = (data?.findFirstGenre?.comics ?? []) as Model["Comic"][];
+        comics = (data?.findFirstGenre?.comics ?? []) as Comic[];
       });
   }
 
