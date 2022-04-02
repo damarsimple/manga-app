@@ -5,12 +5,32 @@ import { useRouter } from "next/router";
 import { useR18 } from "../stores/r18";
 import { dontRenderContext } from "../modules/rules";
 import { useUserStore } from "../stores/user";
+import { useQuery, gql } from "@apollo/client";
 
 export default function ContextMenu() {
   const { push, pathname } = useRouter();
   const { mode } = useR18();
 
-  const { user } = useUserStore()
+  const { user } = useUserStore();
+
+  const { data: { findManyComicBookmarkCount } = {} } = useQuery<{
+    findManyComicBookmarkCount: number;
+  }>(
+    gql`
+      query FindManyComicBookmarkCount($where: ComicBookmarkWhereInput) {
+        findManyComicBookmarkCount(where: $where)
+      }
+    `,
+    {
+      variables: {
+        where: {
+          userId: {
+            equals: user?.id ?? 0,
+          },
+        },
+      },
+    }
+  );
 
   if (dontRenderContext.some((r) => r.test(pathname))) return <></>;
 
@@ -47,13 +67,14 @@ export default function ContextMenu() {
           color: mode ? "success" : "error",
         },
 
-        ...(user ? [
-          {
-            label: `Bookmark ()`,
-            path: "/dashboard/bookmarks",
-          },
-        ] : [])
-
+        ...(user
+          ? [
+              {
+                label: `Bookmark (${findManyComicBookmarkCount})`,
+                path: "/dashboard/bookmarks",
+              },
+            ]
+          : []),
       ].map(({ label, path, color }) => (
         <Link href={path} key={label}>
           <a>

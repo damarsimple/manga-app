@@ -10,7 +10,7 @@ const GIF_GOMENASAI = [
     "/gomennasai-lidara.gif",
     "/megumin-sad.gif",
     "/mina-aino-perdon-mina-aino-sorry.gif",
-    "sorry.gif"
+    "/sorry.gif"
 ];
 
 const GIF_SAYONARA = [

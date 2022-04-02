@@ -1,7 +1,7 @@
 import React from "react";
 import { Container } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { dontRender } from "../modules/rules";
+import { dontRenderFooter } from "../modules/rules";
 import { useRouter } from "next/router";
 /* eslint-disable @next/next/no-img-element */
 
@@ -12,7 +12,7 @@ export default function Footer() {
 
   const { mode } = theme.palette;
 
-  if (dontRender.some((r) => r.test(pathname))) return <></>;
+  if (dontRenderFooter.some((r) => r.test(pathname))) return <></>;
 
   return (
     <Container
