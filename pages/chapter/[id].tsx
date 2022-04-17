@@ -432,7 +432,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     variables: {
       where: {
         position: {
-          hasEvery: ["CHAPTER_TOP", "CHAPTER_BOTTOM"],
+          hasSome: ["CHAPTER_TOP", "CHAPTER_BOTTOM"],
         },
       },
     },
